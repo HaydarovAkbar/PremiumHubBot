@@ -19,7 +19,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'jazzmin',
+    # 'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -29,19 +29,13 @@ INSTALLED_APPS = [
 ]
 
 DEV_APPS = [
-    'corsheaders',
     'app',
-    'rest_framework',
-    'drf_yasg',
-    'django_filters',
 ]
 INSTALLED_APPS += DEV_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -118,10 +112,11 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-HOST = 'https://4d53-194-93-24-3.ngrok-free.app'
+HOST = 'https://e4fd-213-230-69-88.ngrok-free.app'
 USERNAME = '@bizda24_bot'
 TOKEN = config('TOKEN')
 
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 CSRF_TRUSTED_ORIGINS = [HOST]
+SIGNUP_URL = f"{HOST}/signup/"
