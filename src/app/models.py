@@ -18,7 +18,7 @@ class CustomUser(models.Model):
     is_admin = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.first_name + ' ' + self.last_name
+        return f"{self.first_name} {self.last_name}"
 
     class Meta:
         db_table = 'custom_user'
@@ -40,3 +40,12 @@ class Channel(models.Model):
 class Group(models.Model):
     chat_id = models.BigIntegerField(db_index=True, unique=True)
     name = models.CharField(max_length=100, null=True, blank=True)
+    link = models.URLField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'group'
