@@ -96,47 +96,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-HOST = 'https://akbarshox.uz'
-
-# CORS_ALLOWED_ORIGINS = [
-#     HOST,
-# ]
-#
-# CORS_ALLOWED_ORIGIN_REGEXES = [
-#     r"^https://\w+\.akbarshox\.uz",
-# ]
-#
-# CORS_ALLOW_METHODS = [
-#     'DELETE',
-#     'GET',
-#     'OPTIONS',
-#     'PATCH',
-#     'POST',
-#     'PUT',
-# ]
-#
-# CORS_ALLOW_HEADERS = [
-#     'accept',
-#     'accept-encoding',
-#     'authorization',
-#     'content-type',
-#     'dnt',
-#     'origin',
-#     'user-agent',
-#     'x-csrftoken',
-#     'x-requested-with',
-# ]
-
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
-
-
-CORS_ALLOWED_ORIGINS = [
-    HOST,
-    'http://localhost:5000',
-    'http://localhost:3000',
-    # 'http://localhost:8000',
-]
 
 CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 
@@ -160,7 +120,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 HOST = 'https://4d53-194-93-24-3.ngrok-free.app'
 USERNAME = '@bizda24_bot'
-
+TOKEN = config('TOKEN')
 
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
