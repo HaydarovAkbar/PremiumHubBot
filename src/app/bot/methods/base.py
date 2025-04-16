@@ -70,6 +70,11 @@ def start(update: Update, context: CallbackContext):
         'last_name': update.effective_user.last_name,
         'is_active': False,
     })
+    if user.is_blocked:
+        update.message.reply_text(
+            "Siz botdan ko’p marta ro’yxatdan o’tganingiz uchun bot sizni bloklagan, agar buni xato deb hisoblasangiz, @hup_support ga murojaat qiling"
+        )
+        return state.START
     if not _:
         if not user.phone_number:
             context.bot.send_message(chat_id=update.effective_user.id,
