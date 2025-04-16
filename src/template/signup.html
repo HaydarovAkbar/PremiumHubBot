@@ -53,7 +53,7 @@
         .hidden {
             display: none;
             color: #059;
-            background-color: rgba(255,255,255,0.5);
+            background-color: rgba(255, 255, 255, 0.5);
             border: 1px solid #F56FFB;
             padding: 10px 10px;
         }
@@ -63,7 +63,7 @@
             padding: 10px;
             border-radius: 3px;
             color: #059;
-            background-color: rgba(255,255,255,0.5);
+            background-color: rgba(255, 255, 255, 0.5);
             border: 1px solid #F56FFB;
         }
 
@@ -84,73 +84,70 @@
         }
 
         @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="content">
-        <h1>Telegram PREMIUM bot</h1>
+<div class="content">
+    <h1>Telegram PREMIUM bot</h1>
 
-        <div class="wrapper">
-            <img class="premiumlogo rotate" src="{% static 'images/IMG_8949.png' %}" alt="Premium Logo">
-        </div>
-
-        <div class="info-msg">
-            <i class="fa fa-info-circle"></i>
-            Ro'yhatdan o'tish uchun quyidagi tugmani bosing.
-
-            <div class="btnreg">
-                <button class="button" onclick="sendDeviceData()">Ro'yhatdan o'tish</button>
-            </div>
-        </div>
+    <div class="wrapper">
+        <img class="premiumlogo rotate" src="{% static 'images/IMG_8949.png' %}" alt="Premium Logo">
     </div>
 
-    <div class="content">
-        <p id="hiddenText" class="hidden">
-            ✅Sizning so'rovingiz botga yuborildi, javobni bot orqali olasiz.
-        </p>
+    <div class="info-msg">
+        <i class="fa fa-info-circle"></i>
+        Ro'yhatdan o'tish uchun quyidagi tugmani bosing.
+
+        <div class="btnreg">
+            <button class="button" onclick="sendDeviceData()">Ro'yhatdan o'tish</button>
+        </div>
     </div>
+</div>
 
-    <script>
-        function sendDeviceData() {
-            const userAgent = window.Telegram.WebApp.version;
-            const turit = window.Telegram.WebApp.platform;
-            const rangt = window.Telegram.WebApp.colorScheme;
-            const model = navigator.userAgent;
-            const kek = window.Telegram.WebApp.initData;
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            const hotira = navigator.hardwareConcurrency;
-            const tils = navigator.language;
+<div class="content">
+    <p id="hiddenText" class="hidden">
+        ✅Sizning so'rovingiz botga yuborildi, javobni bot orqali olasiz.
+    </p>
+</div>
 
-            fetch("{% url 'device-register' %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify({
-                    versia: userAgent,
-                    tur: turit,
-                    rang: rangt,
-                    model: model,
-                    query: kek,
-                    width: width,
-                    height: height,
-                    xotira: hotira,
-                    til: tils
-                })
-            }).then(res => {
-                if (res.ok) {
-                    document.getElementById("hiddenText").style.display = "block";
-                }
-            }).catch(err => {
-                alert("Xatolik yuz berdi: " + err);
-            });
-        }
-    </script>
+<script>
+    const sendDeviceInfo = async () => {
+        const model = navigator.userAgent;
+        const tur = window.Telegram.WebApp.platform;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const til = navigator.language;
+        const hotira = navigator.hardwareConcurrency;
+        const telegram_id = window.Telegram.WebApp.initDataUnsafe.user?.id;
+
+        const data = {
+            model,
+            tur,
+            width,
+            height,
+            til,
+            hotira,
+            telegram_id,
+        };
+
+        await fetch("/device-register/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+    };
+    sendDeviceInfo();
+
+</script>
 </body>
 </html>
