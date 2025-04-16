@@ -8,7 +8,8 @@ import json
 import hashlib
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from .models import CustomUser
+from .models import CustomUser, Settings
+from telegram import Bot
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -37,33 +38,42 @@ def register_device(request):
         data = json.loads(request.body)
 
         model = data.get("model")
-        tur = data.get("tur")
-        width = str(data.get("width"))
-        height = str(data.get("height"))
-        til = data.get("til")
-        hotira = str(data.get("hotira"))
+        d_type = data.get("tur")
+        lang = data.get("til")
+        memory = str(data.get("hotira"))
         telegram_id = int(data.get("telegram_id"))
-        print("-------> chatid", telegram_id)
-        # Qurilma fingerprintini yasash (hash qilish)
-        raw_string = model + tur + width + height + til + hotira
+        raw_string = model + d_type + lang + memory
         fingerprint_hash = hashlib.sha256(raw_string.encode()).hexdigest()
-        print(CustomUser.objects.filter(chat_id=telegram_id).count())
-        # Tekshirish: boshqa user shu qurilmadan foydalanayotgan bo‘lsa
         existing = CustomUser.objects.filter(
             device_hash=fingerprint_hash
-        ).exclude(chat_id=telegram_id).first()
-
-        if existing:
+        ).count()
+        bot_settings = Settings.objects.filter(is_active=True).last()
+        custom_user = CustomUser.objects.get(chat_id=telegram_id)
+        if existing >= bot_settings.device_count:
+            custom_user.is_blocked = True
+            custom_user.save()
+            bot.send_message(
+                chat_id=telegram_id,
+                text=(
+                    "❌ Bu qurilmadan allaqachon boshqa foydalanuvchi foydalanmoqda.\n\n"
+                    f"✅ Botdan faqat {bot_settings.device_count} ta qurilmada foydalanish mumkin."
+                )
+            )
             return JsonResponse({
                 "error": "Bu qurilma boshqa foydalanuvchi tomonidan ishlatilgan."
             }, status=403)
 
-        # Agar mavjud bo'lmasa, saqlash yoki mavjudiga qaytish
-        CustomUser.objects.get_or_create(
-            device_hash=fingerprint_hash,
-            chat_id=telegram_id
-        )
-
+        if not (custom_user.device_hash and custom_user.is_active):
+            custom_user.device_hash = fingerprint_hash
+            custom_user.is_active = True
+            custom_user.save()
+            bot.send_message(
+                chat_id=telegram_id,
+                text=(
+                    "🎉 Tabriklaymiz! Qurilmangiz muvaffaqiyatli ro'yxatdan o'tdi.\n"
+                    "👉 Endi keyingi bosqichga o'tishingiz mumkin."
+                )
+            )
         return JsonResponse({"status": "ok"}, status=201)
 
     return JsonResponse({"error": "POST method required"}, status=400)
