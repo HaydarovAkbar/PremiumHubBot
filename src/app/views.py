@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from .models import CustomUser, Settings
 from telegram import Bot
+from .bot.keyboards.base import Keyboards
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -56,7 +57,8 @@ def register_device(request):
                 chat_id=telegram_id,
                 text=(
                     "❌ Bu qurilmadan allaqachon boshqa foydalanuvchi foydalanmoqda.\n\n"
-                    f"✅ Botdan faqat {bot_settings.device_count} ta qurilmada foydalanish mumkin."
+                    f"✅ Botdan faqat {bot_settings.device_count} ta qurilmada foydalanish mumkin.\n\n"
+                    "Agar buni xato deb hisoblasangiz, @hup_support ga murojaat qiling"
                 )
             )
             return JsonResponse({
@@ -67,12 +69,14 @@ def register_device(request):
             custom_user.device_hash = fingerprint_hash
             custom_user.is_active = True
             custom_user.save()
+            keyword = Keyboards()
             bot.send_message(
                 chat_id=telegram_id,
                 text=(
                     "🎉 Tabriklaymiz! Qurilmangiz muvaffaqiyatli ro'yxatdan o'tdi.\n"
                     "👉 Endi keyingi bosqichga o'tishingiz mumkin."
-                )
+                ),
+                reply_markup=keyword.base()
             )
         return JsonResponse({"status": "ok"}, status=201)
 
