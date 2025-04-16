@@ -1,4 +1,8 @@
 class MessageText:
+    BASE_MSG = """
+    
+    """
+
     settings = {
         'uz': "<b>Sozlamalar menyusiga xush kelibsiz</b>",
         'ru': "<b>Добро пожаловать в меню настроек</b>",

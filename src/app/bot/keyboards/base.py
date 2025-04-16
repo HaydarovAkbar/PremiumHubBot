@@ -34,9 +34,10 @@ class Keyboards:
     def base():
         keyboard = [
             ["🌟 Bepul Premium va Stars olish 🌟"],
-            ["💸 Premium narxlari", "🌟 Premium sotib olish"],
-            ["⭐ Stars Narxlari"],
-            ["🏆 TOP Reyting", "🎉 Top Reytinglar"],
+            ["💸 Premium narxlari", "⭐ Stars Narxlari"],
+            ["🏆 TOP Reyting"],
+            ["🎁 Bonus olish", "💳 Mening Hisobim"],
+            ["📝 Qo'llanma", "👨‍💻 Administrator"]
         ]
         return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
