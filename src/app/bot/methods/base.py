@@ -52,6 +52,7 @@ def add_to_channel(update: Update, context: CallbackContext):
 def start(update: Update, context: CallbackContext):
     all_channel = Channel.objects.filter(is_active=True)
     left_channel = []
+    print(settings.SIGNUP_URL)
     for channel in all_channel:
         try:
             a = context.bot.get_chat_member(chat_id=channel.chat_id, user_id=update.effective_user.id)
@@ -75,7 +76,9 @@ def start(update: Update, context: CallbackContext):
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text="Botdan to’liq foydalanish uchun “Telefon raqamni yuborish” tugmasini bosing",
                                      parse_mode='HTML',
-                                     reply_markup=keyword.phone_number())
+                                     reply_markup=keyword.phone_number(),
+                                     input_field_placeholder="Masalan: +998XXXXXXXXX"
+                                     )
             return state.PHONE
         if not user.is_active:
             context.bot.send_message(chat_id=update.effective_user.id,
@@ -92,7 +95,9 @@ def start(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=update.effective_user.id,
                              text="Botdan to’liq foydalanish uchun “Telefon raqamni yuborish” tugmasini bosing",
                              parse_mode='HTML',
-                             reply_markup=keyword.phone_number())
+                             reply_markup=keyword.phone_number(),
+                             input_field_placeholder="Masalan: +998XXXXXXXXX"
+                             )
     return state.PHONE
 
 

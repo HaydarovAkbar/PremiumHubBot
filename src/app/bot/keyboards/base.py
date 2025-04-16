@@ -28,7 +28,7 @@ class Keyboards:
     @staticmethod
     def phone_number():
         keyboard = [KeyboardButton("📲Telefon raqamni yuborish", request_contact=True)]
-        return ReplyKeyboardMarkup([keyboard], resize_keyboard=True)
+        return ReplyKeyboardMarkup([keyboard], resize_keyboard=True, one_time_keyboard=True)
 
     @staticmethod
     def base():
