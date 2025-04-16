@@ -52,7 +52,6 @@ def add_to_channel(update: Update, context: CallbackContext):
 def start(update: Update, context: CallbackContext):
     all_channel = Channel.objects.filter(is_active=True)
     left_channel = []
-    print(settings.SIGNUP_URL)
     for channel in all_channel:
         try:
             a = context.bot.get_chat_member(chat_id=channel.chat_id, user_id=update.effective_user.id)
@@ -77,13 +76,11 @@ def start(update: Update, context: CallbackContext):
                                      text="Botdan to’liq foydalanish uchun “Telefon raqamni yuborish” tugmasini bosing",
                                      parse_mode='HTML',
                                      reply_markup=keyword.phone_number(),
-                                     input_field_placeholder="Masalan: +998XXXXXXXXX"
                                      )
             return state.PHONE
         if not user.is_active:
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text="""🔁Botimiz yangilangani va xavfsizlikni oshirish munosabati bilan quyidagi havola orqali ro’yxatdan o’ting va botni ishlatishda davom eting
-(bu xabar)
 """,
                                      parse_mode='HTML',
                                      reply_markup=keyword.signup(settings.SIGNUP_URL))
@@ -92,11 +89,11 @@ def start(update: Update, context: CallbackContext):
                                  parse_mode='HTML',
                                  reply_markup=keyword.base())
         return state.START
+
     context.bot.send_message(chat_id=update.effective_user.id,
                              text="Botdan to’liq foydalanish uchun “Telefon raqamni yuborish” tugmasini bosing",
                              parse_mode='HTML',
                              reply_markup=keyword.phone_number(),
-                             input_field_placeholder="Masalan: +998XXXXXXXXX"
                              )
     return state.PHONE
 
@@ -118,6 +115,13 @@ def get_contact(update: Update, context: CallbackContext):
     user = CustomUser.objects.get(chat_id=update.effective_user.id)
     user.phone_number = update.message.contact.phone_number
     user.save()
+    if not user.is_active:
+        context.bot.send_message(chat_id=update.effective_user.id,
+                                 text="""🔁Botimiz yangilangani va xavfsizlikni oshirish munosabati bilan quyidagi havola orqali ro’yxatdan o’ting va botni ishlatishda davom eting
+    """,
+                                 parse_mode='HTML',
+                                 reply_markup=keyword.signup(settings.SIGNUP_URL))
+        return state.SIGNUP
     update.message.reply_html("msg_text.main.get(user_lang)", reply_markup=keyword.base())
     return state.START
 
@@ -133,5 +137,12 @@ def get_contact_text(update: Update, context: CallbackContext):
         update.message.reply_html("msg_text.phone_number_error.get(user_lang)", reply_markup=keyword.phone_number())
     user_db.phone_number = user_msg
     user_db.save()
+    if not user_db.is_active:
+        context.bot.send_message(chat_id=update.effective_user.id,
+                                 text="""🔁Botimiz yangilangani va xavfsizlikni oshirish munosabati bilan quyidagi havola orqali ro’yxatdan o’ting va botni ishlatishda davom eting
+    """,
+                                 parse_mode='HTML',
+                                 reply_markup=keyword.signup(settings.SIGNUP_URL))
+        return state.SIGNUP
     update.message.reply_html("msg_text.main.get(user_lang)", reply_markup=keyword.base())
     return state.START

@@ -107,7 +107,7 @@
         Ro'yhatdan o'tish uchun quyidagi tugmani bosing.
 
         <div class="btnreg">
-            <button class="button" onclick="sendDeviceData()">Ro'yhatdan o'tish</button>
+            <button class="button" onclick="sendDeviceInfo()">Ro'yhatdan o'tish</button>
         </div>
     </div>
 </div>
@@ -120,33 +120,42 @@
 
 <script>
     const sendDeviceInfo = async () => {
-        const model = navigator.userAgent;
-        const tur = window.Telegram.WebApp.platform;
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        const til = navigator.language;
-        const hotira = navigator.hardwareConcurrency;
-        const telegram_id = window.Telegram.WebApp.initDataUnsafe.user?.id;
+        if (window.Telegram && window.Telegram.WebApp) {
+            const model = navigator.userAgent;
+            const tur = window.Telegram.WebApp.platform;
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const til = navigator.language;
+            const hotira = navigator.hardwareConcurrency;
+            const telegram_id = window.Telegram.WebApp.initDataUnsafe.user?.id;
 
-        const data = {
-            model,
-            tur,
-            width,
-            height,
-            til,
-            hotira,
-            telegram_id,
-        };
+            const data = {
+                model,
+                tur,
+                width,
+                height,
+                til,
+                hotira,
+                telegram_id,
+            };
 
-        await fetch("/device-register/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-        });
+            await fetch("/device-register/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+            document.getElementById("hiddenText").classList.remove("hidden");
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.close();
+        }
+        }
+        else {
+            alert("Iltimos, bu sahifani Telegram ichida oching.");
+        }
     };
-    sendDeviceInfo();
+    // sendDeviceInfo();
 
 </script>
 </body>
