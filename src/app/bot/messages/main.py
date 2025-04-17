@@ -1,147 +1,44 @@
 class MessageText:
+    prem_photo_id = 'AgACAgIAAxkBAAIc6GgAAea7PjTk9Z15KiJC9FU8vGFL6gACIO4xG7QzCEhZvfmXA_tM6wEAAwIAA3gAAzYE'
+    star_photo_id = 'AgACAgIAAxkBAAIdA2gAAfEaEBGNpfMFJPLCAAH93M8n6aEAApjuMRu0MwhILAELcsCKtdcBAAMCAAN4AAM2BA'
+
     BASE_MSG = """
-    
+<b>Assalomu alaykum! PremiumHub botimizga xush kelibsiz!</b>
+<i>
+Siz ushbu bot orqali qanday imkoniyatlarga ega boʻlishingizni bilasizmi ? Bilmaganlar uchun pastda ko'rsatib o'tamiz 👇
+
+1. Tezda Premium va Stars xarid qilish 🌟
+
+2. Arzon narxlar hamta sifatli xizmatlarimiz orqali Premium va Stars olish 💫
+
+3. Bonuslar olish orqali Telegram Premium hamda Telegram Stars  ni tekinga olish imkoniyati✨ 
+
+Bot qoʻllanmasini oʻqisangiz, nima qilish kerakligini bilib olasiz😊
+
+<b>‼️ Xizmatlarimiz kafolatlangan‼️</b>
+
+Mamnun mijozlarimiz otzivlarini @PremiumHub shu  koʻrishingiz va ishonchni yanayam mustahkamlash uchun guruhimiz aʼzolaridan soʻrashingiz mumkin. 
+
+Siz ham mamnun mijozlarimiz qatorida boʻlishingizni chin yurakdan tilab qolamiz!</i>
     """
-
-    settings = {
-        'uz': "<b>Sozlamalar menyusiga xush kelibsiz</b>",
-        'ru': "<b>Добро пожаловать в меню настроек</b>",
-        'en': "Welcome to the settings menu",
-    }
-    change_language = {
-        'uz': "<b>Tilni o'zgartirish</b>",
-        'ru': "<b>Изменить язык</b>",
-        'en': "Change language",
-    }
-    successfuly_changed_language = {
-        'uz': "<b>Til muvaffaqiyatli o'zgartirildi</b>",
-        'ru': "<b>Язык успешно изменен</b>",
-        'en': "Language changed successfully",
-    }
-    main = {
-        'uz': "<b>Tilni tanlang! 👇</b>",
-        'ru': "<b>Выберите язык! 👇</b>",
-        'en': "<b>Choose language! 👇</b>",
-    }
-
-    base = {
-        'uz': "<b>Men sizga matn ni audio qilib beraman!!!</b>\n\n🔹 <i>Matn\n🔸Word\n🔻Pdf\n▫️Excel\n▪️PowerPoint</i>\n\n<b>Formatlarini audio ga o'girish imkoniyati mavjud</b>\n\n❗️<code>Buning uchun hisobingiz aktiv xolatda bo'lishi kerak !!!</code>",
-        'ru': "<b>Я превращу текст в аудио для вас !!!</b>\n\n🔹 <i>Текст\n🔸Word\n🔻Pdf\n▫️Excel\n▪️PowerPoint</i>\n\n<b>Возможность преобразования в аудио форматы</b>\n\n❗️<code>Для этого ваша учетная запись должна быть в активном состоянии !!!</code>",
-        'en': "<b>I will turn the text into audio for you !!!</b>\n\n🔹 <i>Text\n🔸Word\n🔻Pdf\n▫️Excel\n▪️PowerPoint</i>\n\n<b>Ability to convert to audio formats</b>\n\n❗️<code>For this, your account must be in active state !!!</code>",
-    }
-
-    get_link = {
-        'uz': "<b>Link jo'natishing va \n\nInstagram\nYoutube\nTiktok\n\nIjtimoiy tarmoqlaridan video yuklashingiz mumkin!!!</b>",
-        'ru': "<b>Вы можете отправить ссылку и загрузить видео из социальных сетей\n\nInstagram\nYoutube\nTiktok</b>",
-        'en': "<b>You can send a link and upload a video from social networks\n\nInstagram\nYoutube\nTiktok</b>",
-    }
-
-    get_feedback = {
-        'uz': "<b>Fikringizni jo'nating</b>",
-        'ru': "<b>Отправьте свой комментарий</b>",
-        'en': "<b>Send us your feedback</b>",
-    }
-
-    get_stats = {
-        'uz': "<b>Statistika</b>",
-        'ru': "<b>Статистика</b>",
-        'en': "<b>Statistics</b>",
-    }
-
-    feedback_sent = {
-        "uz": "<b>Fikringiz jo'natildi\nBiz uni ko'rib chiqamiz va tez orada javob qaytaramiz</b>",
-        'ru': "<b>Ваш комментарий отправлен\nМы рассмотрим его и свяжемся с вами в ближайшее время.</b>",
-        'en': "<b>Your comment has been submitted\nWe will review it and get back to you shortly</b>",
-    }
-
-    add_to_channel = {
-        'uz': "Botdan foydalanish uchun avval kanallarimizga a'zo bo'ling",
-        'ru': "Прежде чем использовать бота, подпишитесь на наши каналы",
-        'en': "Before using the bot, subscribe to our channels",
-    }
-
-    is_admin = {
-        'uz': "<b>Xush kelibsiz Admin</b>",
-        'ru': "<b>Добро пожаловать Админ</b>",
-        'en': "<b>Welcome Admin</b>",
-    }
-
-    search_user = {
-        'uz': "Foydalanuvchini izlash uchun ismini kiriting",
-        'ru': "Введите имя пользователя, чтобы найти его",
-        'en': "Enter the username to find the user",
-    }
-    not_found_user = {
-        'uz': "Foydalanuvchi topilmadi",
-        'ru': "Пользователь не найден",
-        'en': "User not found",
-    }
-
-    enter_channel_title = {
-        'uz': "Kanal nomini kiriting",
-        'ru': "Введите название канала",
-        'en': "Enter the channel name",
-    }
-
-    enter_channel_url = {
-        'uz': "Kanal havolasini kiriting",
-        'ru': "Введите ссылку на канал",
-        'en': "Enter the channel link",
-    }
-
-    enter_channel_id = {
-        'uz': "Kanal ID sini kiriting",
-        'ru': "Введите ID канала",
-        'en': "Enter the channel ID",
-    }
-
-    succesfuly_added = {
-        'uz': "Kanal muvaffaqiyatli qo'shildi 👌  \n\n<b>Bot kanaldan foydalanishi uchun botni avval kanalga a'zo qilish kerak buni unitmang!!!</b>",
-        'ru': "Канал успешно добавлен 👌  \n\n<b>Чтобы бот мог использовать канал, сначала подпишитесь на канал!</b>",
-        'en': "Channel added successfully 👌  \n\n<b>To use the bot, first subscribe to the channel!</b>",
-    }
-
-    channel_deleted = {
-        'uz': "Kanal muvaffaqiyatli o'chirildi 👌",
-        'ru': "Канал успешно удален 👌",
-        'en': "Channel deleted successfully 👌",
-    }
-
-    send_adversting = {
-        'uz': "Reklama xabarini yuboring",
-        'ru': "Отправьте рекламное сообщение",
-        'en': "Send an advertising message",
-    }
-    confirmation = {
-        'uz': "Laktsiyangizni tasdiqlaysizmi ?",
-        'ru': "Вы подтверждаете свой выбор ?",
-        'en': "Do you confirm your choice ?",
-    }
-
-    choose_menu = {
-        'uz': "Menyudan tanlang",
-        'ru': "Выберите из меню",
-        'en': "Choose from the menu",
-    }
-
-    change_code = {
-        'uz': "mahsulot soni {} ga o'zgartirildi",
-        'ru': "количество продукта изменено на {}",
-        'en': "product quantity changed to {}",
-    }
-
-    notification_admins = {
-        'uz': "<b>Yangi buyurtma kelib tushdi</b>",
-        'ru': "<b>Поступил новый заказ</b>",
-        'en': "<b>A new order has arrived</b>",
-    }
+    GET_PREMIUM_AND_STARS = """
+<b>Sizga haligacha Telegram Premium sovgʻa qilishmadimi?</b>
+<i>
+➖ Telegram Premium obunani sovgʻa sifatida tekinga olishni istaysizmi?
+ 
+Shunchaki pastdagi havola orqali doʻstlaringizni taklif qiling. Botning oʻzi sizga pul toʻlaydi. Toʻplangan pullarga Premium obunasini follashtirishingiz mumkin.</i>
+"""
 
 
 class KeyboardText:
     base = {
-        'uz': ["Shaxsiy kabinetim", "Fikr yuborish", "Statistika ko'rish", "Sozlamalar ⚙️"],
+        'uz': ["🌟 Bepul Premium va Stars olish 🌟", "💸 Premium narxlari", "⭐ Stars Narxlari", "🏆 TOP Reyting",
+               "🎁 Bonus olish", "💳 Mening Hisobim", "📝 Qo'llanma", "👨‍💻 Administrator"],
         'ru': ["Личный кабинет", "Отправить отзыв", "Посмотреть статистику", "Настройки ⚙️"],
         'en': ["Personal account", "Send feedback", "View statistics", "Settings ⚙️"],
+    }
+    referral = {
+        'uz': "📤 Do'stlarga Ulashish",
     }
     send = {
         "uz": "Yuborish 📤",

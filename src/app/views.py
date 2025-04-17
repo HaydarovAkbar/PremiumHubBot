@@ -52,6 +52,7 @@ def register_device(request):
         custom_user = CustomUser.objects.get(chat_id=telegram_id)
         if existing >= bot_settings.device_count:
             custom_user.is_blocked = True
+            custom_user.is_active = False
             custom_user.save()
             bot.send_message(
                 chat_id=telegram_id,

@@ -3,11 +3,15 @@ from telegram.ext import Dispatcher, CommandHandler, MessageHandler, Filters, Co
     CallbackQueryHandler
 from django.conf import settings
 from .methods.base import start, check_channel, add_to_channel, get_contact, get_contact_text
+from .methods.free_premium_and_stars import get_free_premium_and_stars, get_file_url
+from .methods.prices import get_premium_prices, get_stars_prices
 import logging
 import time
 from telegram.error import RetryAfter
 from .states import States
-from .messages.main import KeyboardText as msg_text
+from .messages.main import KeyboardText
+
+key_msg = KeyboardText()
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -38,6 +42,7 @@ all_handler = ConversationHandler(
     entry_points=[
         CommandHandler('start', start),
         CommandHandler('admin', start),
+        MessageHandler(Filters.all, get_file_url),
     ],
     states={
         state.CHECK_CHANNEL: [
@@ -46,14 +51,22 @@ all_handler = ConversationHandler(
             CallbackQueryHandler(add_to_channel),
         ],
         state.PHONE: [
-                        CommandHandler('start', start),
-                        CommandHandler('admin', start),
-                        MessageHandler(Filters.contact, get_contact),
-                        MessageHandler(Filters.text, get_contact_text),
+            CommandHandler('start', start),
+            CommandHandler('admin', start),
+            MessageHandler(Filters.contact, get_contact),
+            MessageHandler(Filters.text, get_contact_text),
+        ],
+        state.START: [
+            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][0] + ')$'), get_free_premium_and_stars),
+            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][1] + ')$'), get_premium_prices),
+            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][2] + ')$'), get_stars_prices),
+            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][3] + ')$'), get_stars_prices),
+            # MessageHandler(Filters.regex('^(' + msg_text.base['uz'][4] + ')$'), mysettings),
         ]
     },
     fallbacks=[CommandHandler('start', start),
                CommandHandler('admin', start),
+               MessageHandler(Filters.all, get_file_url),
                ]
 )
 

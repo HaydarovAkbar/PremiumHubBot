@@ -64,3 +64,44 @@ class Settings(models.Model):
 
     class Meta:
         db_table = 'settings'
+
+
+class Prices(models.Model):
+    with_profile_1 = models.DecimalField(max_digits=10, decimal_places=2, help_text="Profilga kirish orqali 1-oy")
+    with_profile_12 = models.DecimalField(max_digits=10, decimal_places=2, help_text="Profilga kirish orqali 12-oy")
+    with_gift_3 = models.DecimalField(max_digits=10, decimal_places=2, help_text="Gift orqali 3-oy")
+    with_gift_6 = models.DecimalField(max_digits=10, decimal_places=2, help_text="Gift orqali 6-oy")
+    with_gift_12 = models.DecimalField(max_digits=10, decimal_places=2, help_text="Gift orqali 12-oy")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return str(self.with_profile_1)
+
+    class Meta:
+        verbose_name_plural = 'Premium narxlari'
+        verbose_name = 'Premium narx'
+        db_table = 'prices'
+
+
+class StarsPrices(models.Model):
+    price_50 = models.DecimalField(max_digits=10, decimal_places=2, help_text="50 Stars narxi")
+    price_75 = models.DecimalField(max_digits=10, decimal_places=2, help_text="75 Stars narxi")
+    price_100 = models.DecimalField(max_digits=10, decimal_places=2, help_text="100 Stars narxi")
+    price_150 = models.DecimalField(max_digits=10, decimal_places=2, help_text="150 Stars narxi")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return str(self.price_50)
+
+    class Meta:
+        verbose_name_plural = 'Stars narxlari'
+        verbose_name = 'Stars narx'
+        db_table = 'star_prices'
