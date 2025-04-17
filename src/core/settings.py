@@ -113,7 +113,8 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 HOST = 'https://a956-213-230-69-88.ngrok-free.app'
-USERNAME = '@bizda24_bot'
+USERNAME = 'AiGeneratedPhotoBot'
+ADMIN_USERNAME = 'premium_xizmatim'
 TOKEN = config('TOKEN')
 
 SESSION_COOKIE_SECURE = False

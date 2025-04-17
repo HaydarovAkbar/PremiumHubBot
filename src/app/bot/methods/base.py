@@ -5,9 +5,11 @@ from telegram.ext import CallbackContext
 from app.models import CustomUser, Channel
 from ..keyboards.base import Keyboards
 from ..states import States
+from ..messages.main import MessageText
 
 keyword = Keyboards()
 state = States()
+msg = MessageText()
 
 
 def check_channel(update: Update, context: CallbackContext):
@@ -90,7 +92,7 @@ def start(update: Update, context: CallbackContext):
                                      parse_mode='HTML',
                                      reply_markup=keyword.signup(settings.SIGNUP_URL))
             return state.SIGNUP
-        context.bot.send_message(chat_id=update.effective_user.id, text="msg_text.base.get(user_lang)",
+        context.bot.send_message(chat_id=update.effective_user.id, text=msg.BASE_MSG,
                                  parse_mode='HTML',
                                  reply_markup=keyword.base())
         return state.START
@@ -127,7 +129,7 @@ def get_contact(update: Update, context: CallbackContext):
                                  parse_mode='HTML',
                                  reply_markup=keyword.signup(settings.SIGNUP_URL))
         return state.SIGNUP
-    update.message.reply_html("msg_text.main.get(user_lang)", reply_markup=keyword.base())
+    update.message.reply_html(msg.BASE_MSG, reply_markup=keyword.base())
     return state.START
 
 
@@ -149,5 +151,5 @@ def get_contact_text(update: Update, context: CallbackContext):
                                  parse_mode='HTML',
                                  reply_markup=keyword.signup(settings.SIGNUP_URL))
         return state.SIGNUP
-    update.message.reply_html("msg_text.main.get(user_lang)", reply_markup=keyword.base())
+    update.message.reply_html(msg.BASE_MSG, reply_markup=keyword.base())
     return state.START
