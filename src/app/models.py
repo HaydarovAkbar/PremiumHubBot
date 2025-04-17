@@ -105,3 +105,9 @@ class StarsPrices(models.Model):
         verbose_name_plural = 'Stars narxlari'
         verbose_name = 'Stars narx'
         db_table = 'star_prices'
+
+
+class CustomUserAccount(models.Model):
+    chat_id = models.BigIntegerField(db_index=True, unique=True)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Jami summasi")
+    current_price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Hozirgi summasi")

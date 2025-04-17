@@ -73,3 +73,16 @@ class Keyboards:
             )
         ]
         return InlineKeyboardMarkup([keyboard])
+
+    @staticmethod
+    def rating():
+        return InlineKeyboardMarkup([
+            [InlineKeyboardButton(
+                "🏆 TOP Reyting",
+                callback_data='top_rating'
+            )],
+            [InlineKeyboardButton(
+                "🏆 Haftalik TOP Reyting",
+                callback_data='weekly_rating'
+            )]
+        ])
