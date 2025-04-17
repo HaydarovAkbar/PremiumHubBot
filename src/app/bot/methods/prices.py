@@ -1,6 +1,3 @@
-import time
-
-import telegram
 from django.conf import settings
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext

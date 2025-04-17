@@ -2,6 +2,8 @@ from telegram import Bot
 from telegram.ext import Dispatcher, CommandHandler, MessageHandler, Filters, ConversationHandler, \
     CallbackQueryHandler
 from django.conf import settings
+
+from .methods.admin import admin
 from .methods.base import start, check_channel, add_to_channel, get_contact, get_contact_text
 from .methods.free_premium_and_stars import get_free_premium_and_stars, get_file_url
 from .methods.prices import get_premium_prices, get_stars_prices
@@ -62,6 +64,11 @@ all_handler = ConversationHandler(
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][2] + ')$'), get_stars_prices),
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][3] + ')$'), get_stars_prices),
             # MessageHandler(Filters.regex('^(' + msg_text.base['uz'][4] + ')$'), mysettings),
+        ],
+        state.RATING: [
+            CommandHandler('start', start),
+            CommandHandler('admin', start),
+            CallbackQueryHandler(start)
         ]
     },
     fallbacks=[CommandHandler('start', start),
