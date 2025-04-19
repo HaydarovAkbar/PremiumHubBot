@@ -11,7 +11,7 @@ state = States()
 msg = MessageText()
 
 
-def get_rating_base(update: Update, context: CallbackContext):
+def get_bonus_base(update: Update, context: CallbackContext):
     all_channel = Channel.objects.filter(is_active=True)
     left_channel = []
     for channel in all_channel:
@@ -28,17 +28,21 @@ def get_rating_base(update: Update, context: CallbackContext):
         return state.CHECK_CHANNEL
     user_db = CustomUser.objects.get(chat_id=update.effective_user.id)
     if user_db.is_active:
-        _msg = """<b>🎉 Top Reytinglar</b>
+        _msg = """<b>Bonuslarni qo'lga kiritish uchun shartlar va vazifalar quyidagicha: 👇</b>
 
-Haftalik va oylik konkurslarda qatnashing <b>Telegram Premium va Telegram stars⭐️</b> yutib oling.🎁"""
+🔹 Shartlar va talablar bilan tanishib chiqing.
+🔹 Ko‘rsatilgan vazifalarni to‘liq bajaring.
+🔹 Hammasini to‘g‘ri amalga oshirganingizdan so‘ng bonuslarni qo‘lga kiriting!
+
+<b>Oson va qulay imkoniyatdan foydalanib, bonuslarga ega bo‘ling! 🎁</b>"""
         update.message.reply_html(
             _msg,
-            reply_markup=keyword.rating(),
+            reply_markup=keyword.bonus(),
         )
         return state.RATING
 
 
-def get_rating_type(update: Update, context: CallbackContext):
+def get_bonus_type(update: Update, context: CallbackContext):
     all_channel = Channel.objects.filter(is_active=True)
     left_channel = []
     for channel in all_channel:
