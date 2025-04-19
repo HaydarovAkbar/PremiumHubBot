@@ -8,7 +8,7 @@ from .methods.base import start, check_channel, add_to_channel, get_contact, get
 from .methods.free_premium_and_stars import get_free_premium_and_stars, get_file_url
 from .methods.prices import get_premium_prices, get_stars_prices
 from .methods.rating import get_rating_base, get_rating_type
-from .methods.bonus import get_bonus_base
+from .methods.bonus import get_bonus_base, get_bonus_type, get_daily_bonus
 import logging
 import time
 from telegram.error import RetryAfter
@@ -71,6 +71,16 @@ all_handler = ConversationHandler(
             CommandHandler('start', start),
             CommandHandler('admin', start),
             CallbackQueryHandler(get_rating_type)
+        ],
+        state.BONUS: [
+            CommandHandler('start', start),
+            CommandHandler('admin', start),
+            CallbackQueryHandler(get_bonus_type)
+        ],
+        state.CHANNEL_BOOST_BONUS:[
+            CommandHandler('start', start),
+            CommandHandler('admin', start),
+            CallbackQueryHandler(get_daily_bonus)
         ]
     },
     fallbacks=[CommandHandler('start', start),

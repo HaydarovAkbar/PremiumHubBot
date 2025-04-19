@@ -11,6 +11,7 @@ from django.http import JsonResponse
 from .models import CustomUser, Settings
 from telegram import Bot
 from .bot.keyboards.base import Keyboards
+from django.conf import settings
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -31,6 +32,13 @@ class MainView(View):
 
 def signup_view(request):
     return render(request, 'signup.html')
+
+
+def stories_bonus(request):
+    context = {
+        'video_url': f'{settings.HOST}/static/videos/stories.mp4'
+    }
+    return render(request, 'story.html', context)
 
 
 @csrf_exempt

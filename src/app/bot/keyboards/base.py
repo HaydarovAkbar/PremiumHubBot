@@ -1,5 +1,6 @@
 from typing import List
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton, WebAppInfo, \
+    ReplyKeyboardRemove
 from app.models import Channel
 from ..messages.main import KeyboardText
 
@@ -84,7 +85,11 @@ class Keyboards:
             [InlineKeyboardButton(
                 "🏆 Haftalik TOP Reyting",
                 callback_data='weekly_rating'
-            )]
+            )],
+            [InlineKeyboardButton(
+                "⬅️ Orqaga",
+                callback_data='back'
+            )],
         ])
 
     @staticmethod
@@ -104,6 +109,46 @@ class Keyboards:
             )],
             [InlineKeyboardButton(
                 "😉 Qiziqarli bonuslar",
-                callback_data='qizi_bonus'
-            )]
+                callback_data='qiziq_bonus'
+            )],
+            [InlineKeyboardButton(
+                "⬅️ Orqaga",
+                callback_data='back'
+            )],
+        ])
+
+    @staticmethod
+    def channel_boost(channel_url: str):
+        return InlineKeyboardMarkup([
+            [InlineKeyboardButton(
+                "⭐ Ovoz berish uchun kanal",
+                url=channel_url
+            )],
+            [InlineKeyboardButton(
+                "♻️ Kunlik bonus",
+                callback_data='daily_bonus'
+            )],
+            [InlineKeyboardButton(
+                "⬅️ Orqaga",
+                callback_data='back'
+            )],
+        ])
+
+    delete = ReplyKeyboardRemove()
+
+    @staticmethod
+    def story_bonus(webapp_url):
+        return InlineKeyboardMarkup([
+            [InlineKeyboardButton(
+                "🔗 WEBAPP",
+                web_app=WebAppInfo(url=webapp_url)
+            )],
+            [InlineKeyboardButton(
+                "♻️ Tekshirish",
+                callback_data='check'
+            )],
+            [InlineKeyboardButton(
+                "⬅️ Orqaga",
+                callback_data='back'
+            )],
         ])

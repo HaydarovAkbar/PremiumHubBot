@@ -107,6 +107,77 @@ class StarsPrices(models.Model):
         db_table = 'star_prices'
 
 
+class RewardsChannelBoost(models.Model):
+    channel_url = models.CharField(max_length=150, null=True, blank=True, verbose_name='Ovoz beriladigan kanal')
+    elementary_bonus = models.DecimalField(max_digits=10, decimal_places=2, help_text="Boshlang'ich bonus narxi",
+                                           null=True, blank=True)
+    daily_bonus = models.DecimalField(
+        max_digits=10, decimal_places=2, help_text="Kunlik bonus narxi",
+        null=True, blank=True
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return str(self.channel_url)
+
+
+class DailyBonus(models.Model):
+    rewards_channel = models.OneToOneField(RewardsChannelBoost, on_delete=models.CASCADE)
+    chat_id = models.BigIntegerField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    last_bonus = models.DateField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return str(self.chat_id)
+
+    class Meta:
+        verbose_name_plural = 'Kunlik bonuslar'
+        verbose_name = 'Kunlik bonus'
+        db_table = 'daily_bonus'
+        indexes = [
+            models.Index(fields=['chat_id', 'rewards_channel']),
+        ]
+
+
+class StoryBonusPrice(models.Model):
+    price = models.DecimalField(max_digits=6, decimal_places=2, help_text="Boshlang'ich bonus narxi",
+                                null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return str(self.price)
+
+    class Meta:
+        verbose_name_plural = 'Story narxlar'
+        verbose_name = 'Story narx'
+        db_table = 'story_bonus_price'
+
+
+class StoryBonusAccounts(models.Model):
+    chat_id = models.BigIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return str(self.chat_id)
+
+    class Meta:
+        verbose_name_plural = 'Story bonuslar'
+        verbose_name = 'Story bonuslar'
+        db_table = 'story_bonus'
+
+
 class CustomUserAccount(models.Model):
     chat_id = models.BigIntegerField(db_index=True, unique=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Jami summasi")
