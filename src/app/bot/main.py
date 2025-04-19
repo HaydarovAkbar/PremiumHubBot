@@ -3,10 +3,12 @@ from telegram.ext import Dispatcher, CommandHandler, MessageHandler, Filters, Co
     CallbackQueryHandler
 from django.conf import settings
 
-from .methods.admin import admin
+# from .methods.admin import admin
 from .methods.base import start, check_channel, add_to_channel, get_contact, get_contact_text
 from .methods.free_premium_and_stars import get_free_premium_and_stars, get_file_url
 from .methods.prices import get_premium_prices, get_stars_prices
+from .methods.rating import get_rating_base, get_rating_type
+from .methods.bonus import get_bonus_base
 import logging
 import time
 from telegram.error import RetryAfter
@@ -62,13 +64,13 @@ all_handler = ConversationHandler(
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][0] + ')$'), get_free_premium_and_stars),
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][1] + ')$'), get_premium_prices),
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][2] + ')$'), get_stars_prices),
-            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][3] + ')$'), get_stars_prices),
-            # MessageHandler(Filters.regex('^(' + msg_text.base['uz'][4] + ')$'), mysettings),
+            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][3] + ')$'), get_rating_base),
+            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][4] + ')$'), get_bonus_base),
         ],
         state.RATING: [
             CommandHandler('start', start),
             CommandHandler('admin', start),
-            CallbackQueryHandler(start)
+            CallbackQueryHandler(get_rating_type)
         ]
     },
     fallbacks=[CommandHandler('start', start),

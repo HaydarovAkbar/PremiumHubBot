@@ -86,3 +86,24 @@ class Keyboards:
                 callback_data='weekly_rating'
             )]
         ])
+
+    @staticmethod
+    def bonus():
+        return InlineKeyboardMarkup([
+            [InlineKeyboardButton(
+                "⭐ Kanalga ovoz berib bonus olish",
+                callback_data='premium_bonus'
+            )],
+            [InlineKeyboardButton(
+                "🔗 Stories bonus",
+                callback_data='stories_bonus'
+            )],
+            [InlineKeyboardButton(
+                "🫂 Guruhga odam qo'shish orqali pul ishlash",
+                callback_data='add_group_bonus'
+            )],
+            [InlineKeyboardButton(
+                "😉 Qiziqarli bonuslar",
+                callback_data='qizi_bonus'
+            )]
+        ])
