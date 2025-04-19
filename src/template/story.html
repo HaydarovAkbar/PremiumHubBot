@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>🎁 Stories Bonus</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            text-align: center;
+            background: linear-gradient(to bottom right, #e0c3fc, #8ec5fc);
+            padding: 20px;
+            color: #333;
+        }
+
+        h2 {
+            font-size: 28px;
+            margin-top: 20px;
+        }
+
+        p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        video {
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: block;
+            width: 90%;
+            max-width: 320px;
+            margin: 10px auto;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn.download {
+            background-color: #007bff;
+        }
+
+        .btn.confirm {
+            background-color: #28a745;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <h2>🎁 Stories Bonus</h2>
+    <p>Ushbu videoni Telegram Story’ga joylashtiring va sovg‘ani qo‘lga kiriting!</p>
+
+    <video controls src="{% static 'videos/stories.mp4' %}"></video>
+
+    <a class="btn" href="{{ video_url }}" download>⬇️ Videoni yuklab olish</a>
+    <button class="btn confirm" onclick="Telegram.WebApp.close()">✅ Joylashtirdim</button>
+</body>
+</html>
