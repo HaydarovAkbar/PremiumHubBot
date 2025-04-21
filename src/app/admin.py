@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import CustomUser, Channel, Settings, Prices, StarsPrices, RewardsChannelBoost, DailyBonus, StoryBonusPrice, StoryBonusAccounts
+from .models import CustomUser, Channel, Settings, Prices, StarsPrices, RewardsChannelBoost, DailyBonus, \
+    StoryBonusPrice, StoryBonusAccounts, Group, InvitedUser, InterestingBonus, InterestingBonusUser
 
 admin.site.register(CustomUser)
 admin.site.register(Channel)
@@ -10,3 +11,7 @@ admin.site.register(RewardsChannelBoost)
 admin.site.register(DailyBonus)
 admin.site.register(StoryBonusPrice)
 admin.site.register(StoryBonusAccounts)
+admin.site.register(Group)
+admin.site.register(InvitedUser)
+admin.site.register(InterestingBonus)
+admin.site.register(InterestingBonusUser)

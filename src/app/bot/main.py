@@ -8,7 +8,9 @@ from .methods.base import start, check_channel, add_to_channel, get_contact, get
 from .methods.free_premium_and_stars import get_free_premium_and_stars, get_file_url
 from .methods.prices import get_premium_prices, get_stars_prices
 from .methods.rating import get_rating_base, get_rating_type
-from .methods.bonus import get_bonus_base, get_bonus_type, get_daily_bonus
+from .methods.bonus import get_bonus_base, get_bonus_type, get_daily_bonus, get_stories_bonus
+from .methods.group import get_group_base, new_member_handler
+from .methods.interesting_bonus import get_interesting_bonus_base, check_interesting_bonus_nik, check_interesting_bonus_bio
 import logging
 import time
 from telegram.error import RetryAfter
@@ -77,16 +79,42 @@ all_handler = ConversationHandler(
             CommandHandler('admin', start),
             CallbackQueryHandler(get_bonus_type)
         ],
-        state.CHANNEL_BOOST_BONUS:[
+        state.CHANNEL_BOOST_BONUS: [
             CommandHandler('start', start),
             CommandHandler('admin', start),
             CallbackQueryHandler(get_daily_bonus)
-        ]
+        ],
+        state.STORY_BONUS: [
+            CommandHandler('start', start),
+            CommandHandler('admin', start),
+            CallbackQueryHandler(get_stories_bonus)
+        ],
+        state.GROUP_BONUS: [
+            CommandHandler('start', start),
+            CommandHandler('admin', start),
+            CallbackQueryHandler(get_group_base)
+        ],
+        state.INTERESTING_BONUS: [
+            CommandHandler('start', start),
+            CommandHandler('admin', start),
+            CallbackQueryHandler(get_interesting_bonus_base)
+        ],
+        state.INTERESTING_BONUS_NIK: [
+            CommandHandler('start', start),
+            CommandHandler('admin', start),
+            CallbackQueryHandler(check_interesting_bonus_nik)
+        ],
+        state.INTERESTING_BONUS_BIO: [
+            CommandHandler('start', start),
+            CommandHandler('admin', start),
+            CallbackQueryHandler(check_interesting_bonus_bio)
+        ],
     },
     fallbacks=[CommandHandler('start', start),
                CommandHandler('admin', start),
                MessageHandler(Filters.all, get_file_url),
                ]
 )
-
+new_member_handler = MessageHandler(Filters.status_update.new_chat_members, new_member_handler)
+dispatcher.add_handler(new_member_handler)
 dispatcher.add_handler(all_handler)

@@ -41,11 +41,17 @@ class Group(models.Model):
     chat_id = models.BigIntegerField(db_index=True, unique=True)
     name = models.CharField(max_length=100, null=True, blank=True)
     link = models.URLField(null=True, blank=True)
+    price = models.DecimalField(decimal_places=2, max_digits=10, null=True, blank=True,
+                                verbose_name="Qo'shganlik uchun summa: ")
+    limit = models.PositiveIntegerField(null=True, blank=True, verbose_name="Qo'shish kerak bo'lgan limit")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.name}"
 
     class Meta:
         db_table = 'group'
@@ -182,3 +188,68 @@ class CustomUserAccount(models.Model):
     chat_id = models.BigIntegerField(db_index=True, unique=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Jami summasi")
     current_price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Hozirgi summasi")
+
+
+class InvitedUser(models.Model):
+    inviter_chat_id = models.BigIntegerField(null=True, blank=True)
+    new_user_chat_id = models.BigIntegerField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.inviter_chat_id)
+
+    class Meta:
+        verbose_name_plural = 'Gruppaga qo\'shilganlar'
+        verbose_name = 'Gruppaga qo\'shganlar'
+        db_table = 'invited_user'
+
+
+class InvitedBonusUser(models.Model):
+    chat_id = models.BigIntegerField(db_index=True, unique=True)
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True)
+    clean = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.chat_id)
+
+    class Meta:
+        verbose_name_plural = 'Gruppaga qo\'shilganlar bonuslari'
+        verbose_name = 'Gruppaga qo\'shilganlar bonuslar'
+        db_table = 'invited_user_bonus'
+
+
+class InterestingBonus(models.Model):
+    bio = models.DecimalField(max_digits=10, decimal_places=2, help_text="Bio summasi")
+    fullname = models.DecimalField(max_digits=10, decimal_places=2, help_text="Nikname summasi")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.bio) + " - " + str(self.fullname)
+
+    class Meta:
+        verbose_name_plural = 'Qiziqarli bonus narxlari'
+        verbose_name = 'Qiziqarli bonus narx'
+        db_table = 'interesting_bonus'
+
+
+class InterestingBonusUser(models.Model):
+    chat_id = models.BigIntegerField(db_index=True, unique=True)
+    bio = models.BooleanField(default=False)
+    fullname = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.chat_id)
+
+    class Meta:
+        verbose_name_plural = 'Qiziqarli bonus userlar'
+        verbose_name = 'Qiziqarli bonus user'
+        db_table = 'interesting_user_bonus'

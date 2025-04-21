@@ -152,3 +152,50 @@ class Keyboards:
                 callback_data='back'
             )],
         ])
+
+    @staticmethod
+    def groups(group):
+        return InlineKeyboardMarkup([
+            [InlineKeyboardButton(
+                group.name,
+                url=group.link
+            )],
+            [InlineKeyboardButton(
+                "♻️ Tekshirish",
+                callback_data='check'
+            )],
+            [InlineKeyboardButton(
+                "⬅️ Orqaga",
+                callback_data='back'
+            )]
+        ])
+
+    @staticmethod
+    def interesting_bonus():
+        return InlineKeyboardMarkup([
+            [InlineKeyboardButton(
+                "📤 Nickname bonus",
+                callback_data='nik',
+            )],
+            [InlineKeyboardButton(
+                "📥 Bio bonus",
+                callback_data='bio'
+            )],
+            [InlineKeyboardButton(
+                "⬅️ Orqaga",
+                callback_data='back'
+            )]
+        ])
+
+    @staticmethod
+    def interesting_check_bonus():
+        return InlineKeyboardMarkup([
+            [InlineKeyboardButton(
+                "♻️ Tekshirish",
+                callback_data='check'
+            )],
+            [InlineKeyboardButton(
+                "⬅️ Orqaga",
+                callback_data='back'
+            )]
+        ])
