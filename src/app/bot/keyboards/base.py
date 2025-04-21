@@ -199,3 +199,27 @@ class Keyboards:
                 callback_data='back'
             )]
         ])
+
+    @staticmethod
+    def my_account():
+        return InlineKeyboardMarkup([
+            [InlineKeyboardButton(
+                "Premium vs stars uchun sarflash",
+                callback_data='spend'
+            )]
+        ])
+
+    @staticmethod
+    def spend_fields(fields, current_price):
+        result = list()
+        for field in fields:
+            icon = "✅ " if field.price >= current_price else " ❌"
+            result.append([InlineKeyboardButton(
+                field.name + icon,
+                callback_data=str(field.id)
+            )])
+        result.append([InlineKeyboardButton(
+            "⬅️ Orqaga",
+            callback_data='back'
+        )])
+        return InlineKeyboardMarkup(result)
