@@ -9,6 +9,8 @@ class CustomUser(models.Model):
     last_name = models.CharField(max_length=100, null=True, blank=True)
     phone_number = models.CharField(max_length=14, null=True, blank=True)
     device_hash = models.CharField(max_length=64, null=True, blank=True)
+    invited_count = models.PositiveIntegerField(default=0)
+    premium_count = models.PositiveIntegerField(default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -59,7 +61,7 @@ class Group(models.Model):
 
 class Settings(models.Model):
     device_count = models.IntegerField(default=1)
-
+    spend_price = models.DecimalField(decimal_places=2, max_digits=10, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -253,3 +255,38 @@ class InterestingBonusUser(models.Model):
         verbose_name_plural = 'Qiziqarli bonus userlar'
         verbose_name = 'Qiziqarli bonus user'
         db_table = 'interesting_user_bonus'
+
+
+class SpendPrice(models.Model):
+    text = models.TextField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return str(self.text)[:20]
+
+    class Meta:
+        verbose_name_plural = 'Sotish xabarlari'
+        verbose_name = 'Sotish xabar'
+        db_table = 'spend_price'
+
+
+class SpendPriceField(models.Model):
+    spend_price = models.ForeignKey(SpendPrice, on_delete=models.SET_NULL, null=True, blank=True)
+
+    name = models.CharField(max_length=120, null=True, blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.spend_price)
+
+    class Meta:
+        verbose_name_plural = 'Sotish xabari narxlari'
+        verbose_name = 'Sotish xabar narx'
+        db_table = 'spend_price_field'

@@ -10,7 +10,9 @@ from .methods.prices import get_premium_prices, get_stars_prices
 from .methods.rating import get_rating_base, get_rating_type
 from .methods.bonus import get_bonus_base, get_bonus_type, get_daily_bonus, get_stories_bonus
 from .methods.group import get_group_base, new_member_handler
-from .methods.interesting_bonus import get_interesting_bonus_base, check_interesting_bonus_nik, check_interesting_bonus_bio
+from .methods.interesting_bonus import get_interesting_bonus_base, check_interesting_bonus_nik, \
+    check_interesting_bonus_bio
+from .methods.account import my_account, spend, spend_field
 import logging
 import time
 from telegram.error import RetryAfter
@@ -68,6 +70,9 @@ all_handler = ConversationHandler(
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][2] + ')$'), get_stars_prices),
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][3] + ')$'), get_rating_base),
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][4] + ')$'), get_bonus_base),
+            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][5] + ')$'), my_account),
+            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][6] + ')$'), get_bonus_base),
+            CallbackQueryHandler(spend)
         ],
         state.RATING: [
             CommandHandler('start', start),
@@ -108,6 +113,11 @@ all_handler = ConversationHandler(
             CommandHandler('start', start),
             CommandHandler('admin', start),
             CallbackQueryHandler(check_interesting_bonus_bio)
+        ],
+        state.MY_ACCOUNT: [
+            CommandHandler('start', start),
+            CommandHandler('admin', start),
+            CallbackQueryHandler(spend_field)
         ],
     },
     fallbacks=[CommandHandler('start', start),
