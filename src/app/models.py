@@ -290,3 +290,19 @@ class SpendPriceField(models.Model):
         verbose_name_plural = 'Sotish xabari narxlari'
         verbose_name = 'Sotish xabar narx'
         db_table = 'spend_price_field'
+
+
+class PromoCodes(models.Model):
+    name = models.CharField(max_length=14, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    status = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.name)
+
+    class Meta:
+        verbose_name_plural = 'Promo codes'
+        verbose_name = 'Promo codes'
+        db_table = 'promo_codes'

@@ -12,7 +12,7 @@ from .methods.bonus import get_bonus_base, get_bonus_type, get_daily_bonus, get_
 from .methods.group import get_group_base, new_member_handler
 from .methods.interesting_bonus import get_interesting_bonus_base, check_interesting_bonus_nik, \
     check_interesting_bonus_bio
-from .methods.account import my_account, spend, spend_field
+from .methods.account import my_account, spend, spend_field, get_promo_code, send_promo_code
 import logging
 import time
 from telegram.error import RetryAfter
@@ -118,6 +118,16 @@ all_handler = ConversationHandler(
             CommandHandler('start', start),
             CommandHandler('admin', start),
             CallbackQueryHandler(spend_field)
+        ],
+        state.GET_PROMO_CODE: [
+            CommandHandler('start', start),
+            CommandHandler('admin', start),
+            CallbackQueryHandler(get_promo_code)
+        ],
+        state.SEND_PROMO_CODE: [
+            CommandHandler('start', start),
+            CommandHandler('admin', start),
+            CallbackQueryHandler(send_promo_code)
         ],
     },
     fallbacks=[CommandHandler('start', start),

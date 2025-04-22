@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import CustomUser, Channel, Settings, Prices, StarsPrices, RewardsChannelBoost, DailyBonus, \
     StoryBonusPrice, StoryBonusAccounts, Group, InvitedUser, InterestingBonus, InterestingBonusUser, CustomUserAccount, \
-    SpendPrice, SpendPriceField
+    SpendPrice, SpendPriceField, PromoCodes
 
 admin.site.register(CustomUser)
 admin.site.register(Channel)
@@ -19,3 +19,4 @@ admin.site.register(InterestingBonusUser)
 admin.site.register(CustomUserAccount)
 admin.site.register(SpendPrice)
 admin.site.register(SpendPriceField)
+admin.site.register(PromoCodes)

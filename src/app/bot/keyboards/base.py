@@ -213,9 +213,9 @@ class Keyboards:
     def spend_fields(fields, current_price):
         result = list()
         for field in fields:
-            icon = "✅ " if field.price >= current_price else " ❌"
+            icon = "✅ " if current_price >= field.price else " ❌"
             result.append([InlineKeyboardButton(
-                field.name + icon,
+                field.name + ' - ' + str(field.price)[:-3] + icon,
                 callback_data=str(field.id)
             )])
         result.append([InlineKeyboardButton(
@@ -223,3 +223,29 @@ class Keyboards:
             callback_data='back'
         )])
         return InlineKeyboardMarkup(result)
+
+    @staticmethod
+    def get_promo_code():
+        return InlineKeyboardMarkup([
+            [InlineKeyboardButton(
+                "💳 Promokod kod harid qilish",
+                callback_data='get_promo_code'
+            )],
+            [InlineKeyboardButton(
+                "⬅️ Orqaga",
+                callback_data='back'
+            )]
+        ])
+
+    @staticmethod
+    def send_promo_code():
+        return InlineKeyboardMarkup([
+            [InlineKeyboardButton(
+                "💳 Adminga yuborish",
+                callback_data='send_admin'
+            )],
+            [InlineKeyboardButton(
+                "⬅️ Orqaga",
+                callback_data='back'
+            )]
+        ])
