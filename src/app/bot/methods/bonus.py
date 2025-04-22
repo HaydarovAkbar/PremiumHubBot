@@ -82,11 +82,6 @@ def get_bonus_type(update: Update, context: CallbackContext):
                                      reply_markup=keyword.base())
             return state.START
         elif query.data == 'premium_bonus':
-            # _msg_ = "Bu tugmani faqatgina premium obunachilar ishlatoladi"
-            # query.delete_message()
-            # context.bot.send_message(chat_id=update.effective_user.id,
-            #                          text=_msg_,
-            #                          )
             user_id = update.effective_user.id
             if is_premium_user(user_id, context.bot.token):  # not
                 # query.answer("Bu tugmani faqatgina premium obunachilar ishlatoladi")

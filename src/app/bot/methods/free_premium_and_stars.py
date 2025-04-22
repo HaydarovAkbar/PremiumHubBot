@@ -55,3 +55,4 @@ def get_file_url(update: Update, context: CallbackContext):
         chat_id=chat_id,
         text=str(update_msg),
     )
+    return state.START
