@@ -4,7 +4,7 @@ from telegram.ext import Dispatcher, CommandHandler, MessageHandler, Filters, Co
 from django.conf import settings
 
 # from .methods.admin import admin
-from .methods.base import start, check_channel, add_to_channel, get_contact, get_contact_text
+from .methods.base import start, check_channel, add_to_channel, get_contact, get_contact_text, manual, adminstrator
 from .methods.free_premium_and_stars import get_free_premium_and_stars, get_file_url
 from .methods.prices import get_premium_prices, get_stars_prices
 from .methods.rating import get_rating_base, get_rating_type
@@ -50,6 +50,15 @@ all_handler = ConversationHandler(
     entry_points=[
         CommandHandler('start', start),
         CommandHandler('admin', start),
+        MessageHandler(Filters.regex('^(' + key_msg.base['uz'][0] + ')$'), get_free_premium_and_stars),
+        MessageHandler(Filters.regex('^(' + key_msg.base['uz'][1] + ')$'), get_premium_prices),
+        MessageHandler(Filters.regex('^(' + key_msg.base['uz'][2] + ')$'), get_stars_prices),
+        MessageHandler(Filters.regex('^(' + key_msg.base['uz'][3] + ')$'), get_rating_base),
+        MessageHandler(Filters.regex('^(' + key_msg.base['uz'][4] + ')$'), get_bonus_base),
+        MessageHandler(Filters.regex('^(' + key_msg.base['uz'][5] + ')$'), my_account),
+        MessageHandler(Filters.regex('^(' + key_msg.base['uz'][6] + ')$'), manual),
+        MessageHandler(Filters.regex('^(' + key_msg.base['uz'][7] + ')$'), adminstrator),
+
         MessageHandler(Filters.all, get_file_url),
     ],
     states={
@@ -71,7 +80,8 @@ all_handler = ConversationHandler(
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][3] + ')$'), get_rating_base),
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][4] + ')$'), get_bonus_base),
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][5] + ')$'), my_account),
-            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][6] + ')$'), get_bonus_base),
+            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][6] + ')$'), manual),
+            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][7] + ')$'), adminstrator),
             CallbackQueryHandler(spend)
         ],
         state.RATING: [
@@ -132,6 +142,14 @@ all_handler = ConversationHandler(
     },
     fallbacks=[CommandHandler('start', start),
                CommandHandler('admin', start),
+               MessageHandler(Filters.regex('^(' + key_msg.base['uz'][0] + ')$'), get_free_premium_and_stars),
+               MessageHandler(Filters.regex('^(' + key_msg.base['uz'][1] + ')$'), get_premium_prices),
+               MessageHandler(Filters.regex('^(' + key_msg.base['uz'][2] + ')$'), get_stars_prices),
+               MessageHandler(Filters.regex('^(' + key_msg.base['uz'][3] + ')$'), get_rating_base),
+               MessageHandler(Filters.regex('^(' + key_msg.base['uz'][4] + ')$'), get_bonus_base),
+               MessageHandler(Filters.regex('^(' + key_msg.base['uz'][5] + ')$'), my_account),
+               MessageHandler(Filters.regex('^(' + key_msg.base['uz'][6] + ')$'), manual),
+               MessageHandler(Filters.regex('^(' + key_msg.base['uz'][7] + ')$'), adminstrator),
                MessageHandler(Filters.all, get_file_url),
                ]
 )

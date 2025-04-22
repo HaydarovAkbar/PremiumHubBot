@@ -2,6 +2,7 @@ class MessageText:
     prem_photo_id = 'AgACAgIAAxkBAAIc6GgAAea7PjTk9Z15KiJC9FU8vGFL6gACIO4xG7QzCEhZvfmXA_tM6wEAAwIAA3gAAzYE'
     star_photo_id = 'AgACAgIAAxkBAAIdA2gAAfEaEBGNpfMFJPLCAAH93M8n6aEAApjuMRu0MwhILAELcsCKtdcBAAMCAAN4AAM2BA'
     channel_boost_id = 'AgACAgIAAxkBAAIdMGgDsap04ttehDgVD7PI_Bl_UhZAAAKY7TEbYdsgSOZtPnqRXZ2tAQADAgADeAADNgQ'
+    manual_video_id = 'BAACAgIAAxkBAAIe3mgHVa6tNrZlthnkqqVPbg3hawhwAALwcAACJNc5SsHnxklgBmrhNgQ'
 
     BASE_MSG = """
 <b>Assalomu alaykum! PremiumHub botimizga xush kelibsiz!</b>
