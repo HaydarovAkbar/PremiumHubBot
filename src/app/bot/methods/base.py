@@ -153,3 +153,46 @@ def get_contact_text(update: Update, context: CallbackContext):
         return state.SIGNUP
     update.message.reply_html(msg.BASE_MSG, reply_markup=keyword.base())
     return state.START
+
+
+def manual(update: Update, context: CallbackContext):
+    file_id = msg.manual_video_id
+    _msg_ = """
+1. Doʻstlaringizni taklif qiling va pul yigʻing. Yigʻilgan pulni <b>«Telegram Premium yoki Telegram Stars»</b>ga almashtiring.
+
+2. Premiumingiz boʻlsa, kanalimizga ovoz berish orqali har kunlik bonuslarni olishingiz va <b>«Telegram Premium yoki Telegram Stars»</b>ga ishlatishingiz mumkin
+
+3. Referal yigʻish maqsadida turli xil yolgʻon soʻzlar bilan reklama tarqatmang! Zero, qalb xotirjamligining asosi rostgoʻylikdir.
+
+Bular haqida toʻliq maʼlumot olish uchun maxsus qoʻllanmalar bilan tanishib chiqing 👇
+
+<b>• Botda roʻyxatdan oʻtish uchun qoʻllanma: </b>
+t.me/premium_olish_qollanmasi/3
+
+<b>• Premium olish uchun botda pul ishlash ketma-ketligi: </b>
+t.me/premium_olish_qollanmasi/4
+
+<b>• Botda pul yigʻib Premium olish usuli: </b>
+t.me/premium_olish_qollanmasi/5
+
+<b>• Menga uzoq muddatli Premium obunasi kerak desangiz: </b>
+t.me/premium_olish_qollanmasi/6
+    """
+    update.message.reply_video(
+        video=file_id,
+        caption=_msg_,
+        parse_mode='HTML',
+    )
+
+
+def adminstrator(update: Update, context: CallbackContext):
+    _msg_ = """<b>
+📞 Premium uchun: @Premium_xizmatim
+
+🛠 Savollar uchun: @Hup_support
+
+💬 Chat: @Premiumhub_chat</b>
+    """
+    update.message.reply_html(
+        _msg_,
+    )
