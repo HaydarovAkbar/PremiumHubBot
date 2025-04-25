@@ -8,7 +8,7 @@ import json
 import hashlib
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from .models import CustomUser, Settings
+from .models import CustomUser, Settings, CustomUserAccount
 from telegram import Bot
 from .bot.keyboards.base import Keyboards
 from django.conf import settings
@@ -61,6 +61,24 @@ def register_device(request):
         if existing >= bot_settings.device_count:
             custom_user.is_blocked = True
             custom_user.is_active = False
+            try:
+                referral_user = CustomUser.objects.get(chat_id=custom_user.referral)
+                referral_user_account, __ = CustomUserAccount.objects.get_or_create(
+                    chat_id=custom_user.referral
+                )
+                referral_user_account.current_price += 1000.0
+                referral_user_account.save()
+                bot.send_message(
+                    chat_id=referral_user_account.chat_id,
+                    text="""
+Siz taklif qilgan foydalanuvchi ro'yxatdan o'tdi!
+
+Sizga 1000.0 so'm bonus berildi.
+"""
+
+                )
+            except CustomUser.DoesNotExist:
+                pass
             custom_user.save()
             bot.send_message(
                 chat_id=telegram_id,
