@@ -11,6 +11,7 @@ class CustomUser(models.Model):
     device_hash = models.CharField(max_length=64, null=True, blank=True)
     invited_count = models.PositiveIntegerField(default=0)
     premium_count = models.PositiveIntegerField(default=0)
+    referral = models.BigIntegerField(default=0, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -188,8 +189,8 @@ class StoryBonusAccounts(models.Model):
 
 class CustomUserAccount(models.Model):
     chat_id = models.BigIntegerField(db_index=True, unique=True)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Jami summasi")
-    current_price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Hozirgi summasi")
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Jami summasi", default=0)
+    current_price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Hozirgi summasi", default=0)
 
 
 class InvitedUser(models.Model):
@@ -294,6 +295,7 @@ class SpendPriceField(models.Model):
 
 class PromoCodes(models.Model):
     name = models.CharField(max_length=14, null=True, blank=True)
+    chat_id = models.BigIntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -55,9 +55,16 @@ def my_account(update: Update, context: CallbackContext):
 Taklif qilgan do‘stlaringiz: {user_db.invited_count} ta
 Premium doʻstlar: {user_db.premium_count} ta 
 Guruhimizga taklif qilgan do'stlaringiz: {group_added_count} ta 
-Sizning raqamingiz: {user_db.phone_number}
+Sizning raqamingiz: +{user_db.phone_number}
 </b>
 """
+        promo_msg = ""
+        my_promo_codes = PromoCodes.objects.filter(chat_id=update.effective_user.id, status=True)
+        if my_promo_codes:
+            promo_msg = "🔷 <b>Sizning promokodlaringiz:</b> 🔷\n"
+        for my_promo_code in my_promo_codes:
+            promo_msg += f"<code>{my_promo_code.name}</code>     -    Aktiv ✅\n"
+        _msg += promo_msg
         update.message.reply_html(
             _msg,
             reply_markup=keyword.my_account(),
@@ -176,7 +183,15 @@ def get_promo_code(update: Update, context: CallbackContext):
                                      reply_markup=keyword.base())
             return state.START
         spend_field = SpendPriceField.objects.get(id=context.chat_data['promo_code'])
+        user_account, __ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id)
+        user_account.current_price -= spend_field.price
+        user_account.save()
         promo_code = promo_code_generator()
+        PromoCodes.objects.create(
+            chat_id=update.effective_user.id,
+            name=promo_code,
+            status=True,
+        )
         _msg_ = f"""
 Sizga <b>{spend_field.name}</b> uchun promokod berildi
 
@@ -221,12 +236,15 @@ def send_promo_code(update: Update, context: CallbackContext):
                                      reply_markup=keyword.base())
             return state.START
         promo_code = context.chat_data['promo_code']
+        spent_field = SpendPriceField.objects.get(id=context.chat_data['promo_code'])
         admins = CustomUser.objects.filter(is_admin=True)
         for admin in admins:
             try:
                 adm_msg = (
                     f"🆕 Yangi promo kod ro'yxatdan o'tdi!\n\n"
                     f"🔹 Promo kod: <code>{promo_code}</code>\n"
+                    f"🔹 Promo turi: <code>{spent_field.name}</code>\n"
+                    f"🔹 Promo narxi: <code>{spent_field.price}</code>\n"
                     f"🔹 Foydalanuvchi: <a href='tg://user?id={user_db.chat_id}'>{update.effective_chat.full_name}</a>\n"
                     f"🔹 User ID: <code>{user_db.chat_id}</code>"
                 )
