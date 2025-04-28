@@ -229,6 +229,10 @@ class CustomUserAccount(models.Model):
     def __str__(self):
         return str(self.chat_id) + ' <---> ' + str(self.current_price)
 
+    class Meta:
+        verbose_name_plural = 'Foydalanuvchi Akkountlari'
+        verbose_name = 'Foydalanuvchi Akkounti'
+
 
 class InvitedUser(models.Model):
     inviter_chat_id = models.BigIntegerField(null=True, blank=True)
