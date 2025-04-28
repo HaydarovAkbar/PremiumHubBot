@@ -1,7 +1,7 @@
 from django.conf import settings
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
-from app.models import CustomUser, Channel, Prices, StarsPrices
+from app.models import CustomUser, Channel, Prices, StarsPrices, TopUser
 from ..keyboards.base import Keyboards
 from ..states import States
 from ..messages.main import MessageText
@@ -62,15 +62,42 @@ def get_rating_type(update: Update, context: CallbackContext):
     if user_db.is_active:
         query = update.callback_query
         query.answer()
+        if query.data == 'back':
+            query.delete_message()
+            context.bot.send_message(chat_id=update.effective_user.id,
+                                     text="Menyuga qaytdik!",
+                                     reply_markup=keyword.base())
+            return state.START
         if query.data == 'top_rating':
-            _msg_ = "Top reyting"
+            _msg_ = "🏆TOP 20 ta oylik foydalanuvchilar:\n\n"
+            top_20_user = TopUser.objects.order_by('-monthly_earned')[:20]
+            counter = 1
+            top_3 = {
+                '1': '🥇',
+                '2': '🥈',
+                '3': '🥉'
+            }
+            for user in top_20_user:
+                medal = top_3.get(str(counter), counter)
+                _msg_ += f"{medal}. {user.fullname} - {user.monthly_earned} so'm\n"
+                counter += 1
             query.delete_message()
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=_msg_,
-
                                      )
         else:
-            _msg_ = "Haftalik reyting"
+            _msg_ = "🏆TOP 10 ta haftalik foydalanuvchilar:\n\n"
+            top_20_user = TopUser.objects.order_by('-weekly_earned')[:10]
+            counter = 1
+            top_3 = {
+                '1': '🥇',
+                '2': '🥈',
+                '3': '🥉'
+            }
+            for user in top_20_user:
+                medal = top_3.get(str(counter), counter)
+                _msg_ += f"{medal}. {user.fullname} - {user.monthly_earned} so'm\n"
+                counter += 1
             query.delete_message()
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=_msg_, )

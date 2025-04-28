@@ -1,5 +1,23 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+
+
+# class CustomUserManager(BaseUserManager):
+#     def create_user(self, username, email, password=None):
+#         if not email:
+#             raise ValueError('The Email field must be set')
+#         user = self.model(username=username, email=email)
+#         user.set_password(password)
+#         user.save(using=self._db)
+#         return user
+#
+#     def create_superuser(self, username, email, password=None):
+#         user = self.create_user(username, email, password)
+#         user.is_staff = True
+#         user.is_superuser = True
+#         user.save(using=self._db)
+#         return user
 
 
 class CustomUser(models.Model):
@@ -20,10 +38,15 @@ class CustomUser(models.Model):
     is_blocked = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
 
+    # objects = CustomUserManager()
+    REQUIRED_FIELDS = ['phone_number']
+
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"({self.first_name} {self.last_name}) - Phone: {self.phone_number}   -  is_blocked: {self.is_blocked}"
 
     class Meta:
+        verbose_name_plural = "Foydalanuvchilar"
+        verbose_name = "Foydalanuvchi"
         db_table = 'custom_user'
 
 
@@ -37,6 +60,8 @@ class Channel(models.Model):
     is_active = models.BooleanField(default=True)
 
     class Meta:
+        verbose_name_plural = "Majburiy azolik kanallari"
+        verbose_name = "Majburiy azolik kanal"
         db_table = 'channel'
 
 
@@ -57,6 +82,8 @@ class Group(models.Model):
         return f"{self.name}"
 
     class Meta:
+        verbose_name_plural = "Azolik gruppasi"
+        verbose_name = "Azolik gruppasi"
         db_table = 'group'
 
 
@@ -66,12 +93,19 @@ class Settings(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    referral_price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Referral summasi", default=0)
+    referral_prem_price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Referral premium summasi",
+                                              default=0)
+    promo_limit = models.IntegerField(null=True, blank=True, verbose_name="Promo limit")
+
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return str(self.device_count)
 
     class Meta:
+        verbose_name_plural = "Asosiy sozlamalar"
+        verbose_name = "Asosiy sozlama"
         db_table = 'settings'
 
 
@@ -192,6 +226,9 @@ class CustomUserAccount(models.Model):
     total_price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Jami summasi", default=0)
     current_price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Hozirgi summasi", default=0)
 
+    def __str__(self):
+        return str(self.chat_id) + ' <---> ' + str(self.current_price)
+
 
 class InvitedUser(models.Model):
     inviter_chat_id = models.BigIntegerField(null=True, blank=True)
@@ -301,10 +338,34 @@ class PromoCodes(models.Model):
 
     status = models.BooleanField(default=False)
 
+    reward = models.CharField(max_length=50, null=True, blank=True)
+
     def __str__(self):
         return str(self.name)
 
     class Meta:
-        verbose_name_plural = 'Promo codes'
-        verbose_name = 'Promo codes'
+        verbose_name_plural = 'Promo kodlar'
+        verbose_name = 'Promo kod'
         db_table = 'promo_codes'
+
+
+class TopUser(models.Model):
+    chat_id = models.BigIntegerField(db_index=True, unique=True, null=True, blank=True)
+    fullname = models.CharField(max_length=255, null=True, blank=True)
+    balance = models.BigIntegerField(default=0)
+
+    total_earned = models.BigIntegerField(default=0)
+
+    weekly_earned = models.BigIntegerField(default=0)
+    monthly_earned = models.BigIntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.fullname} - {self.balance} so'm"
+
+    class Meta:
+        verbose_name_plural = 'Top userlar'
+        verbose_name = 'Top user'
+        db_table = 'top_user'

@@ -139,7 +139,9 @@ def spend_field(update: Update, context: CallbackContext):
                                      reply_markup=keyword.base())
             return state.START
         spend_field = SpendPriceField.objects.get(id=query.data)
-        if account.current_price >= spend_field.price:
+        bot_setting = Settings.objects.filter(is_active=True).last()
+        user_promo_count = PromoCodes.objects.filter(status=True, chat_id=user_db.chat_id).count()
+        if account.current_price >= spend_field.price and bot_setting.promo_limit > user_promo_count:
             context.chat_data['promo_code'] = query.data
             query.edit_message_text(
                 f"""
@@ -154,7 +156,7 @@ sizga promokod beriladi.
             )
             return state.GET_PROMO_CODE
         else:
-            query.answer()
+            query.answer("❌ Siz ushbu taklifdan foydalana olmaysiz!\nExtimoliy sabablar: \n1. Mablag' yetarli emas\n2. Limitga yetgansiz")
 
 
 def get_promo_code(update: Update, context: CallbackContext):
@@ -191,6 +193,7 @@ def get_promo_code(update: Update, context: CallbackContext):
             chat_id=update.effective_user.id,
             name=promo_code,
             status=True,
+            reward=spend_field.name[:50],
         )
         _msg_ = f"""
 Sizga <b>{spend_field.name}</b> uchun promokod berildi
