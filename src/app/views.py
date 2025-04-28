@@ -8,10 +8,21 @@ import json
 import hashlib
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from .models import CustomUser, Settings, CustomUserAccount
+from .models import CustomUser, Settings, CustomUserAccount, TopUser
 from telegram import Bot
 from .bot.keyboards.base import Keyboards
 from django.conf import settings
+import requests
+
+
+def is_premium_user(user_id: int, bot_token: str) -> bool:
+    url = f"https://api.telegram.org/bot{bot_token}/getChat"
+    response = requests.post(url, data={"chat_id": user_id})
+
+    if response.status_code == 200:
+        data = response.json()
+        return data.get("result", {}).get("is_premium", False)
+    return False
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -61,24 +72,6 @@ def register_device(request):
         if existing >= bot_settings.device_count:
             custom_user.is_blocked = True
             custom_user.is_active = False
-            try:
-                referral_user = CustomUser.objects.get(chat_id=custom_user.referral)
-                referral_user_account, __ = CustomUserAccount.objects.get_or_create(
-                    chat_id=custom_user.referral
-                )
-                referral_user_account.current_price += 1000.0
-                referral_user_account.save()
-                bot.send_message(
-                    chat_id=referral_user_account.chat_id,
-                    text="""
-Siz taklif qilgan foydalanuvchi ro'yxatdan o'tdi!
-
-Sizga 1000.0 so'm bonus berildi.
-"""
-
-                )
-            except CustomUser.DoesNotExist:
-                pass
             custom_user.save()
             bot.send_message(
                 chat_id=telegram_id,
@@ -94,9 +87,44 @@ Sizga 1000.0 so'm bonus berildi.
 
         if not (custom_user.device_hash and custom_user.is_active):
             custom_user.device_hash = fingerprint_hash
+            custom_is_premium = is_premium_user(custom_user.chat_id, settings.TOKEN)
+            custom_user_ref_price = bot_settings.referral_prem_price if custom_is_premium else bot_settings.referral_price
             custom_user.is_active = True
             custom_user.save()
             keyword = Keyboards()
+            try:
+                referral_user = CustomUser.objects.get(chat_id=custom_user.referral)
+                referral_user_account, __ = CustomUserAccount.objects.get_or_create(
+                    chat_id=custom_user.referral
+                )
+                top_user, a = TopUser.objects.get_or_create(
+                    chat_id=referral_user.chat_id,
+                    defaults={
+                        'fullname': referral_user.first_name,
+                    }
+                )
+                top_user.balance += int(custom_user_ref_price)
+                top_user.weekly_earned += int(custom_user_ref_price)
+                top_user.monthly_earned += int(custom_user_ref_price)
+                top_user.save()
+                referral_user_account.current_price += custom_user_ref_price
+                referral_user_account.save()
+                if custom_is_premium:
+                    referral_user.premium_count += 1
+                else:
+                    referral_user.invited_count += 1
+                custom_user.save()
+                bot.send_message(
+                    chat_id=referral_user_account.chat_id,
+                    text=f"""
+🎉 Tabriklaymiz!  Siz taklif qilgan foydalanuvchi ro'yxatdan o'tdi!
+
+Sizga {custom_user_ref_price} so'm bonus berildi.
+            """
+
+                )
+            except CustomUser.DoesNotExist:
+                pass
             bot.send_message(
                 chat_id=telegram_id,
                 text=(
