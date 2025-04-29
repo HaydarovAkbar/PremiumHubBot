@@ -15,3 +15,8 @@ class States:
     MY_ACCOUNT = 14
     GET_PROMO_CODE = 15
     SEND_PROMO_CODE = 16
+
+    # admin states
+    ADMIN = 17
+    ADS = 18
+    ADS_BUTTON=19

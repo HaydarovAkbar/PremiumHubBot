@@ -39,6 +39,11 @@ class KeyboardText:
         'ru': ["Личный кабинет", "Отправить отзыв", "Посмотреть статистику", "Настройки ⚙️"],
         'en': ["Personal account", "Send feedback", "View statistics", "Settings ⚙️"],
     }
+    admin = {
+        'uz': ["💠 Xabar yuborish", "🔍 Foydalanuvchi qidirish"],
+        'ru': ["Личный кабинет", "Отправить отзыв", "Посмотреть статистику", "Настройки ⚙️"],
+        'en': ["Personal account", "Send feedback", "View statistics", "Settings ⚙️"],
+    }
     referral = {
         'uz': "📤 Do'stlarga Ulashish",
     }
