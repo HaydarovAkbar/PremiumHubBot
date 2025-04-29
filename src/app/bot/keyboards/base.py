@@ -249,3 +249,23 @@ class Keyboards:
                 callback_data='back'
             )]
         ])
+
+    @staticmethod
+    def admin_base():
+        return ReplyKeyboardMarkup([
+            ["💠 Xabar yuborish"],
+            ["🔍 Foydalanuvchi qidirish"]
+        ], resize_keyboard=True)
+
+    @staticmethod
+    def back():
+        return ReplyKeyboardMarkup([
+            ["⬅️ Orqaga"]
+        ], resize_keyboard=True)
+
+    @staticmethod
+    def ads():
+        return ReplyKeyboardMarkup([
+            ["📳 YUBORISH"],
+            ["⬅️ Orqaga"]
+        ], resize_keyboard=True)

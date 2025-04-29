@@ -13,6 +13,7 @@ from .methods.group import get_group_base, new_member_handler
 from .methods.interesting_bonus import get_interesting_bonus_base, check_interesting_bonus_nik, \
     check_interesting_bonus_bio
 from .methods.account import my_account, spend, spend_field, get_promo_code, send_promo_code
+from .methods.admin import admin_base, ads, get_ads, parse_button, received_advert
 import logging
 import time
 from telegram.error import RetryAfter
@@ -49,7 +50,7 @@ dispatcher = Dispatcher(bot, None)
 all_handler = ConversationHandler(
     entry_points=[
         CommandHandler('start', start),
-        CommandHandler('admin', start),
+        CommandHandler('admin', admin_base),
         MessageHandler(Filters.regex('^(' + key_msg.base['uz'][0] + ')$'), get_free_premium_and_stars),
         MessageHandler(Filters.regex('^(' + key_msg.base['uz'][1] + ')$'), get_premium_prices),
         MessageHandler(Filters.regex('^(' + key_msg.base['uz'][2] + ')$'), get_stars_prices),
@@ -64,12 +65,12 @@ all_handler = ConversationHandler(
     states={
         state.CHECK_CHANNEL: [
             CommandHandler('start', start),
-            CommandHandler('admin', start),
+            CommandHandler('admin', admin_base),
             CallbackQueryHandler(add_to_channel),
         ],
         state.PHONE: [
             CommandHandler('start', start),
-            CommandHandler('admin', start),
+            CommandHandler('admin', admin_base),
             MessageHandler(Filters.contact, get_contact),
             MessageHandler(Filters.text, get_contact_text),
         ],
@@ -86,62 +87,82 @@ all_handler = ConversationHandler(
         ],
         state.RATING: [
             CommandHandler('start', start),
-            CommandHandler('admin', start),
+            CommandHandler('admin', admin_base),
             CallbackQueryHandler(get_rating_type)
         ],
         state.BONUS: [
             CommandHandler('start', start),
-            CommandHandler('admin', start),
+            CommandHandler('admin', admin_base),
             CallbackQueryHandler(get_bonus_type)
         ],
         state.CHANNEL_BOOST_BONUS: [
             CommandHandler('start', start),
-            CommandHandler('admin', start),
+            CommandHandler('admin', admin_base),
             CallbackQueryHandler(get_daily_bonus)
         ],
         state.STORY_BONUS: [
             CommandHandler('start', start),
-            CommandHandler('admin', start),
+            CommandHandler('admin', admin_base),
             CallbackQueryHandler(get_stories_bonus)
         ],
         state.GROUP_BONUS: [
             CommandHandler('start', start),
-            CommandHandler('admin', start),
+            CommandHandler('admin', admin_base),
             CallbackQueryHandler(get_group_base)
         ],
         state.INTERESTING_BONUS: [
             CommandHandler('start', start),
-            CommandHandler('admin', start),
+            CommandHandler('admin', admin_base),
             CallbackQueryHandler(get_interesting_bonus_base)
         ],
         state.INTERESTING_BONUS_NIK: [
             CommandHandler('start', start),
-            CommandHandler('admin', start),
+            CommandHandler('admin', admin_base),
             CallbackQueryHandler(check_interesting_bonus_nik)
         ],
         state.INTERESTING_BONUS_BIO: [
             CommandHandler('start', start),
-            CommandHandler('admin', start),
+            CommandHandler('admin', admin_base),
             CallbackQueryHandler(check_interesting_bonus_bio)
         ],
         state.MY_ACCOUNT: [
             CommandHandler('start', start),
-            CommandHandler('admin', start),
+            CommandHandler('admin', admin_base),
             CallbackQueryHandler(spend_field)
         ],
         state.GET_PROMO_CODE: [
             CommandHandler('start', start),
-            CommandHandler('admin', start),
+            CommandHandler('admin', admin_base),
             CallbackQueryHandler(get_promo_code)
         ],
         state.SEND_PROMO_CODE: [
             CommandHandler('start', start),
-            CommandHandler('admin', start),
+            CommandHandler('admin', admin_base),
             CallbackQueryHandler(send_promo_code)
+        ],
+        state.ADMIN: [
+            CommandHandler('start', start),
+            CommandHandler('admin', admin_base),
+            MessageHandler(Filters.regex('^(' + key_msg.back['uz'] + ')$'), admin_base),
+            MessageHandler(Filters.regex('^(' + "💠 Xabar yuborish" + ')$'), ads),
+            MessageHandler(Filters.regex('^(' + key_msg.admin['uz'][1] + ')$'), get_premium_prices),
+        ],
+        state.ADS: [
+            CommandHandler('start', start),
+            CommandHandler('admin', admin_base),
+            MessageHandler(Filters.regex('^(' + key_msg.back['uz'] + ')$'), admin_base),
+            MessageHandler(Filters.all, get_ads),
+        ],
+        state.ADS_BUTTON: [
+            CommandHandler('start', start),
+            CommandHandler('admin', admin_base),
+            MessageHandler(Filters.regex('^(' + key_msg.back['uz'] + ')$'), admin_base),
+            MessageHandler(Filters.regex('^(' + "📳 YUBORISH" + ')$'), received_advert),
+            MessageHandler(Filters.text, parse_button),
         ],
     },
     fallbacks=[CommandHandler('start', start),
-               CommandHandler('admin', start),
+               CommandHandler('admin', admin_base),
                MessageHandler(Filters.regex('^(' + key_msg.base['uz'][0] + ')$'), get_free_premium_and_stars),
                MessageHandler(Filters.regex('^(' + key_msg.base['uz'][1] + ')$'), get_premium_prices),
                MessageHandler(Filters.regex('^(' + key_msg.base['uz'][2] + ')$'), get_stars_prices),

@@ -30,6 +30,7 @@ INSTALLED_APPS = [
 
 DEV_APPS = [
     'app',
+    'django_celery_results',
 ]
 INSTALLED_APPS += DEV_APPS
 
@@ -124,3 +125,9 @@ CSRF_COOKIE_SECURE = False
 CSRF_TRUSTED_ORIGINS = [HOST]
 SIGNUP_URL = f"{HOST}/signup/"
 STORY_URL = f"{HOST}/story/"
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'default'

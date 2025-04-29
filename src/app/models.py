@@ -227,7 +227,7 @@ class CustomUserAccount(models.Model):
     current_price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Hozirgi summasi", default=0)
 
     def __str__(self):
-        return str(self.chat_id) + ' <---> ' + str(self.current_price)
+        return str(self.chat_id) + ' - ' + str(self.current_price)
 
     class Meta:
         verbose_name_plural = 'Foydalanuvchi Akkountlari'

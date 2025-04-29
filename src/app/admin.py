@@ -8,12 +8,14 @@ from .models import CustomUser, Channel, Settings, Prices, StarsPrices, RewardsC
 
 class CustomUserAdmin(admin.ModelAdmin):
     list_display = ['first_name', 'last_name', 'phone_number', 'is_active', 'is_blocked']
-    list_filter = ['is_active', 'is_blocked']
+    list_filter = ['is_active', 'is_blocked', 'is_admin']
     list_per_page = 20
+    search_fields = ['chat_id', 'phone_number']
+    search_help_text = "chat_id, phone_number"
 
     fieldsets = (
         ("Asosiy ma'lumotlar", {
-            'fields': ('first_name', 'last_name', 'phone_number', 'is_active', 'is_blocked')
+            'fields': ('first_name', 'last_name', 'phone_number', 'is_active', 'is_blocked', 'is_admin')
         }),
         ("Qo'shimcha ma'lumotlar", {
             'fields': ('chat_id', 'device_hash', 'invited_count', 'premium_count', 'referral')
