@@ -51,8 +51,8 @@
             background-color: #007bff;
         }
 
-        .btn.confirm {
-            background-color: #28a745;
+        .btn.share {
+            background-color: #ff9800;
         }
 
         .btn:hover {
@@ -61,12 +61,31 @@
     </style>
 </head>
 <body>
-    <h2>🎁 Stories Bonus</h2>
-    <p>Ushbu videoni Telegram Story’ga joylashtiring va sovg‘ani qo‘lga kiriting!</p>
+<h2>🎁 Stories Bonus</h2>
+<p>Ushbu videoni Telegram Story’ga joylashtiring va sovg‘ani qo‘lga kiriting!</p>
 
-    <video controls src="{% static 'videos/stories.mp4' %}"></video>
+<video controls src="{% static 'videos/stories.mp4' %}"></video>
 
-    <a class="btn" href="{{ video_url }}" download>⬇️ Videoni yuklab olish</a>
-    <button class="btn confirm" onclick="Telegram.WebApp.close()">✅ Joylashtirdim</button>
+<a class="btn download" href="{% static 'videos/stories.mp4' %}" download>⬇️ Videoni yuklab olish</a>
+
+<button class="btn share" onclick="shareToStory()">📤 Storyga joylash</button>
+
+<button onclick="Telegram.WebApp.shareToStory('https://telegra.ph/file/5583ac37c90979f052b7b.png');">
+    Test Share
+</button>
+<script>
+    function shareToStory() {
+        Telegram.WebApp.shareToStory(
+            "{{ request.build_absolute_uri|slice:':-1' }}{% static 'videos/stories_new.mp4' %}",
+            {
+                text: "🎁 Bonus olish uchun Storyga joylashtiring!",
+                widget_link: {
+                    url: "https://t.me/AiGeneratedPhotoBot?start=758934089",
+                    name: "🎁 Premium va Stars olish"
+                }
+            }
+        );
+    }
+</script>
 </body>
 </html>

@@ -2,7 +2,7 @@ from django.conf import settings
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 from app.models import CustomUser, Channel, Prices, StarsPrices, RewardsChannelBoost, DailyBonus, CustomUserAccount, \
-    InterestingBonus, InterestingBonusUser
+    InterestingBonus, InterestingBonusUser, TopUser
 from ..keyboards.base import Keyboards
 from ..states import States
 from ..messages.main import MessageText
@@ -57,7 +57,7 @@ Ustiga bosib nusxalab olishingiz mumkin
 <b>O'z telegram BIO ingizga bizning nomimizni qo'ying va {interesting_bonus.bio} so'm bonus oling.</b>
 Ustiga bosib nusxalab olishingiz mumkin
 
-<code>Tg Premium 👇  https://t.me/HubPremiyumBot?start=758934089 📝</code>
+<code>Tg Premium 👇  https://t.me/HubPremiyumBot?start={update.effective_user.id} 📝</code>
                     """
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=_msg_,
@@ -119,6 +119,16 @@ def check_interesting_bonus_nik(update: Update, context: CallbackContext):
                 user_account.current_price += bonus_amount
                 user_account.total_price += bonus_amount
                 user_account.save()
+                top_user, a = TopUser.objects.get_or_create(
+                    chat_id=update.effective_user.id,
+                    defaults={
+                        'fullname': update.effective_user.full_name,
+                    }
+                )
+                top_user.balance += int(bonus_amount)
+                top_user.weekly_earned += int(bonus_amount)
+                top_user.monthly_earned += int(bonus_amount)
+                top_user.save()
                 interesting_bonus_user.fullname = True
                 interesting_bonus_user.save()
                 _msg_ = f"""✅ Tabriklaymiz! Siz {bonus_amount} so'm bonus qo'lga kiritdingiz."""
@@ -175,7 +185,7 @@ def check_interesting_bonus_bio(update: Update, context: CallbackContext):
                 chat_id=update.effective_user.id
             )
             user_bio = update.effective_chat.bio or "" if hasattr(update.effective_chat, 'bio') else ""
-            required_text = "Tg Premium 👇 https://t.me/HubPremiyumBot?start=758934089"
+            required_text = f"Tg Premium 👇 https://t.me/HubPremiyumBot?start={update.effective_user.id}"
             has_in_name = required_text.lower() in user_bio.lower()
             if has_in_name:
                 user_account = CustomUserAccount.objects.get(
@@ -194,6 +204,16 @@ def check_interesting_bonus_bio(update: Update, context: CallbackContext):
                 user_account.current_price += bonus_amount
                 user_account.total_price += bonus_amount
                 user_account.save()
+                top_user, a = TopUser.objects.get_or_create(
+                    chat_id=update.effective_user.id,
+                    defaults={
+                        'fullname': update.effective_user.full_name,
+                    }
+                )
+                top_user.balance += int(bonus_amount)
+                top_user.weekly_earned += int(bonus_amount)
+                top_user.monthly_earned += int(bonus_amount)
+                top_user.save()
                 interesting_bonus_user.bio = True
                 interesting_bonus_user.save()
                 _msg_ = f"""✅ Tabriklaymiz! Siz {bonus_amount} so'm bonus qo'lga kiritdingiz."""

@@ -84,6 +84,7 @@ def get_rating_type(update: Update, context: CallbackContext):
             query.delete_message()
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=_msg_,
+                                     reply_markup=keyword.back()
                                      )
         else:
             _msg_ = "🏆TOP 10 ta haftalik foydalanuvchilar:\n\n"
@@ -100,6 +101,6 @@ def get_rating_type(update: Update, context: CallbackContext):
                 counter += 1
             query.delete_message()
             context.bot.send_message(chat_id=update.effective_user.id,
-                                     text=_msg_, )
+                                     text=_msg_, reply_markup=keyword.back())
 
     return state.RATING

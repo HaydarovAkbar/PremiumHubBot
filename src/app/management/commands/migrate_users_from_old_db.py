@@ -1,5 +1,5 @@
 import time
-import pymysql
+# import pymysql
 from django.core.management.base import BaseCommand
 from app.models import CustomUser, CustomUserAccount  # o'z model yo'lingni tekshir!
 
@@ -8,10 +8,10 @@ class Command(BaseCommand):
     help = "Migrate users from external MySQL database (MariaDB) to Django DB"
 
     def handle(self, *args, **options):
-        host = "109.73.201.204"
-        user = "premium_bot"
-        password = "Shohzod1009"
-        database = "premium_bot"
+        # host = "109.73.201.204"
+        # user = "premium_bot"
+        # password = "Shohzod1009"
+        # database = "premium_bot"
 
         # batch_size = 1000
         # offset = 57000
@@ -77,20 +77,34 @@ class Command(BaseCommand):
         #         break
 
         # self.stdout.write(self.style.SUCCESS(f"🎉 Jami {total_imported} foydalanuvchi import qilindi!"))
-        connection = pymysql.connect(
-            host=host,
-            user=user,
-            password=password,
-            database=database
-        )
-        with connection.cursor() as cursor:
-            query = f"-- SELECT * FROM users LIMIT 5 OFFSET 10"
-            query = f"SELECT * FROM users_trans;"
-            cursor.execute(query)
-            rows = cursor.fetchall()
+        # connection = pymysql.connect(
+        #     host=host,
+        #     user=user,
+        #     password=password,
+        #     database=database
+        # )
+        # with connection.cursor() as cursor:
+        #     query = f"-- SELECT * FROM users LIMIT 5 OFFSET 10"
+        #     query = f"SELECT * FROM users_trans;"
+        #     cursor.execute(query)
+        #     rows = cursor.fetchall()
+        #
+        # connection.close()
+        #
+        # # if not rows:
+        # #     self.stdout.write(self.style.SUCCESS("✅ Barcha foydalanuvchilar import qilindi."))
+        # print(rows)
+        counter = 0
+        print("Migrating users from external MySQL database...")
+        for cus_user in CustomUser.objects.all():
+            referral_count = CustomUser.objects.filter(referral=cus_user.chat_id).count()
+            if referral_count > 0:
+                cus_user.invited_count = referral_count
+                cus_user.save()
+            counter += 1
 
-        connection.close()
+            if counter % 100 == 0:
+                time.sleep(1)
+                print("Migrated {} users".format(counter))
 
-        # if not rows:
-        #     self.stdout.write(self.style.SUCCESS("✅ Barcha foydalanuvchilar import qilindi."))
-        print(rows)
+        print("End!")
