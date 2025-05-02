@@ -19,4 +19,5 @@ class States:
     # admin states
     ADMIN = 17
     ADS = 18
-    ADS_BUTTON=19
+    ADS_BUTTON = 19
+    KILL_TASK = 20
