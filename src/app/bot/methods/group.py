@@ -48,7 +48,6 @@ def get_group_base(update: Update, context: CallbackContext):
     if user_db.is_active:
         query = update.callback_query
         if query.data == 'back':
-            print("Back --------------->")
             query.delete_message()
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text="Menyuga qaytdik!",

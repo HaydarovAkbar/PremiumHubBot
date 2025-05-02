@@ -1,8 +1,10 @@
+from datetime import datetime
+
 from django.conf import settings
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 from app.models import CustomUser, Channel, Prices, StarsPrices, RewardsChannelBoost, DailyBonus, StoryBonusPrice, \
-    StoryBonusAccounts, Group
+    StoryBonusAccounts, Group, CustomUserAccount
 from ..keyboards.base import Keyboards
 from ..states import States
 from ..messages.main import MessageText
@@ -83,11 +85,11 @@ def get_bonus_type(update: Update, context: CallbackContext):
             return state.START
         elif query.data == 'premium_bonus':
             user_id = update.effective_user.id
-            if is_premium_user(user_id, context.bot.token):  # not
+            if not is_premium_user(user_id, context.bot.token):  # not
                 # query.answer("Bu tugmani faqatgina premium obunachilar ishlatoladi")
                 query.delete_message()
                 context.bot.send_message(chat_id=user_id, text="Bu tugmani faqatgina premium obunachilar ishlatoladi")
-                return
+                return state.BONUS
             else:
                 query.delete_message()
                 reward_db = RewardsChannelBoost.objects.filter(is_active=True).last()
@@ -138,6 +140,21 @@ def get_bonus_type(update: Update, context: CallbackContext):
     return state.BONUS
 
 
+def get_user_boosts(chat_id, user_id):
+    payload = {
+        "chat_id": chat_id,  # "@channelusername" yoki integer
+        "user_id": user_id
+    }
+    API_URL = f"https://api.telegram.org/bot{settings.TOKEN}/getUserChatBoosts"
+    response = requests.post(API_URL, json=payload)
+
+    if response.ok:
+        data = response.json()
+        if data.get("ok"):
+            return data["result"]
+    return False
+
+
 def get_daily_bonus(update: Update, context: CallbackContext):
     all_channel = Channel.objects.filter(is_active=True)
     left_channel = []
@@ -170,14 +187,40 @@ def get_daily_bonus(update: Update, context: CallbackContext):
             return state.BONUS
         query.delete_message()
         reward_db = RewardsChannelBoost.objects.filter(is_active=True).last()
-        daily_bonus = DailyBonus.objects.filter(chat_id=update.effective_user.id, rewards_channel=reward_db)
-        if daily_bonus.exists():
+        daily_bonus, _ = DailyBonus.objects.get_or_create(chat_id=update.effective_user.id, rewards_channel=reward_db)
+
+        def extract_channel_username(url: str) -> str:
+            if url.startswith("https://t.me/"):
+                return url.split("https://t.me/")[-1].split("/")[0].strip("@")
+            return url.strip("@")
+
+        boost_count = get_user_boosts(extract_channel_username(reward_db.channel_url), update.effective_user.id)
+        if not boost_count:
             context.bot.send_message(chat_id=update.effective_user.id,
-                                     text="Kunlik bonus bor",
+                                     text=f"❌ Siz kanalimizga boost bermagansiz xali !)",
                                      reply_markup=keyword.base()
                                      )
+            return state.START
+        if not _:
+            if daily_bonus.last_bonus != datetime.today().date():
+                daily_bonus.last_bonus = datetime.today().date()
+                daily_bonus.save()
+                custom_account, __ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id)
+                custom_account.current_price = reward_db.daily_bonus
+                custom_account.save()
+                context.bot.send_message(chat_id=update.effective_user.id,
+                                         text=f"🎉 Tabriklaymiz sizga {reward_db.daily_bonus} so'm kunlik bonus berildi.",
+                                         reply_markup=keyword.base()
+                                         )
+            context.bot.send_message(chat_id=update.effective_user.id,
+                                     text="Kunlik bonus allaqachon olgansiz!",
+                                     reply_markup=keyword.base()
+                                     )
+        custom_account, __ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id)
+        custom_account.current_price = reward_db.elementary_bonus
+        custom_account.save()
         context.bot.send_message(chat_id=update.effective_user.id,
-                                 text="Botdan foydalanish uchun barcha kanallarga a'zo bo'ling",
+                                 text=f"🎉 Tabriklaymiz sizga {reward_db.elementary_bonus} so'm kanalimizga ovoz berganingiz uchun bonus berildi.",
                                  reply_markup=keyword.base()
                                  )
         return state.START
@@ -222,12 +265,20 @@ def get_stories_bonus(update: Update, context: CallbackContext):
                                      text="Siz allaqachon bonus olgansiz!",
                                      reply_markup=keyword.base()
                                      )
+            return state.STORY_BONUS
         stories_counter = context.chat_data.get('stories_counter', 0)
         context.chat_data['stories_counter'] = stories_counter + 1
         if context.chat_data['stories_counter'] > 2:
             context.bot.send_message(chat_id=update.effective_user.id,
-                                     text="Sizga bonus taqdin etildi ✅",
+                                     text="Menyuga qaytdik!",
                                      reply_markup=keyword.bonus()
+                                     )
+            custom_account, __ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id)
+            custom_account.current_price = story_db.price
+            custom_account.save()
+            StoryBonusAccounts.objects.create(chat_id=update.effective_user.id)
+            context.bot.send_message(chat_id=update.effective_user.id,
+                                     text=f"🎉 Tabriklaymiz sizga {story_db.price} so'm kanalimizga ovoz berganingiz uchun bonus berildi.",
                                      )
         else:
             context.bot.send_message(chat_id=update.effective_user.id,

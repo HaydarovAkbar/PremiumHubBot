@@ -13,7 +13,7 @@ from .methods.group import get_group_base, new_member_handler
 from .methods.interesting_bonus import get_interesting_bonus_base, check_interesting_bonus_nik, \
     check_interesting_bonus_bio
 from .methods.account import my_account, spend, spend_field, get_promo_code, send_promo_code
-from .methods.admin import admin_base, ads, get_ads, parse_button, received_advert
+from .methods.admin import admin_base, ads, get_ads, parse_button, received_advert, get_kill_id, kill_task
 import logging
 import time
 from telegram.error import RetryAfter
@@ -145,6 +145,7 @@ all_handler = ConversationHandler(
             CommandHandler('admin', admin_base),
             MessageHandler(Filters.regex('^(' + key_msg.back['uz'] + ')$'), admin_base),
             MessageHandler(Filters.regex('^(' + "💠 Xabar yuborish" + ')$'), ads),
+            MessageHandler(Filters.regex('^(' + "🛑 Xabarni to'xtatish" + ')$'), kill_task),
             MessageHandler(Filters.regex('^(' + key_msg.admin['uz'][1] + ')$'), get_premium_prices),
         ],
         state.ADS: [
@@ -160,6 +161,12 @@ all_handler = ConversationHandler(
             MessageHandler(Filters.regex('^(' + "📳 YUBORISH" + ')$'), received_advert),
             MessageHandler(Filters.text, parse_button),
         ],
+        state.KILL_TASK: [
+            CommandHandler('start', start),
+            CommandHandler('admin', admin_base),
+            MessageHandler(Filters.regex('^(' + key_msg.back['uz'] + ')$'), admin_base),
+            MessageHandler(Filters.text, get_kill_id),
+        ]
     },
     fallbacks=[CommandHandler('start', start),
                CommandHandler('admin', admin_base),

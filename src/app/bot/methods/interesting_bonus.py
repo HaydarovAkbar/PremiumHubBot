@@ -39,10 +39,11 @@ def get_interesting_bonus_base(update: Update, context: CallbackContext):
         elif query.data == 'nik':
             query.delete_message()
             interesting_bonus = InterestingBonus.objects.filter().last()
-            _msg_ = f"""<b>O'z telegram ismingizga bizning nomimizni qo'ying va {interesting_bonus.fullname} so'm bonus oling.</b>
-                    Ustiga bosib nusxalab olishingiz mumkin
+            _msg_ = f"""
+<b>O'z telegram ismingizga bizning nomimizni qo'ying va {interesting_bonus.fullname} so'm bonus oling.</b>
+Ustiga bosib nusxalab olishingiz mumkin
                     
-                    <code>🅿️ PremiumHub 📝</code>
+<code>🅿️ PremiumHub 📝</code>
                     """
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=_msg_,
@@ -128,13 +129,11 @@ def check_interesting_bonus_nik(update: Update, context: CallbackContext):
                 )
                 return state.INTERESTING_BONUS_NIK
             _msg_ = f"""
-❗️ <b>Kechirasiz tekshirish natijasida sizda talabga javob beradigan nikname aniqlanmadi
-O'z telegram Ismingizni ingizga bizning nomimizni qo'ying va {interesting_bonus.bio} so'm bonus oling.</b>
-
+<b>O'z telegram ismingizga bizning nomimizni qo'ying va {interesting_bonus.fullname} so'm bonus oling.</b>
 Ustiga bosib nusxalab olishingiz mumkin
 
-<code>Tg Premium 👇  https://t.me/HubPremiyumBot?start=758934089 📝</code>
-                    """
+<code>🅿️ PremiumHub 📝</code>
+                                """
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=_msg_,
                                      parse_mode="HTML",
