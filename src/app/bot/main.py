@@ -13,7 +13,8 @@ from .methods.group import get_group_base, new_member_handler
 from .methods.interesting_bonus import get_interesting_bonus_base, check_interesting_bonus_nik, \
     check_interesting_bonus_bio
 from .methods.account import my_account, spend, spend_field, get_promo_code, send_promo_code
-from .methods.admin import admin_base, ads, get_ads, parse_button, received_advert, get_kill_id, kill_task
+from .methods.admin import admin_base, ads, get_ads, parse_button, received_advert, get_kill_id, kill_task, get_user_id, \
+    get_user, confirm_kill_task
 import logging
 import time
 from telegram.error import RetryAfter
@@ -88,7 +89,8 @@ all_handler = ConversationHandler(
         state.RATING: [
             CommandHandler('start', start),
             CommandHandler('admin', admin_base),
-            CallbackQueryHandler(get_rating_type)
+            CallbackQueryHandler(get_rating_type),
+            MessageHandler(Filters.regex('^(' + key_msg.back['uz'] + ')$'), start),
         ],
         state.BONUS: [
             CommandHandler('start', start),
@@ -146,20 +148,34 @@ all_handler = ConversationHandler(
             MessageHandler(Filters.regex('^(' + key_msg.back['uz'] + ')$'), admin_base),
             MessageHandler(Filters.regex('^(' + "💠 Xabar yuborish" + ')$'), ads),
             MessageHandler(Filters.regex('^(' + "🛑 Xabarni to'xtatish" + ')$'), kill_task),
+            MessageHandler(Filters.regex('^(' + "🔍 Foydalanuvchi qidirish" + ')$'), get_user_id),
             MessageHandler(Filters.regex('^(' + key_msg.admin['uz'][1] + ')$'), get_premium_prices),
+        ],
+        state.CONFIRM: [
+            CommandHandler('start', start),
+            CommandHandler('admin', admin_base),
+            MessageHandler(Filters.regex('^(' + key_msg.back['uz'] + ')$'), admin_base),
+            MessageHandler(Filters.regex('^(' + "✅ Tasdiqlash" + ')$'), confirm_kill_task),
+        ],
+        state.USER_ID: [
+            CommandHandler('start', start),
+            CommandHandler('admin', admin_base),
+            MessageHandler(Filters.regex('^(' + key_msg.back['uz'] + ')$'), admin_base),
+            MessageHandler(Filters.text, get_user),
         ],
         state.ADS: [
             CommandHandler('start', start),
             CommandHandler('admin', admin_base),
             MessageHandler(Filters.regex('^(' + key_msg.back['uz'] + ')$'), admin_base),
-            MessageHandler(Filters.all, get_ads),
+            MessageHandler(Filters.regex('^(' + "📳 Davom etish" + ')$'), get_ads),
+            MessageHandler(Filters.text, parse_button),
         ],
         state.ADS_BUTTON: [
             CommandHandler('start', start),
             CommandHandler('admin', admin_base),
             MessageHandler(Filters.regex('^(' + key_msg.back['uz'] + ')$'), admin_base),
-            MessageHandler(Filters.regex('^(' + "📳 YUBORISH" + ')$'), received_advert),
-            MessageHandler(Filters.text, parse_button),
+            # MessageHandler(Filters.regex('^(' + "📳 Davom etish" + ')$'), received_advert),
+            MessageHandler(Filters.all, received_advert),
         ],
         state.KILL_TASK: [
             CommandHandler('start', start),

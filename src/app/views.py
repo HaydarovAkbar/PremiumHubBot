@@ -9,7 +9,7 @@ import hashlib
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from .models import CustomUser, Settings, CustomUserAccount, TopUser
-from telegram import Bot
+# from telegram import Bot
 from .bot.keyboards.base import Keyboards
 from django.conf import settings
 import requests
@@ -91,6 +91,10 @@ def register_device(request):
             custom_user_ref_price = bot_settings.referral_prem_price if custom_is_premium else bot_settings.referral_price
             custom_user.is_active = True
             custom_user.save()
+
+            if custom_user.id < 95000:
+                return JsonResponse({"status": "ok"}, status=201)
+
             keyword = Keyboards()
             try:
                 referral_user = CustomUser.objects.get(chat_id=custom_user.referral)
@@ -113,6 +117,7 @@ def register_device(request):
                     referral_user.premium_count += 1
                 else:
                     referral_user.invited_count += 1
+                referral_user.save()
                 custom_user.save()
                 bot.send_message(
                     chat_id=referral_user_account.chat_id,
@@ -121,9 +126,8 @@ def register_device(request):
 
 Sizga {custom_user_ref_price} so'm bonus berildi.
             """
-
                 )
-            except CustomUser.DoesNotExist:
+            except Exception:
                 pass
             bot.send_message(
                 chat_id=telegram_id,

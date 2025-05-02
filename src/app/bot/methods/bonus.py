@@ -4,7 +4,7 @@ from django.conf import settings
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 from app.models import CustomUser, Channel, Prices, StarsPrices, RewardsChannelBoost, DailyBonus, StoryBonusPrice, \
-    StoryBonusAccounts, Group, CustomUserAccount
+    StoryBonusAccounts, Group, CustomUserAccount, TopUser
 from ..keyboards.base import Keyboards
 from ..states import States
 from ..messages.main import MessageText
@@ -85,10 +85,21 @@ def get_bonus_type(update: Update, context: CallbackContext):
             return state.START
         elif query.data == 'premium_bonus':
             user_id = update.effective_user.id
-            if not is_premium_user(user_id, context.bot.token):  # not
-                # query.answer("Bu tugmani faqatgina premium obunachilar ishlatoladi")
+            if not is_premium_user(user_id, context.bot.token):
                 query.delete_message()
-                context.bot.send_message(chat_id=user_id, text="Bu tugmani faqatgina premium obunachilar ishlatoladi")
+                context.bot.send_message(chat_id=user_id, text="📵 Bu tugmani faqatgina premium obunachilar ishlatoladi 📵",
+                                         reply_markup=keyword.bonus(),
+                                         parse_mode=ParseMode.HTML
+                                         )
+                # _msg = """<b>Bonuslarni qo'lga kiritish uchun shartlar va vazifalar quyidagicha: 👇</b>
+                #
+                # 🔹 Shartlar va talablar bilan tanishib chiqing.
+                # 🔹 Ko‘rsatilgan vazifalarni to‘liq bajaring.
+                # 🔹 Hammasini to‘g‘ri amalga oshirganingizdan so‘ng bonuslarni qo‘lga kiriting!"""
+                # context.bot.send_message(chat_id=user_id, text=_msg,
+                #                          reply_markup=keyword.bonus(),
+                #                          parse_mode=ParseMode.HTML
+                #                          )
                 return state.BONUS
             else:
                 query.delete_message()
@@ -102,7 +113,7 @@ def get_bonus_type(update: Update, context: CallbackContext):
                 return state.CHANNEL_BOOST_BONUS
         elif query.data == 'stories_bonus':
             story_bonus_price = StoryBonusPrice.objects.filter(is_active=True).last()
-            _msg_ = f"<b>👇Pastdaki WEBAPP dan foydalanib storiesingizga video joylang va {story_bonus_price.price} so'm bonus oling.</b>"
+            _msg_ = f"<b>👇Pastdaki WEBAPP dan foydalanib storiesingizga video joylang va {story_bonus_price.price} so'm bonus oling.</b>\n\n<code>Eslatib o'tamiz admin tomonidan tekshirilgach vazifa bajarilmagan xolatda akkountingiz BLOK qilinadi va botdan foydalanishingiz taqiqlanadi ❗️</code>"
             query.delete_message()
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=_msg_,
@@ -208,6 +219,16 @@ def get_daily_bonus(update: Update, context: CallbackContext):
                 custom_account, __ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id)
                 custom_account.current_price = reward_db.daily_bonus
                 custom_account.save()
+                top_user, a = TopUser.objects.get_or_create(
+                    chat_id=update.effective_user.id,
+                    defaults={
+                        'fullname': update.effective_user.full_name,
+                    }
+                )
+                top_user.balance += int(reward_db.elementary_bonus)
+                top_user.weekly_earned += int(reward_db.elementary_bonus)
+                top_user.monthly_earned += int(reward_db.elementary_bonus)
+                top_user.save()
                 context.bot.send_message(chat_id=update.effective_user.id,
                                          text=f"🎉 Tabriklaymiz sizga {reward_db.daily_bonus} so'm kunlik bonus berildi.",
                                          reply_markup=keyword.base()
@@ -217,8 +238,18 @@ def get_daily_bonus(update: Update, context: CallbackContext):
                                      reply_markup=keyword.base()
                                      )
         custom_account, __ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id)
-        custom_account.current_price = reward_db.elementary_bonus
+        custom_account.current_price += reward_db.elementary_bonus
         custom_account.save()
+        top_user, a = TopUser.objects.get_or_create(
+            chat_id=update.effective_user.id,
+            defaults={
+                'fullname': update.effective_user.full_name,
+            }
+        )
+        top_user.balance += int(reward_db.elementary_bonus)
+        top_user.weekly_earned += int(reward_db.elementary_bonus)
+        top_user.monthly_earned += int(reward_db.elementary_bonus)
+        top_user.save()
         context.bot.send_message(chat_id=update.effective_user.id,
                                  text=f"🎉 Tabriklaymiz sizga {reward_db.elementary_bonus} so'm kanalimizga ovoz berganingiz uchun bonus berildi.",
                                  reply_markup=keyword.base()
@@ -276,6 +307,16 @@ def get_stories_bonus(update: Update, context: CallbackContext):
             custom_account, __ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id)
             custom_account.current_price = story_db.price
             custom_account.save()
+            top_user, a = TopUser.objects.get_or_create(
+                chat_id=update.effective_user.id,
+                defaults={
+                    'fullname': update.effective_user.full_name,
+                }
+            )
+            top_user.balance += int(story_db.price)
+            top_user.weekly_earned += int(story_db.price)
+            top_user.monthly_earned += int(story_db.price)
+            top_user.save()
             StoryBonusAccounts.objects.create(chat_id=update.effective_user.id)
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=f"🎉 Tabriklaymiz sizga {story_db.price} so'm kanalimizga ovoz berganingiz uchun bonus berildi.",
@@ -283,7 +324,7 @@ def get_stories_bonus(update: Update, context: CallbackContext):
         else:
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text="Tekshirilmoqda iltimos keyinroq urinib ko'ring 🕞",
-                                     reply_markup=keyword.bonus()
+                                     reply_markup=keyword.story_bonus(settings.STORY_URL)
                                      )
         return state.STORY_BONUS
     return state.BONUS

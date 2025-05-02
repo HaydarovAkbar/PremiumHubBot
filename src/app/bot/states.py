@@ -21,3 +21,5 @@ class States:
     ADS = 18
     ADS_BUTTON = 19
     KILL_TASK = 20
+    USER_ID = 21
+    CONFIRM = 22

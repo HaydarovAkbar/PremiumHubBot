@@ -2,7 +2,7 @@ from django.conf import settings
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 from app.models import CustomUser, Channel, Prices, StarsPrices, RewardsChannelBoost, DailyBonus, StoryBonusPrice, \
-    StoryBonusAccounts, Group, InvitedUser, CustomUserAccount, InvitedBonusUser
+    StoryBonusAccounts, Group, InvitedUser, CustomUserAccount, InvitedBonusUser, TopUser
 from ..keyboards.base import Keyboards
 from ..states import States
 from ..messages.main import MessageText
@@ -74,9 +74,19 @@ def get_group_base(update: Update, context: CallbackContext):
                                                  parse_mode=ParseMode.HTML,
                                                  )
                     else:
-                        user_account.current_price = user_account.current_price + last_group.price
-                        user_account.total_price = user_account.total_price + last_group.price
+                        user_account.current_price += last_group.price
+                        user_account.total_price += last_group.price
                         user_account.save()
+                        top_user, a = TopUser.objects.get_or_create(
+                            chat_id=update.effective_user.id,
+                            defaults={
+                                'fullname': update.effective_user.full_name,
+                            }
+                        )
+                        top_user.balance += int(last_group.price)
+                        top_user.weekly_earned += int(last_group.price)
+                        top_user.monthly_earned += int(last_group.price)
+                        top_user.save()
                         invited_bonus_user.clean = True
                         invited_bonus_user.save()
                         context.bot.send_message(chat_id=update.effective_user.id,

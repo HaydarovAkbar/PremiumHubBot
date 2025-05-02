@@ -267,6 +267,12 @@ class Keyboards:
     @staticmethod
     def ads():
         return ReplyKeyboardMarkup([
-            ["📳 YUBORISH"],
+            ["📳 Davom etish"],
             ["⬅️ Orqaga"]
+        ], resize_keyboard=True)
+
+    @staticmethod
+    def confirm():
+        return ReplyKeyboardMarkup([
+            ["✅ Tasdiqlash"]
         ], resize_keyboard=True)
