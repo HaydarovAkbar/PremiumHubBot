@@ -58,13 +58,13 @@ Guruhimizga taklif qilgan do'stlaringiz: {group_added_count} ta
 Sizning raqamingiz: +{user_db.phone_number}
 </b>
 """
-        promo_msg = ""
-        my_promo_codes = PromoCodes.objects.filter(chat_id=update.effective_user.id, status=True)
-        if my_promo_codes:
-            promo_msg = "🔷 <b>Sizning promokodlaringiz:</b> 🔷\n"
-        for my_promo_code in my_promo_codes:
-            promo_msg += f"<code>{my_promo_code.name}</code>     -    Aktiv ✅\n"
-        _msg += promo_msg
+        # promo_msg = ""
+        # my_promo_codes = PromoCodes.objects.filter(chat_id=update.effective_user.id, status=True)
+        # if my_promo_codes:
+        #     promo_msg = "🔷 <b>Sizning promokodlaringiz:</b> 🔷\n"
+        # for my_promo_code in my_promo_codes:
+        #     promo_msg += f"<code>{my_promo_code.name}</code>     -    Aktiv ✅\n"
+        # _msg += promo_msg
         update.message.reply_html(
             _msg,
             reply_markup=keyword.my_account(),
