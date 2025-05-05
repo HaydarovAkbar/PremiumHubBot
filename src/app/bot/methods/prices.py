@@ -27,7 +27,7 @@ def prem_message_generate(prices: Prices):
 ▪️ 6 oylik obuna -  {number_format(prices.with_gift_6)} so‘m
 ▪️ 12 oylik obuna -  {number_format(prices.with_gift_12)} so‘m
  
-<code>💠 Qadrdonlaringizga hadya qilishingiz ham mumkin.</code>
+<pre>💠 Qadrdonlaringizga hadya qilishingiz ham mumkin.</pre>
 """
     return msg
 
@@ -50,7 +50,7 @@ Qolganlari admin bilan kelishikgan holda</i>
 
 <b>2-3 daqiqa ichida Akkauntingizga Telegram Stars o'tkaziladi 🤝 </b>
 
-<code>💠 Qadrdonlaringizga hadya qilishingiz ham mumkin.</code>
+<pre>💠 Qadrdonlaringizga hadya qilishingiz ham mumkin.</pre>
 """
     return msg
 

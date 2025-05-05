@@ -63,8 +63,17 @@ def start(update: Update, context: CallbackContext):
   
 Do'stingiz ro'yxatdan o'tganidan keyin, biz sizga referal puli taqdim etamiz!""")
         except CustomUser.DoesNotExist:
-            pass
-
+            payload = None
+    user, _ = CustomUser.objects.get_or_create(chat_id=update.effective_user.id, defaults={
+        'username': update.effective_user.username,
+        'first_name': update.effective_user.first_name,
+        'last_name': update.effective_user.last_name,
+        'is_active': False,
+        'referral': payload,
+    })
+    user.first_name = update.effective_user.first_name
+    user.last_name = update.effective_user.last_name
+    user.save()
     all_channel = Channel.objects.filter(is_active=True)
     left_channel = []
     for channel in all_channel:
@@ -79,13 +88,6 @@ Do'stingiz ro'yxatdan o'tganidan keyin, biz sizga referal puli taqdim etamiz!"""
                                  text="Botni ishga tushirish uchun quyidagi kanallarga obuna bo’ling va “♻️ Tekshirish” tugmasini bosing",
                                  reply_markup=keyword.channels(left_channel))
         return state.CHECK_CHANNEL
-    user, _ = CustomUser.objects.get_or_create(chat_id=update.effective_user.id, defaults={
-        'username': update.effective_user.username,
-        'first_name': update.effective_user.first_name,
-        'last_name': update.effective_user.last_name,
-        'is_active': False,
-        'referral': payload,
-    })
     if user.is_blocked:
         update.message.reply_text(
             "Siz botdan ko’p marta ro’yxatdan o’tganingiz uchun bot sizni bloklagan, agar buni xato deb hisoblasangiz, @hup_support ga murojaat qiling"
@@ -101,7 +103,7 @@ Do'stingiz ro'yxatdan o'tganidan keyin, biz sizga referal puli taqdim etamiz!"""
             return state.PHONE
         if not user.is_active:
             context.bot.send_message(chat_id=update.effective_user.id,
-                                     text="""🔁Botimiz yangilangani va xavfsizlikni oshirish munosabati bilan quyidagi havola orqali ro’yxatdan o’ting va botni ishlatishda davom eting
+                                     text="""🔁 Botimiz yangilangani va xavfsizlikni oshirish munosabati bilan quyidagi havola orqali ro’yxatdan o’ting va botni ishlatishda davom eting
 """,
                                      parse_mode='HTML',
                                      reply_markup=keyword.signup(settings.SIGNUP_URL))
