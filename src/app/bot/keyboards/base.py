@@ -290,3 +290,35 @@ class Keyboards:
         return ReplyKeyboardMarkup([
             ["✅ Tasdiqlash"]
         ], resize_keyboard=True)
+
+    @staticmethod
+    def passive():
+        return InlineKeyboardMarkup([
+            [InlineKeyboardButton(
+                "Passiv qilish ☑️",
+                callback_data='passiv'
+            )]
+        ])
+
+    @staticmethod
+    def adm_url(url):
+        return InlineKeyboardMarkup([
+            [InlineKeyboardButton(
+                "WEB 🌐",
+                url=url
+            )]
+        ])
+
+    @staticmethod
+    def adm_user_profile():
+        return InlineKeyboardMarkup([
+            [InlineKeyboardButton("BANLASH", callback_data='is_ban'),
+             InlineKeyboardButton("BANDAN OLISH", callback_data='no_ban'),
+             ],
+            [InlineKeyboardButton("BALANSE OLISH", callback_data='get_balance'),
+             InlineKeyboardButton("BALANSE TO'LDIRISH", callback_data='push_balance'),
+             ],
+            [InlineKeyboardButton("XABAR YUBORISH", callback_data='send_msg'),
+             InlineKeyboardButton("REFFERAL SISTEM", callback_data='referral'),
+             ],
+        ])
