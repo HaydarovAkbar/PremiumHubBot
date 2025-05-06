@@ -23,3 +23,8 @@ class States:
     KILL_TASK = 20
     USER_ID = 21
     CONFIRM = 22
+    PASSIVE = 23
+    USER_PROFILE = 24
+    GET_BALANCE = 25
+    PUSH_BALANCE = 26
+    SEND_MSG = 27

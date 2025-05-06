@@ -1,9 +1,13 @@
+from decouple import TRUE_VALUES
+
+from .. import keyboards
 from ..tasks import send_advert_to_all
 import time
 from django.conf import settings
 from telegram import Update, InlineKeyboardMarkup, ParseMode
 from telegram.ext import CallbackContext, ConversationHandler
-from app.models import CustomUser, Channel, CustomUserAccount
+from app.models import CustomUser, Channel, CustomUserAccount, PromoCodes, StoryBonusAccounts, InvitedUser, \
+    InterestingBonusUser, DailyBonus
 from ..keyboards.base import Keyboards
 from ..states import States
 from ..messages.main import MessageText
@@ -12,6 +16,8 @@ from telegram import MessageEntity
 from html import escape as html_escape
 from celery.result import AsyncResult
 from core.celery import app
+
+from ...models import InterestingBonus
 
 keyword = Keyboards()
 state = States()
@@ -81,9 +87,16 @@ def admin_base(update: Update, context: CallbackContext):
     #             print("❌ Yuklashda xatolik")
 
     if admins.exists():
-        _msg_ = "<b>Admin xush kelibsiz!</b>"
-        update.message.reply_html(_msg_,
-                                  reply_markup=keyword.admin_base())
+        stiker_id = "CAACAgIAAxkBAAEDsX1h4zDsLzkJZ5FxIQ3t4gStVwf0mAACQAEAAladvQps6VtALEnWJSME"
+        update.message.reply_sticker(
+            sticker=stiker_id,
+            reply_markup=keyword.admin_base()
+        )
+        adm_url = f"{settings.HOST}/admin/"
+        update.message.reply_html(
+            "<b>Web adminkaga o'tish</b>",
+            reply_markup=keyword.adm_url(adm_url),
+        )
         return state.ADMIN
 
 
@@ -306,7 +319,7 @@ def confirm_kill_task(update, context):
 def get_user_id(update, context):
     update.message.reply_html(
         "<b>Izlamoqchi bo'lgan foydalanuvchi telegram id yoki telefon nomerini kiriting:</b>",
-        reply_markup=keyword.back(),
+        # reply_markup=keyword.back(),
     )
     return state.USER_ID
 
@@ -318,47 +331,290 @@ def get_user(update, context):
 
     is_chat_id = re.fullmatch(r"\d{6,15}", user_msg)
 
+    # if is_phone:
+    #     update.message.reply_text(f"📱 Siz telefon raqam kiritdingiz: {user_msg}")
+    #     custom_user = CustomUser.objects.filter(phone_number=user_msg)
+    #     if custom_user:
+    #         user_db = custom_user.first()
+    #         full_name = f"{user_db.first_name} {user_db.last_name}"  # yoki update.effective_chat.full_name
+    #
+    #         msg = (
+    #             f"🔍 Foydalanuvchi topildi!\n\n"
+    #             f"👤 Foydalanuvchi: <a href='tg://user?id={user_db.chat_id}'>{full_name}</a>\n"
+    #             f"🆔 Chat ID: <code>{user_db.chat_id}</code>\n"
+    #             f"📲 Telefon nomer: +{user_db.phone_number}\n"
+    #         )
+    #
+    #         update.message.reply_html(msg)
+    #     else:
+    #         update.message.reply_text(
+    #             "🚯 Siz kiritgan telefon nomer orqali bazada foydalanuvchi topilmadi")
+    #         return state.USER_ID
+    # elif is_chat_id:
+    #     update.message.reply_text(f"🆔 Siz Telegram chat ID kiritdingiz: {user_msg}")
+    #     custom_user = CustomUser.objects.filter(chat_id=user_msg)
+    #
+    #     if custom_user:
+    #         user_db = custom_user.first()
+    #         full_name = f"{user_db.first_name} {user_db.last_name}"  # yoki update.effective_chat.full_name
+    #
+    #         msg = (
+    #             f"🔍 Foydalanuvchi topildi!\n\n"
+    #             f"👤 Foydalanuvchi: <a href='tg://user?id={user_db.chat_id}'>{full_name}</a>\n"
+    #             f"🆔 Chat ID: <code>{user_db.chat_id}</code>\n"
+    #             f"📲 Telefon nomer: +{user_db.phone_number}\n"
+    #         )
+    #         update.message.reply_html(msg)
+    #     else:
+    #         update.message.reply_text(
+    #             "🚯 Siz kiritgan TELEGRAM ID orqali bazada foydalanuvchi topilmadi")
+    #         return state.USER_ID
+    # else:
+    #     update.message.reply_text(
+    #         "❌ Noto‘g‘ri format. Iltimos, faqat 998 bilan boshlanuvchi telefon raqam yoki chat ID kiriting.")
+    #     return state.USER_ID
     if is_phone:
         update.message.reply_text(f"📱 Siz telefon raqam kiritdingiz: {user_msg}")
         custom_user = CustomUser.objects.filter(phone_number=user_msg)
-        if custom_user:
-            user_db = custom_user.first()
-            full_name = f"{user_db.first_name} {user_db.last_name}"  # yoki update.effective_chat.full_name
-
-            msg = (
-                f"🔍 Foydalanuvchi topildi!\n\n"
-                f"👤 Foydalanuvchi: <a href='tg://user?id={user_db.chat_id}'>{full_name}</a>\n"
-                f"🆔 Chat ID: <code>{user_db.chat_id}</code>\n"
-                f"📲 Telefon nomer: +{user_db.phone_number}\n"
-            )
-
-            update.message.reply_html(msg)
-        else:
-            update.message.reply_text(
-                "🚯 Siz kiritgan telefon nomer orqali bazada foydalanuvchi topilmadi")
-            return state.USER_ID
     elif is_chat_id:
         update.message.reply_text(f"🆔 Siz Telegram chat ID kiritdingiz: {user_msg}")
         custom_user = CustomUser.objects.filter(chat_id=user_msg)
-
-        if custom_user:
-            user_db = custom_user.first()
-            full_name = f"{user_db.first_name} {user_db.last_name}"  # yoki update.effective_chat.full_name
-
-            msg = (
-                f"🔍 Foydalanuvchi topildi!\n\n"
-                f"👤 Foydalanuvchi: <a href='tg://user?id={user_db.chat_id}'>{full_name}</a>\n"
-                f"🆔 Chat ID: <code>{user_db.chat_id}</code>\n"
-                f"📲 Telefon nomer: +{user_db.phone_number}\n"
-            )
-            update.message.reply_html(msg)
-        else:
-            update.message.reply_text(
-                "🚯 Siz kiritgan TELEGRAM ID orqali bazada foydalanuvchi topilmadi")
-            return state.USER_ID
     else:
         update.message.reply_text(
             "❌ Noto‘g‘ri format. Iltimos, faqat 998 bilan boshlanuvchi telefon raqam yoki chat ID kiriting.")
         return state.USER_ID
+    if custom_user:
+        user_db = custom_user.first()
+        full_name = f"{user_db.first_name} {user_db.last_name}"  # yoki update.effective_chat.full_name
+        if user_db.is_active:
+            status = "Aktive ✅"
+        if user_db.is_blocked:
+            status = "Bloklangan 🔒"
+        if user_db.is_admin:
+            status = "Admin 👮‍♀️"
+        else:
+            status = "Passive"
+        custom_user_account = CustomUserAccount.objects.get(chat_id=user_db.chat_id)
+        context.chat_data['chat_id'] = user_db.chat_id
+        story_ = StoryBonusAccounts.objects.filter(chat_id=user_db.chat_id)
+        if story_:
+            story_ = story_.first()
+        else:
+            story_ = True
+
+        boost = DailyBonus.objects.filter(chat_id=user_db.chat_id)
+        if boost:
+            boost = boost.first()
+        else:
+            boost = True
+        interesting_b = InterestingBonusUser.objects.filter(chat_id=user_db.chat_id)
+        if interesting_b:
+            interesting_b = interesting_b.first()
+        else:
+            interesting_b = True
+        bio = True if interesting_b.bio else False
+        nik = True if interesting_b.fullname else False
+        msg = (
+            f"🔍 Foydalanuvchi topildi!\n\n"
+            f"👤 Foydalanuvchi: <a href='tg://user?id={user_db.chat_id}'>{full_name}</a>\n"
+            f"👤 Username: @{user_db.username}\n"
+            f"♻️ Holati: {status}\n"
+            f"🆔 Chat ID: <code>{user_db.chat_id}</code>\n"
+            f"📲 Telefon nomer: +{user_db.phone_number}\n"
+            f"💰 Hozirgi balanse: {custom_user_account.current_price} so'm \n\n"
+            f"🗒 Vazifalar ro'yxati:\n"
+            f"👤 Guruhga qo'shganlar soni {2}\n"
+            f"🔹 BIO BONUS {bio}\n🔹 NIKNAME {nik}\n"
+            f"💫 Stories bonus: {True if story_ else False}\n"
+            f"💫 Reward bonus: {True if boost else False}\n"
+        )
+        update.message.reply_html(msg, reply_markup=keyword.adm_user_profile())
+        return state.USER_PROFILE
+    else:
+        update.message.reply_text(
+            "🚯 Siz kiritgan TELEGRAM ID orqali bazada foydalanuvchi topilmadi")
 
     return state.USER_ID
+
+
+def info_promo(update: Update, context: CallbackContext):
+    admins = CustomUser.objects.filter(is_admin=True, chat_id=update.message.chat_id)
+    if admins.exists():
+        promo = context.args[0] if len(context.args) == 1 else False
+        if promo:
+            get_db_promo = PromoCodes.objects.filter(name=promo)
+            if get_db_promo.exists():
+                promo_code = get_db_promo.first()
+                promo_user = CustomUser.objects.get(chat_id=promo_code.chat_id)
+                fullname = f"{promo_user.first_name if promo_user.first_name else '-'} {promo_user.last_name if promo_user.last_name else '-'}"
+                mention = f"<a href='tg://user?id={promo_user.chat_id}'>{fullname}</a>"
+                status = "Aktive ✅" if promo_code.status else "Passive ☑️"
+                update.message.reply_html(
+                    f"""
+🤖 <b>Promo kod haqida to'liq ma'lumot:</b>
+
+🆔 PromoKOD: {promo_code.name}
+📛 PromoNAME: <code>{promo_code.reward}</code>
+📅 PromoDATE: <code>{promo_code.created_at.date()}</code>
+📊 PromoSTATUS: <code>{status}</code>
+
+👨‍🦲 PromoUSER: {mention}
+☎️ PromoUSER_PHONE: +{promo_user.phone_number}
+""",
+                    reply_markup=keyword.passive()
+                )
+                context.chat_data["promo_code"] = promo
+                return state.PASSIVE
+            else:
+                update.message.reply_text(
+                    "Bazadan bu promokod haqida ma'lumot topilmadi!",
+                )
+        else:
+            update.message.reply_text(
+                "Promo kod kiritmadingiz!"
+            )
+
+
+def get_all_promo_codes(update: Update, context: CallbackContext):
+    admins = CustomUser.objects.filter(is_admin=True, chat_id=update.message.chat_id)
+    if admins.exists():
+        promo_codes = PromoCodes.objects.filter(status=True).order_by('created_at')[:100]
+        if promo_codes.exists():
+            msg = f"✅ <b>Oxirgi 100 ta aktiv promokodlar</b>\n\n"
+            counter = 1
+            for promo_code in promo_codes:
+                msg += f"{counter}). <code>{promo_code.name}</code> - {promo_code.created_at.date()} - {promo_code.reward}\n"
+                counter += 1
+
+            update.message.reply_html(msg)
+        else:
+            update.message.reply_html(
+                "Hozirda aktiv promokodlar mavjud emas!"
+            )
+
+
+def passive(update: Update, context: CallbackContext):
+    callback_query = update.callback_query
+    promo = context.chat_data["promo_code"]
+    promo_db = PromoCodes.objects.get(name=promo)
+    promo_db.status = False if promo_db.status else True
+    promo_db.save()
+    callback_query.edit_message_text("Passive qilindi ✅")
+    return state.ADMIN
+
+
+def user_profile(update: Update, context: CallbackContext):
+    callback_query = update.callback_query
+    user_db = CustomUser.objects.get(chat_id=context.chat_data['chat_id'])
+
+    if callback_query.data == "is_ban":
+        user_db.is_blocked = True
+        user_db.is_active = False
+        user_db.is_admin = False
+        user_db.save()
+        callback_query.answer("Foydalanuvchi blok qilindi!", show_alert=True)
+    elif callback_query.data == "no_ban":
+        user_db.is_banned = True
+        user_db.save()
+        callback_query.answer("Foydalanuvchi blokdan ochildi!", show_alert=True)
+    elif callback_query.data == "get_balance":
+        callback_query.edit_message_text(
+            "Foydalanuvchidan qancha miqdorda pul yechmoqchisiz yuboring (M: 5000)"
+        )
+        return state.GET_BALANCE
+    elif callback_query.data == "push_balance":
+        callback_query.edit_message_text(
+            "Foydalanuvchiga qancha miqdorda pul kiritmoqchisiz yuboring (M: 5000)"
+        )
+        return state.PUSH_BALANCE
+    elif callback_query.data == "send_msg":
+        callback_query.edit_message_text(
+            "Foydalanuvchiga qanday xabar yubormoqchisiz yuboring!"
+        )
+        return state.SEND_MSG
+    elif callback_query.data == "referral":
+        user_referrals = CustomUser.objects.filter(referral=user_db.chat_id)
+        if user_referrals.exists():
+            msg = "<b>Foydalanuvchi referral qilgan akkountlar:</b>\n\nN)   Familiya-Ism    Status\n"
+            counter = 1
+            for user_referral in user_referrals:
+                fullname = user_referral.first_name if user_referral.first_name else '-' + " " + user_referral.last_name if user_referral.last_name else '-'
+                minio = f"<a href='tg://user?id={user_referral.chat_id}'>{fullname}</a>"
+                msg += f"{counter}). {minio} - {user_referral.is_active}\n"
+                counter += 1
+            context.bot.send_message(chat_id=callback_query.message.chat_id,
+                                     text=msg,
+                                     parse_mode=ParseMode.HTML)
+        else:
+            callback_query.answer(
+                "Foydalanuvchi refferal qilmagan hali!", show_alert=True
+            )
+
+
+def get_balance(update: Update, context: CallbackContext):
+    get_price = update.message.text
+    user_account = CustomUserAccount.objects.get(chat_id=context.chat_data['chat_id'])
+    if user_account.current_price >= int(get_price):
+        user_account.current_price -= int(get_price)
+        user_account.save()
+        update.message.reply_text(
+            f"Balanse kamaytirildi!\nFoydalanuvchini hozirgi balanse: {user_account.current_price} so'm",
+            reply_markup=keyword.admin_base()
+        )
+        return state.ADMIN
+    else:
+        update.message.reply_text(
+            "Siz kiritgan miqdor foydalanuvchi miqdoridan ancha yuqori ekan!"
+        )
+
+
+def push_balance(update: Update, context: CallbackContext):
+    get_price = update.message.text
+    user_account = CustomUserAccount.objects.get(chat_id=context.chat_data['chat_id'])
+    user_account.current_price += int(get_price)
+    user_account.total_price += int(get_price)
+    user_account.save()
+    update.message.reply_text(
+        f"Balanse ko'paytirildi!\nFoydalanuvchini hozirgi balanse: {user_account.current_price} so'm",
+        reply_markup=keyword.admin_base()
+    )
+    return state.ADMIN
+
+
+def send_msg(update: Update, context: CallbackContext):
+    user_chat_id = context.chat_data['chat_id']
+    try:
+        update.message.copy(
+            user_chat_id
+        )
+        update.message.reply_text(
+            "Xabaringiz muvafaqiyatli yuborildi ✅",
+            reply_markup=keyword.admin_base()
+        )
+    except Exception as e:
+        update.message.reply_text(
+            f"Xabaringiz yuborilmadi ❌ \nERROR: {e}",
+            reply_markup=keyword.admin_base()
+        )
+    return state.ADMIN
+
+
+def get_all_stories(update: Update, context: CallbackContext):
+    admins = CustomUser.objects.filter(is_admin=True, chat_id=update.message.chat_id)
+    if admins.exists():
+        promo_codes = StoryBonusAccounts.objects.filter(is_active=True).order_by('created_at')[:100]
+        if promo_codes.exists():
+            msg = f"✅ <b>Oxirgi 100 ta aktiv storieslar</b>\n\n"
+            counter = 1
+            for promo_code in promo_codes:
+                custom_user = CustomUser.objects.get(chat_id=promo_code.chat_id)
+                fullname = custom_user.first_name if custom_user.first_name else '-' + " " + custom_user.last_name if custom_user.last_name else '-'
+                minio = f"<a href='tg://user?id={custom_user.chat_id}'>{fullname}</a>"
+                msg += f"{counter}). {minio} - {promo_code.created_at.date()}\n"
+                counter += 1
+
+            update.message.reply_html(msg)
+        else:
+            update.message.reply_html(
+                "Hozirda aktiv storieslar mavjud emas!"
+            )
