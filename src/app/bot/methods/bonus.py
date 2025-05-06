@@ -1,10 +1,10 @@
 from datetime import datetime
-
+import requests
 from django.conf import settings
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 from app.models import CustomUser, Channel, Prices, StarsPrices, RewardsChannelBoost, DailyBonus, StoryBonusPrice, \
-    StoryBonusAccounts, Group, CustomUserAccount, TopUser
+    StoryBonusAccounts, Group, CustomUserAccount, TopUser, InterestingBonus
 from ..keyboards.base import Keyboards
 from ..states import States
 from ..messages.main import MessageText
@@ -42,19 +42,21 @@ def get_bonus_base(update: Update, context: CallbackContext):
         return state.CHECK_CHANNEL
     user_db = CustomUser.objects.get(chat_id=update.effective_user.id)
     if user_db.is_active:
-        context.bot.send_message(chat_id=update.effective_user.id,
-                                 text="<b>Oson va qulay imkoniyatdan foydalanib, bonuslarga ega bo‘ling! 🎁</b>",
-                                 parse_mode=ParseMode.HTML,
-                                 reply_markup=keyword.delete
-                                 )
-        _msg = """<b>Bonuslarni qo'lga kiritish uchun shartlar va vazifalar quyidagicha: 👇</b>
-
+        msg = """<b>Bonuslarni qo'lga kiritish uchun shartlar va vazifalar quyidagicha: 👇</b>
+        
 🔹 Shartlar va talablar bilan tanishib chiqing.
 🔹 Ko‘rsatilgan vazifalarni to‘liq bajaring.
-🔹 Hammasini to‘g‘ri amalga oshirganingizdan so‘ng bonuslarni qo‘lga kiriting!"""
-        update.message.reply_html(
-            _msg,
-            reply_markup=keyword.bonus(),
+🔹 Hammasini to‘g‘ri amalga oshirganingizdan so‘ng bonuslarni qo‘lga kiriting!
+        """
+        requests.post(
+            f"https://api.telegram.org/bot{settings.TOKEN}/sendMessage",
+            json={
+                "chat_id": user_db.chat_id,
+                "text": str(msg),
+                "parse_mode": "HTML",
+                "reply_markup": keyword.bonus().to_dict(),
+                'message_effect_id': "5046509860389126442",  # 5104841245755180586 5046509860389126442
+            }
         )
         return state.BONUS
 
@@ -83,14 +85,49 @@ def get_bonus_type(update: Update, context: CallbackContext):
                                      text="Menyuga qaytdik!",
                                      reply_markup=keyword.base())
             return state.START
+
+        elif query.data == 'nik':
+            query.delete_message()
+            interesting_bonus = InterestingBonus.objects.filter().last()
+            _msg_ = f"""
+        <b>O'z telegram ismingizga bizning nomimizni qo'ying va {interesting_bonus.fullname} so'm bonus oling.</b>
+        Ustiga bosib nusxalab olishingiz mumkin
+
+        <code>🅿️ PremiumHub</code> 📝
+                            """
+            context.bot.send_message(chat_id=update.effective_user.id,
+                                     text=_msg_,
+                                     parse_mode="HTML",
+                                     reply_markup=keyword.interesting_check_bonus())
+            return state.INTERESTING_BONUS_NIK
+        elif query.data == 'bio':
+            query.delete_message()
+            interesting_bonus = InterestingBonus.objects.filter().last()
+            _msg_ = f"""
+        <b>O'z telegram BIO ingizga bizning nomimizni qo'ying va {interesting_bonus.bio} so'm bonus oling.</b>
+        Ustiga bosib nusxalab olishingiz mumkin
+
+        <code>Tg Premium 👇  </code>https://t.me/HubPremiyumBot?start={update.effective_user.id} 📝
+                            """
+            context.bot.send_message(chat_id=update.effective_user.id,
+                                     text=_msg_,
+                                     parse_mode="HTML",
+                                     reply_markup=keyword.interesting_check_bonus())
+            return state.INTERESTING_BONUS_BIO
+
         elif query.data == 'premium_bonus':
             user_id = update.effective_user.id
             if not is_premium_user(user_id, context.bot.token):
-                query.delete_message()
-                context.bot.send_message(chat_id=user_id, text="📵 Bu tugmani faqatgina premium obunachilar ishlatoladi 📵",
-                                         reply_markup=keyword.bonus(),
-                                         parse_mode=ParseMode.HTML
-                                         )
+                # query.delete_message()
+                # context.bot.send_message(chat_id=user_id,
+                #                          text="📵 Bu tugmani faqatgina premium obunachilar ishlatoladi 📵",
+                #                          reply_markup=keyword.bonus(),
+                #                          parse_mode=ParseMode.HTML
+                #                          )
+                query.answer(
+                    "📵 Bu tugmani faqatgina premium obunachilar ishlatoladi 📵",
+                    show_alert=True
+                )
                 # _msg = """<b>Bonuslarni qo'lga kiritish uchun shartlar va vazifalar quyidagicha: 👇</b>
                 #
                 # 🔹 Shartlar va talablar bilan tanishib chiqing.

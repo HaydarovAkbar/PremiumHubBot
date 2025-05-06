@@ -1,6 +1,6 @@
 import time
 from django.conf import settings
-from telegram import Update
+from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 from app.models import CustomUser, Channel, CustomUserAccount
 from ..keyboards.base import Keyboards
@@ -54,16 +54,20 @@ def add_to_channel(update: Update, context: CallbackContext):
 def start(update: Update, context: CallbackContext):
     payload = context.args[0] if context.args else None
     if payload:
-        try:
-            payload = int(payload)
-            # payload_user = CustomUser.objects.get(chat_id=payload)
-            context.bot.send_message(chat_id=payload,
-                                     text=f"""
-👏 Tabriklaymiz! Siz {update.effective_chat.full_name}ni botga taklif qildingiz!
-  
-Do'stingiz ro'yxatdan o'tganidan keyin, biz sizga referal puli taqdim etamiz!""")
-        except CustomUser.DoesNotExist:
-            payload = None
+        context.chat_data['payload'] = payload
+    #         try:
+    #             payload = int(payload)
+    #             user = update.effective_user
+    #             mention = f"<a href='tg://user?id={user.id}'>{user.full_name}</a>"
+    #             context.bot.send_message(chat_id=payload,
+    #                                      text=f"""
+    # 👏 Tabriklaymiz! Siz {mention}ni botga taklif qildingiz!
+    #
+    # Do'stingiz ro'yxatdan o'tganidan keyin, biz sizga referal puli taqdim etamiz!""",
+    #                                      parse_mode=ParseMode.HTML
+    #                                      )
+    #         except CustomUser.DoesNotExist:
+    #             payload = None
     user, _ = CustomUser.objects.get_or_create(chat_id=update.effective_user.id, defaults={
         'username': update.effective_user.username,
         'first_name': update.effective_user.first_name,
@@ -136,17 +140,37 @@ def get_contact(update: Update, context: CallbackContext):
                                  reply_markup=keyword.channels(left_channel))
         return state.CHECK_CHANNEL
     user = CustomUser.objects.get(chat_id=update.effective_user.id)
-    user.phone_number = update.message.contact.phone_number
-    user.save()
-    if not user.is_active:
-        context.bot.send_message(chat_id=update.effective_user.id,
-                                 text="""🔁Botimiz yangilangani va xavfsizlikni oshirish munosabati bilan quyidagi havola orqali ro’yxatdan o’ting va botni ishlatishda davom eting
-    """,
-                                 parse_mode='HTML',
-                                 reply_markup=keyword.signup(settings.SIGNUP_URL))
-        return state.SIGNUP
-    update.message.reply_html(msg.BASE_MSG, reply_markup=keyword.base())
-    return state.START
+    user_contact = update.message.contact.phone_number
+    if user_contact.startswith('+998') or user_contact.startswith('998'):
+        user.phone_number = update.message.contact.phone_number
+        user.save()
+        if not user.is_active:
+            payload = context.chat_data.get('payload', 0)
+            if payload:
+                try:
+                    payload = int(payload)
+                    user = update.effective_user
+                    mention = f"<a href='tg://user?id={user.id}'>{user.full_name}</a>"
+                    context.bot.send_message(chat_id=payload,
+                                             text=f"""
+                👏 Tabriklaymiz! Siz {mention}ni botga taklif qildingiz!
+    
+                Do'stingiz ro'yxatdan o'tganidan keyin, biz sizga referal puli taqdim etamiz!""",
+                                             parse_mode=ParseMode.HTML
+                                             )
+                except CustomUser.DoesNotExist:
+                    payload = None
+            context.bot.send_message(chat_id=update.effective_user.id,
+                                     text="""🔁Botimiz yangilangani va xavfsizlikni oshirish munosabati bilan quyidagi havola orqali ro’yxatdan o’ting va botni ishlatishda davom eting""",
+                                     parse_mode='HTML',
+                                     reply_markup=keyword.signup(settings.SIGNUP_URL))
+            return state.SIGNUP
+        update.message.reply_html(msg.BASE_MSG, reply_markup=keyword.base())
+        return state.START
+    else:
+        update.message.reply_html(
+            "<b>Botdan foydalanish uchun faqat UZB telefon nomer orqali ochilgan akkountingiz bo'lishi kerak</b>")
+        user.delete()
 
 
 def get_contact_text(update: Update, context: CallbackContext):

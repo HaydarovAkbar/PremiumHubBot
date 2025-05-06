@@ -8,6 +8,7 @@ from app.models import CustomUser, Channel
 from ..keyboards.base import Keyboards
 from ..states import States
 from ..messages.main import MessageText
+import requests
 
 keyword = Keyboards()
 state = States()
@@ -38,11 +39,19 @@ def get_free_premium_and_stars(update: Update, context: CallbackContext):
     user_db = CustomUser.objects.get(chat_id=update.effective_user.id)
     if user_db.is_active:
         url = generate_link(update.effective_user.id)
-        update.message.reply_photo(
-            photo=msg.prem_photo_id,
-            caption=msg.GET_PREMIUM_AND_STARS,
-            reply_markup=keyword.referral(url),
-            parse_mode=ParseMode.HTML,
+        photo_id = msg.prem_photo_id
+        caption = msg.GET_PREMIUM_AND_STARS.replace('URL', url)
+        markup = keyword.referral(url).to_dict()
+        requests.post(
+            f"https://api.telegram.org/bot{settings.TOKEN}/sendPhoto",
+            json={
+                "chat_id": user_db.chat_id,
+                "photo": photo_id,
+                "caption": caption,
+                "parse_mode": "HTML",
+                "reply_markup": markup,
+                'message_effect_id': "5104841245755180586"
+            }
         )
         return state.START
 

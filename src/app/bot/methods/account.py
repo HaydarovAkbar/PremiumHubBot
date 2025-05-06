@@ -106,10 +106,64 @@ def spend(update: Update, context: CallbackContext):
             update.callback_query.answer(
                 f"Kechirasiz xizmat hali to'liq ishga tushmagan !",
             )
-        else:
+        elif update.callback_query.data == 'send_admin':
+            query = update.callback_query
+            account, _ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id, )
+            if query.data == 'back':
+                query.delete_message()
+                context.bot.send_message(chat_id=update.effective_user.id,
+                                         text="Menyuga qaytdik!",
+                                         reply_markup=keyword.base())
+                return state.START
+            promo_code = context.chat_data['promo_code']
+            spent_field = SpendPriceField.objects.get(id=context.chat_data['promo_code'])
+            admins = CustomUser.objects.filter(is_admin=True)
+            for admin in admins:
+                try:
+                    adm_msg = (
+                        f"🆕 Yangi promo kod ro'yxatdan o'tdi!\n\n"
+                        f"🔹 Promo kod: <code>{promo_code}</code>\n"
+                        f"🔹 Promo turi: <code>{spent_field.name}</code>\n"
+                        f"🔹 Promo narxi: <code>{spent_field.price}</code>\n"
+                        f"🔹 Foydalanuvchi: <a href='tg://user?id={user_db.chat_id}'>{update.effective_chat.full_name}</a>\n"
+                        f"🔹 User ID: <code>{user_db.chat_id}</code>"
+                    )
+                    context.bot.send_message(chat_id=admin.chat_id,
+                                             text=adm_msg,
+                                             parse_mode='HTML',
+                                             )
+                except Exception:
+                    pass
+            _msg_ = f"""
+            <b>✅ Promokod adminga muvafaqiyatli yuborildi!</b>
+
+            Tez orada xaridingiz tasdiqlanadi va amalga oshiriladi!!!
+            Iltimos biroz sabr qiling.
+            """
+            query.delete_message()
+            context.bot.send_message(chat_id=update.effective_user.id,
+                                     text=_msg_,
+                                     parse_mode=ParseMode.HTML,
+                                     reply_markup=keyword.base())
+            return state.START
+        elif settings_bot.spend_price > account.current_price and not update.callback_query.data in ['top_rating',
+                                                                                                     'weekly_rating',
+                                                                                                     'premium_bonus',
+                                                                                                     'stories_bonus',
+                                                                                                     'add_group_bonus',
+                                                                                                     'nik',
+                                                                                                     'bio',
+                                                                                                     'daily_bonus',
+                                                                                                     'check',
+                                                                                                     ]:
             update.callback_query.answer(
                 f"Bu xizmatdan foydalanish uchun hisobingizda {settings_bot.spend_price - account.current_price} so'm yetishmayapti!",
+                show_alert=True,
             )
+
+        else:
+            update.callback_query.delete_message()
+
         return state.START
 
 
@@ -156,7 +210,25 @@ sizga promokod beriladi.
             )
             return state.GET_PROMO_CODE
         else:
-            query.answer("❌ Siz ushbu taklifdan foydalana olmaysiz!\nExtimoliy sabablar: \n1. Mablag' yetarli emas\n2. Limitga yetgansiz")
+            if spend_field.price >= account.current_price:
+                context.bot.send_message(chat_id=update.effective_user.id,
+                                         text=f"""
+<b>❌ Afsuski sizning hisobingizda {account.current_price} so'm bor.
+
+Ush bu taklifdan foydalanish uchun sizga yana {spend_field.price - account.current_price} so'm yetishmayapti!
+
+Agarda ushbu taklifdan foydalanmoqchi bo'lsangiz admin bilan bog'laning, karta raqamga pul o'tkazing va taklifdan bemalol foydalanishingiz mumkin.
+
+ADMIN: @Hup_Support </b>
+""", parse_mode=ParseMode.HTML, )
+            else:
+                context.bot.send_message(chat_id=update.effective_user.id,
+                                         text=f"""
+                <b>❌ Afsuski sizning promokod limitingiz bu oy uchun maksimalga yetdi.
+                Agarda ushbu taklifdan foydalanmoqchi bo'lsangiz admin bilan bog'laning.
+
+                ADMIN: @Hup_Support </b>
+                """, parse_mode=ParseMode.HTML, )
 
 
 def get_promo_code(update: Update, context: CallbackContext):

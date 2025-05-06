@@ -55,9 +55,15 @@ class Keyboards:
 
     @staticmethod
     def referral(url):
-        share_text = (
-            "🎁 Hoziroq oʻz sovgʻangiz sari olgʻa bosing:\n"
-        )
+        share_text = f"""
+🎁 Sizga haligacha Telegram Premium sovgʻa qilishmadimi?
+
+➖ Telegram Premium obunani sovgʻa sifatida tekinga olishni istaysizmi?
+ 
+👉 Hoziroq oʻz sovgʻangiz sari olgʻa bosing:
+{url} havola
+"""
+
         share_url = f"https://t.me/share/url?url={url}&text={share_text}"
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton("📤 Doʻstlarga ulashish", url=share_url)]
@@ -86,10 +92,10 @@ class Keyboards:
                 "🏆 Haftalik TOP Reyting",
                 callback_data='weekly_rating'
             )],
-            [InlineKeyboardButton(
-                "⬅️ Orqaga",
-                callback_data='back'
-            )],
+            # [InlineKeyboardButton(
+            #     "⬅️ Orqaga",
+            #     callback_data='back'
+            # )],
         ])
 
     @staticmethod
@@ -107,14 +113,22 @@ class Keyboards:
                 "🫂 Guruhga odam qo'shish orqali pul ishlash",
                 callback_data='add_group_bonus'
             )],
+            # [InlineKeyboardButton(
+            #     "😉 Qiziqarli bonuslar",
+            #     callback_data='qiziq_bonus'
+            # )],
             [InlineKeyboardButton(
-                "😉 Qiziqarli bonuslar",
-                callback_data='qiziq_bonus'
+                "📤 Nickname bonus",
+                callback_data='nik',
             )],
             [InlineKeyboardButton(
-                "⬅️ Orqaga",
-                callback_data='back'
+                "📥 Bio bonus",
+                callback_data='bio'
             )],
+            # [InlineKeyboardButton(
+            #     "⬅️ Orqaga",
+            #     callback_data='back'
+            # )],
         ])
 
     @staticmethod
@@ -244,10 +258,10 @@ class Keyboards:
                 "💳 Adminga yuborish",
                 callback_data='send_admin'
             )],
-            [InlineKeyboardButton(
-                "⬅️ Orqaga",
-                callback_data='back'
-            )]
+            # [InlineKeyboardButton(
+            #     "⬅️ Orqaga",
+            #     callback_data='back'
+            # )]
         ])
 
     @staticmethod

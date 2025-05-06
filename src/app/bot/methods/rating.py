@@ -28,11 +28,11 @@ def get_rating_base(update: Update, context: CallbackContext):
         return state.CHECK_CHANNEL
     user_db = CustomUser.objects.get(chat_id=update.effective_user.id)
     if user_db.is_active:
-        context.bot.send_message(chat_id=update.effective_user.id,
-                                 text="<b>Xush kelibsiz!</b> Real timeda statistika ko'rish imkoniyatiga ega bo'ling",
-                                 parse_mode=ParseMode.HTML,
-                                 reply_markup=keyword.delete
-                                 )
+        # context.bot.send_message(chat_id=update.effective_user.id,
+        #                          text="<b>Xush kelibsiz!</b> Real timeda statistika ko'rish imkoniyatiga ega bo'ling",
+        #                          parse_mode=ParseMode.HTML,
+        #                          reply_markup=keyword.delete
+        #                          )
         _msg = """<b>🎉 Top Reytinglar</b>
 
 Haftalik va oylik konkurslarda qatnashing <b>Telegram Premium va Telegram stars⭐️</b> yutib oling.🎁"""
@@ -84,7 +84,7 @@ def get_rating_type(update: Update, context: CallbackContext):
             query.delete_message()
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=_msg_,
-                                     reply_markup=keyword.back()
+                                     # reply_markup=keyword.back()
                                      )
         else:
             _msg_ = "🏆TOP 10 ta haftalik foydalanuvchilar:\n\n"
@@ -101,6 +101,8 @@ def get_rating_type(update: Update, context: CallbackContext):
                 counter += 1
             query.delete_message()
             context.bot.send_message(chat_id=update.effective_user.id,
-                                     text=_msg_, reply_markup=keyword.back())
+                                     text=_msg_,
+                                     # reply_markup=keyword.back()
+                                     )
 
     return state.RATING
