@@ -43,7 +43,7 @@ def get_interesting_bonus_base(update: Update, context: CallbackContext):
 <b>O'z telegram ismingizga bizning nomimizni qo'ying va {interesting_bonus.fullname} so'm bonus oling.</b>
 Ustiga bosib nusxalab olishingiz mumkin
                     
-<code>🅿️ PremiumHub 📝</code>
+<code>🅿️ PremiumHub</code> 📝
                     """
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=_msg_,
@@ -57,7 +57,7 @@ Ustiga bosib nusxalab olishingiz mumkin
 <b>O'z telegram BIO ingizga bizning nomimizni qo'ying va {interesting_bonus.bio} so'm bonus oling.</b>
 Ustiga bosib nusxalab olishingiz mumkin
 
-<code>Tg Premium 👇  https://t.me/HubPremiyumBot?start={update.effective_user.id} 📝</code>
+<code>Tg Premium 👇  </code>https://t.me/HubPremiyumBot?start={update.effective_user.id} 📝
                     """
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=_msg_,
@@ -90,7 +90,7 @@ def check_interesting_bonus_nik(update: Update, context: CallbackContext):
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=_msg_,
                                      parse_mode="HTML",
-                                     reply_markup=keyword.interesting_bonus()
+                                     reply_markup=keyword.bonus()
                                      )
             return state.INTERESTING_BONUS
         else:
@@ -112,7 +112,7 @@ def check_interesting_bonus_nik(update: Update, context: CallbackContext):
                     context.bot.send_message(chat_id=update.effective_user.id,
                                              text=_msg_,
                                              parse_mode="HTML",
-                                             reply_markup=keyword.interesting_bonus()
+                                             reply_markup=keyword.bonus()
                                              )
                     return state.INTERESTING_BONUS
                 bonus_amount = interesting_bonus.fullname
@@ -142,7 +142,7 @@ def check_interesting_bonus_nik(update: Update, context: CallbackContext):
 <b>O'z telegram ismingizga bizning nomimizni qo'ying va {interesting_bonus.fullname} so'm bonus oling.</b>
 Ustiga bosib nusxalab olishingiz mumkin
 
-<code>🅿️ PremiumHub 📝</code>
+<code>🅿️ PremiumHub</code> 📝
                                 """
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=_msg_,
@@ -175,7 +175,7 @@ def check_interesting_bonus_bio(update: Update, context: CallbackContext):
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=_msg_,
                                      parse_mode="HTML",
-                                     reply_markup=keyword.interesting_bonus()
+                                     reply_markup=keyword.bonus()
                                      )
             return state.INTERESTING_BONUS
         else:
@@ -185,7 +185,7 @@ def check_interesting_bonus_bio(update: Update, context: CallbackContext):
                 chat_id=update.effective_user.id
             )
             user_bio = update.effective_chat.bio or "" if hasattr(update.effective_chat, 'bio') else ""
-            required_text = f"Tg Premium 👇 https://t.me/HubPremiyumBot?start={update.effective_user.id}"
+            required_text = f"Tg Premium 👇 https://t.me/{settings.USERNAME}?start={update.effective_user.id}"
             has_in_name = required_text.lower() in user_bio.lower()
             if has_in_name:
                 user_account = CustomUserAccount.objects.get(
@@ -197,7 +197,7 @@ def check_interesting_bonus_bio(update: Update, context: CallbackContext):
                     context.bot.send_message(chat_id=update.effective_user.id,
                                              text=_msg_,
                                              parse_mode="HTML",
-                                             reply_markup=keyword.interesting_bonus()
+                                             reply_markup=keyword.bonus()
                                              )
                     return state.INTERESTING_BONUS
                 bonus_amount = interesting_bonus.bio
@@ -230,7 +230,7 @@ O'z telegram BIO ingizga bizning nomimizni qo'ying va {interesting_bonus.bio} so
 Ustiga bosib nusxalab olishingiz mumkin
 
 
-<code>Tg Premium 👇  https://t.me/HubPremiyumBot?start=758934089 📝</code>
+<code>Tg Premium 👇  </code>https://t.me/{settings.USERNAME}?start={update.effective_user.id} 📝
                         """
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=_msg_,
