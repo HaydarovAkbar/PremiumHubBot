@@ -347,8 +347,8 @@ def send_promo_code(update: Update, context: CallbackContext):
                                      text=adm_msg,
                                      parse_mode='HTML',
                                      )
-        except Exception:
-            pass
+        except Exception as e:
+            print(e)
         _msg_ = f"""
 <b>✅ Promokod adminga muvafaqiyatli yuborildi!</b>
 

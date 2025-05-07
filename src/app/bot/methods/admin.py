@@ -554,10 +554,28 @@ def user_profile(update: Update, context: CallbackContext):
 
 def get_balance(update: Update, context: CallbackContext):
     get_price = update.message.text
+    user_profile = CustomUser.objects.get(chat_id=context.chat_data['chat_id'])
     user_account = CustomUserAccount.objects.get(chat_id=context.chat_data['chat_id'])
     if user_account.current_price >= int(get_price):
         user_account.current_price -= int(get_price)
         user_account.save()
+        try:
+            fullname = user_profile.first_name if user_profile.first_name else '-' + " " + user_profile.last_name if user_profile.last_name else '-'
+            minio = f"<a href='tg://user?id={user_profile.chat_id}'>{fullname}</a>"
+            adm_msg = (
+                f"<b>🆕 Foydalanuvchiga pul qo'shildi!\n\n</b>"
+                # f"🔹 Pul miqdori: <code>{int(get_price)}</code>\n"
+                f"🔹 FamiliyaIsm: {minio}\n"
+                f"🔹 Kamayish narxi: <code>{int(get_price)}</code>\n"
+                f"🔹 User ID: <code>{user_profile.chat_id}</code>\n"
+                f"📅 DATE: {user_profile.created_at}\n"
+            )
+            context.bot.send_message(chat_id="-1002275382452",
+                                     text=adm_msg,
+                                     parse_mode='HTML',
+                                     )
+        except Exception as e:
+            print(e)
         update.message.reply_text(
             f"Balanse kamaytirildi!\nFoydalanuvchini hozirgi balanse: {user_account.current_price} so'm",
             reply_markup=keyword.admin_base()
@@ -575,6 +593,24 @@ def push_balance(update: Update, context: CallbackContext):
     user_account.current_price += int(get_price)
     user_account.total_price += int(get_price)
     user_account.save()
+    user_profile = CustomUser.objects.get(chat_id=context.chat_data['chat_id'])
+    try:
+        fullname = user_profile.first_name if user_profile.first_name else '-' + " " + user_profile.last_name if user_profile.last_name else '-'
+        minio = f"<a href='tg://user?id={user_profile.chat_id}'>{fullname}</a>"
+        adm_msg = (
+            f"<b>🆕 Foydalanuvchiga pul qo'shildi!\n\n</b>"
+            # f"🔹 Pul miqdori: <code>{int(get_price)}</code>\n"
+            f"🔹 FamiliyaIsm: {minio}\n"
+            f"🔹 Kamayish narxi: <code>{int(get_price)}</code>\n"
+            f"🔹 User ID: <code>{user_profile.chat_id}</code>\n"
+            f"📅 DATE: {user_profile.created_at}\n"
+        )
+        context.bot.send_message(chat_id="-1002275382452",
+                                 text=adm_msg,
+                                 parse_mode='HTML',
+                                 )
+    except Exception as e:
+        print(e)
     update.message.reply_text(
         f"Balanse ko'paytirildi!\nFoydalanuvchini hozirgi balanse: {user_account.current_price} so'm",
         reply_markup=keyword.admin_base()

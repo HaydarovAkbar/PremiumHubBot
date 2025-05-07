@@ -14,7 +14,8 @@ from .methods.interesting_bonus import get_interesting_bonus_base, check_interes
     check_interesting_bonus_bio
 from .methods.account import my_account, spend, spend_field, get_promo_code, send_promo_code
 from .methods.admin import admin_base, ads, get_ads, parse_button, received_advert, get_kill_id, kill_task, get_user_id, \
-    get_user, confirm_kill_task, info_promo, get_all_promo_codes, passive, get_balance, push_balance, send_msg, user_profile, get_all_stories
+    get_user, confirm_kill_task, info_promo, get_all_promo_codes, passive, get_balance, push_balance, send_msg, \
+    user_profile, get_all_stories
 import logging
 import time
 from telegram.error import RetryAfter
@@ -35,7 +36,7 @@ def run():
     webhook_url = settings.HOST + '/premium/'
     print('started webhook')
     try:
-        bot.set_webhook(webhook_url)
+        bot.set_webhook(webhook_url, allowed_updates=["message", "callback_query", "chat_boost", "removed_chat_boost"])
     except RetryAfter as e:
         time.sleep(e.retry_after)
         bot.set_webhook(webhook_url)
