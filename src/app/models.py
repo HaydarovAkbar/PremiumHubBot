@@ -1,3 +1,4 @@
+from celery.worker.strategy import default
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
@@ -169,9 +170,9 @@ class RewardsChannelBoost(models.Model):
 
 
 class DailyBonus(models.Model):
-    rewards_channel = models.OneToOneField(RewardsChannelBoost, on_delete=models.CASCADE)
+    rewards_channel = models.ForeignKey(RewardsChannelBoost, on_delete=models.CASCADE, null=True, blank=True)
     chat_id = models.BigIntegerField()
-
+    count = models.IntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     last_bonus = models.DateField(null=True, blank=True)
@@ -237,6 +238,10 @@ class CustomUserAccount(models.Model):
 class InvitedUser(models.Model):
     inviter_chat_id = models.BigIntegerField(null=True, blank=True)
     new_user_chat_id = models.BigIntegerField(null=True, blank=True)
+
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True)
+
+    is_active = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

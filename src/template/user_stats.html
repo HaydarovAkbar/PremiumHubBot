@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>Kunlik Foydalanuvchi Statistikasi</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f3f4f6;
+            padding: 30px;
+            max-width: 700px;
+            margin: auto;
+        }
+        h1 {
+            text-align: center;
+            color: #374151;
+        }
+        .bar-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .bar {
+            background: white;
+            border-radius: 8px;
+            padding: 8px 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #4b5563;
+            margin-bottom: 4px;
+        }
+        .progress {
+            height: 14px;
+            background: #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #ec4899);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+    </style>
+</head>
+<body>
+    <h1>📊 Kunlik Foydalanuvchi Statistikasi</h1>
+<!--    <div class="bar-container">-->
+<!--        {% for item in daily_data %}-->
+<!--        <div class="bar">-->
+<!--            <div class="label">-->
+<!--                <span>{{ item.date }} 🗓️</span>-->
+<!--                <span>{{ item.count }} 👤</span>-->
+<!--            </div>-->
+<!--            <div class="progress">-->
+<!--                <div class="progress-fill" style="width: {{ item.percent }}%;"></div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        {% endfor %}-->
+<!--    </div>-->
+
+<div class="bar-container">
+    {% for item in daily_data %}
+    <div class="bar">
+        <div class="label">
+            <span>{{ item.date }}</span>
+            <span>+{{ item.added }} 👤 / -{{ item.blocked }} 🚫</span>
+        </div>
+        <div class="progress">
+            <div class="progress-fill" style="width: {{ item.added_percent }}%; background: #10b981;"></div>
+        </div>
+        <div class="progress">
+            <div class="progress-fill" style="width: {{ item.blocked_percent }}%; background: #ef4444;"></div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+</body>
+</html>

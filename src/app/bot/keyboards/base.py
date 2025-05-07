@@ -3,7 +3,8 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMa
     ReplyKeyboardRemove
 from app.models import Channel
 from ..messages.main import KeyboardText
-
+import requests
+from urllib.parse import quote
 msg = KeyboardText()
 
 
@@ -53,18 +54,51 @@ class Keyboards:
         ]
         return InlineKeyboardMarkup(keyboard)
 
+    #     @staticmethod
+    #     def referral(url):
+    #         share_text = f"""
+    # 🎁 Sizga haligacha Telegram Premium sovgʻa qilishmadimi?
+    #
+    # ➖ Telegram Premium obunani sovgʻa sifatida tekinga olishni istaysizmi?
+    #
+    # 👉 Hoziroq oʻz sovgʻangiz sari olgʻa bosing:
+    # {url} havola
+    # """
+    #
+    #         share_url = f"https://t.me/share/url?url={url}&text={share_text}"
+    #         keyboard = InlineKeyboardMarkup([
+    #             [InlineKeyboardButton("📤 Doʻstlarga ulashish", url=share_url)]
+    #         ])
+    #
+    #         return keyboard
+
+
+    # @staticmethod
+    # def referral(url):
+    #     share_text = f"""🎁 Sizga haligacha Telegram Premium sovgʻa qilishmadimi?
+    #
+    # ➖ Telegram Premium obunani sovgʻa sifatida tekinga olishni istaysizmi?
+    #
+    # 👉 Hoziroq oʻz sovgʻangiz sari olgʻa bosing:
+    # """
+    #
+    #     share_url = f"https://t.me/share/url?url={url}&text={quote(share_text)}"
+    #     keyboard = InlineKeyboardMarkup([
+    #         [InlineKeyboardButton("📤 Doʻstlarga ulashish", url=share_url)]
+    #     ])
+    #
+    #     return keyboard
+
     @staticmethod
     def referral(url):
-        share_text = f"""
-🎁 Sizga haligacha Telegram Premium sovgʻa qilishmadimi?
+        share_text = f"""🎁 Sizga haligacha Telegram Premium sovgʻa qilishmadimi?
 
-➖ Telegram Premium obunani sovgʻa sifatida tekinga olishni istaysizmi?
- 
-👉 Hoziroq oʻz sovgʻangiz sari olgʻa bosing:
-{url} havola
-"""
+    ➖ Telegram Premium obunani sovgʻa sifatida tekinga olishni istaysizmi?
 
-        share_url = f"https://t.me/share/url?url={url}&text={share_text}"
+    👉 Hoziroq oʻz sovgʻangiz sari olgʻa bosing:
+    {url}"""
+
+        share_url = f"https://t.me/share/url?text={quote(share_text)}"
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton("📤 Doʻstlarga ulashish", url=share_url)]
         ])
@@ -106,12 +140,12 @@ class Keyboards:
                 callback_data='premium_bonus'
             )],
             [InlineKeyboardButton(
-                "🔗 Stories bonus",
-                callback_data='stories_bonus'
-            )],
-            [InlineKeyboardButton(
                 "🫂 Guruhga odam qo'shish orqali pul ishlash",
                 callback_data='add_group_bonus'
+            )],
+            [InlineKeyboardButton(
+                "🔗 Stories bonus",
+                callback_data='stories_bonus'
             )],
             # [InlineKeyboardButton(
             #     "😉 Qiziqarli bonuslar",
@@ -142,10 +176,10 @@ class Keyboards:
                 "♻️ Kunlik bonus",
                 callback_data='daily_bonus'
             )],
-            [InlineKeyboardButton(
-                "⬅️ Orqaga",
-                callback_data='back'
-            )],
+            # [InlineKeyboardButton(
+            #     "⬅️ Orqaga",
+            #     callback_data='back'
+            # )],
         ])
 
     delete = ReplyKeyboardRemove()

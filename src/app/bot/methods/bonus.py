@@ -15,10 +15,22 @@ state = States()
 msg = MessageText()
 
 
+def is_premium_user_check(user_id: int, bot_token: str, chat_id: int) -> bool:
+    url = f"https://api.telegram.org/bot{bot_token}/getChatMember"
+    response = requests.get(url, params={
+        "chat_id": chat_id,
+        "user_id": user_id
+    })
+
+    if response.status_code == 200:
+        data = response.json()
+        return data.get("result", {}).get("user", {}).get("is_premium", False)
+    return False
+
+
 def is_premium_user(user_id: int, bot_token: str) -> bool:
     url = f"https://api.telegram.org/bot{bot_token}/getChat"
     response = requests.post(url, data={"chat_id": user_id})
-
     if response.status_code == 200:
         data = response.json()
         return data.get("result", {}).get("is_premium", False)
@@ -117,13 +129,7 @@ def get_bonus_type(update: Update, context: CallbackContext):
 
         elif query.data == 'premium_bonus':
             user_id = update.effective_user.id
-            if not is_premium_user(user_id, context.bot.token):
-                # query.delete_message()
-                # context.bot.send_message(chat_id=user_id,
-                #                          text="📵 Bu tugmani faqatgina premium obunachilar ishlatoladi 📵",
-                #                          reply_markup=keyword.bonus(),
-                #                          parse_mode=ParseMode.HTML
-                #                          )
+            if not is_premium_user_check(user_id, context.bot.token, user_id):
                 query.answer(
                     "📵 Bu tugmani faqatgina premium obunachilar ishlatoladi 📵",
                     show_alert=True
@@ -162,7 +168,7 @@ def get_bonus_type(update: Update, context: CallbackContext):
             query.delete_message()
             group = Group.objects.filter(is_active=True).last()
             if group:
-                _msg_ = f"""<b>Quyidagi guruhga kamida {group.limit} ta do'stlaringiz qo'shing va {group.price} so'm bonusga ega bo'ling: 👇</b>"""
+                _msg_ = f"""<b>Quyidagi guruhga do'stlaringiz qo'shing va bonusga ega bo'ling: 👇</b>"""
                 context.bot.send_message(chat_id=update.effective_user.id,
                                          text=_msg_,
                                          parse_mode="HTML",
@@ -190,16 +196,15 @@ def get_bonus_type(update: Update, context: CallbackContext):
 
 def get_user_boosts(chat_id, user_id):
     payload = {
-        "chat_id": chat_id,  # "@channelusername" yoki integer
+        "chat_id": f'@{chat_id}',  # "@channelusername" yoki integer
         "user_id": user_id
     }
     API_URL = f"https://api.telegram.org/bot{settings.TOKEN}/getUserChatBoosts"
     response = requests.post(API_URL, json=payload)
-
     if response.ok:
         data = response.json()
         if data.get("ok"):
-            return data["result"]
+            return data["result"]['boosts']
     return False
 
 
@@ -233,13 +238,12 @@ def get_daily_bonus(update: Update, context: CallbackContext):
                                      parse_mode=ParseMode.HTML,
                                      reply_markup=keyword.bonus())
             return state.BONUS
-        query.delete_message()
+        # query.delete_message()
         reward_db = RewardsChannelBoost.objects.filter(is_active=True).last()
-        daily_bonus, _ = DailyBonus.objects.get_or_create(chat_id=update.effective_user.id, rewards_channel=reward_db)
 
         def extract_channel_username(url: str) -> str:
             if url.startswith("https://t.me/"):
-                return url.split("https://t.me/")[-1].split("/")[0].strip("@")
+                return url.rstrip("/").split("/")[-1].strip("@")
             return url.strip("@")
 
         boost_count = get_user_boosts(extract_channel_username(reward_db.channel_url), update.effective_user.id)
@@ -249,12 +253,17 @@ def get_daily_bonus(update: Update, context: CallbackContext):
                                      reply_markup=keyword.base()
                                      )
             return state.START
+        boost_count = len(boost_count)
+        daily_bonus, _ = DailyBonus.objects.get_or_create(chat_id=update.effective_user.id, rewards_channel=reward_db)
         if not _:
-            if daily_bonus.last_bonus != datetime.today().date():
-                daily_bonus.last_bonus = datetime.today().date()
+            if daily_bonus.count < boost_count:
+                counter = boost_count - daily_bonus.count
+                daily_bonus.count = boost_count
                 daily_bonus.save()
                 custom_account, __ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id)
-                custom_account.current_price = reward_db.daily_bonus
+                price = counter * int(reward_db.elementary_bonus)
+                custom_account.current_price += price
+                custom_account.total_price += price
                 custom_account.save()
                 top_user, a = TopUser.objects.get_or_create(
                     chat_id=update.effective_user.id,
@@ -262,36 +271,64 @@ def get_daily_bonus(update: Update, context: CallbackContext):
                         'fullname': update.effective_user.full_name,
                     }
                 )
-                top_user.balance += int(reward_db.elementary_bonus)
-                top_user.weekly_earned += int(reward_db.elementary_bonus)
-                top_user.monthly_earned += int(reward_db.elementary_bonus)
+                top_user.balance += price
+                top_user.weekly_earned += price
+                top_user.monthly_earned += price
                 top_user.save()
                 context.bot.send_message(chat_id=update.effective_user.id,
-                                         text=f"🎉 Tabriklaymiz sizga {reward_db.daily_bonus} so'm kunlik bonus berildi.",
+                                         text=f"🎉 Tabriklaymiz sizga {price} so'm kunlik bonus berildi.",
+                                         reply_markup=keyword.base()
+                                         )
+            if daily_bonus.last_bonus != datetime.today().date() and boost_count > 0:
+                daily_bonus.last_bonus = datetime.today().date()
+                daily_bonus.save()
+                price = int(reward_db.daily_bonus) * boost_count
+                custom_account, __ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id)
+                custom_account.current_price += price
+                custom_account.total_price += price
+                custom_account.save()
+                top_user, a = TopUser.objects.get_or_create(
+                    chat_id=update.effective_user.id,
+                    defaults={
+                        'fullname': update.effective_user.full_name,
+                    }
+                )
+                top_user.balance += price
+                top_user.weekly_earned += price
+                top_user.monthly_earned += price
+                top_user.save()
+                context.bot.send_message(chat_id=update.effective_user.id,
+                                         text=f"🎉 Tabriklaymiz sizga {price} so'm kunlik bonus berildi.",
                                          reply_markup=keyword.base()
                                          )
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text="Kunlik bonus allaqachon olgansiz!",
                                      reply_markup=keyword.base()
                                      )
-        custom_account, __ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id)
-        custom_account.current_price += reward_db.elementary_bonus
-        custom_account.save()
-        top_user, a = TopUser.objects.get_or_create(
-            chat_id=update.effective_user.id,
-            defaults={
-                'fullname': update.effective_user.full_name,
-            }
-        )
-        top_user.balance += int(reward_db.elementary_bonus)
-        top_user.weekly_earned += int(reward_db.elementary_bonus)
-        top_user.monthly_earned += int(reward_db.elementary_bonus)
-        top_user.save()
-        context.bot.send_message(chat_id=update.effective_user.id,
-                                 text=f"🎉 Tabriklaymiz sizga {reward_db.elementary_bonus} so'm kanalimizga ovoz berganingiz uchun bonus berildi.",
-                                 reply_markup=keyword.base()
-                                 )
-        return state.START
+        else:
+            # if boost_count == daily_bonus.count
+            daily_bonus.count = boost_count
+            daily_bonus.save()
+            custom_account, __ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id)
+            price = boost_count * int(reward_db.elementary_bonus)
+            custom_account.current_price += price
+            custom_account.total_price += price
+            custom_account.save()
+            top_user, a = TopUser.objects.get_or_create(
+                chat_id=update.effective_user.id,
+                defaults={
+                    'fullname': update.effective_user.full_name,
+                }
+            )
+            top_user.balance += price
+            top_user.weekly_earned += price
+            top_user.monthly_earned += price
+            top_user.save()
+            context.bot.send_message(chat_id=update.effective_user.id,
+                                     text=f"🎉 Tabriklaymiz sizga {price} so'm kanalimizga ovoz berganingiz uchun bonus berildi.",
+                                     reply_markup=keyword.base()
+                                     )
+            return state.START
     return state.BONUS
 
 
@@ -342,7 +379,7 @@ def get_stories_bonus(update: Update, context: CallbackContext):
                                      reply_markup=keyword.bonus()
                                      )
             custom_account, __ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id)
-            custom_account.current_price = story_db.price
+            custom_account.current_price += story_db.price
             custom_account.save()
             top_user, a = TopUser.objects.get_or_create(
                 chat_id=update.effective_user.id,

@@ -1,3 +1,5 @@
+import datetime
+
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 from app.models import CustomUser, Channel, Prices, StarsPrices, RewardsChannelBoost, DailyBonus, StoryBonusPrice, \
@@ -312,23 +314,41 @@ def send_promo_code(update: Update, context: CallbackContext):
             return state.START
         promo_code = context.chat_data['promo_code']
         spent_field = SpendPriceField.objects.get(id=context.chat_data['promo_code'])
-        admins = CustomUser.objects.filter(is_admin=True)
-        for admin in admins:
-            try:
-                adm_msg = (
-                    f"🆕 Yangi promo kod ro'yxatdan o'tdi!\n\n"
-                    f"🔹 Promo kod: <code>{promo_code}</code>\n"
-                    f"🔹 Promo turi: <code>{spent_field.name}</code>\n"
-                    f"🔹 Promo narxi: <code>{spent_field.price}</code>\n"
-                    f"🔹 Foydalanuvchi: <a href='tg://user?id={user_db.chat_id}'>{update.effective_chat.full_name}</a>\n"
-                    f"🔹 User ID: <code>{user_db.chat_id}</code>"
-                )
-                context.bot.send_message(chat_id=admin.chat_id,
-                                         text=adm_msg,
-                                         parse_mode='HTML',
-                                         )
-            except Exception:
-                pass
+        # admins = CustomUser.objects.filter(is_admin=True)
+        # for admin in admins:
+        #     try:
+        #         adm_msg = (
+        #             f"🆕 Yangi promo kod ro'yxatdan o'tdi!\n\n"
+        #             f"🔹 Promo kod: <code>{promo_code}</code>\n"
+        #             f"🔹 Promo turi: <code>{spent_field.name}</code>\n"
+        #             f"🔹 Promo narxi: <code>{spent_field.price}</code>\n"
+        #             f"🔹 Foydalanuvchi: <a href='tg://user?id={user_db.chat_id}'>{update.effective_chat.full_name}</a>\n"
+        #             f"🔹 User ID: <code>{user_db.chat_id}</code>"
+        #         )
+        #         context.bot.send_message(chat_id=admin.chat_id,
+        #                                  text=adm_msg,
+        #                                  parse_mode='HTML',
+        #                                  )
+        #     except Exception:
+        #         pass
+        promo_db = PromoCodes.objects.get(name=promo_code)
+        try:
+            adm_msg = (
+                f"#{promo_db.id}"
+                f"<b>🆕 Yangi promo kod ro'yxatdan o'tdi!\n\n</b>"
+                f"🔹 Promo kod: <code>{promo_code}</code>\n"
+                f"🔹 Promo turi: <code>{spent_field.name}</code>\n"
+                f"🔹 Promo narxi: <code>{spent_field.price}</code>\n"
+                f"🔹 Foydalanuvchi: <a href='tg://user?id={user_db.chat_id}'>{update.effective_chat.full_name}</a>\n"
+                f"🔹 User ID: <code>{user_db.chat_id}</code>\n"
+                f"📅 DATE: {datetime.datetime.now()}\n"
+            )
+            context.bot.send_message(chat_id="-1002275382452",
+                                     text=adm_msg,
+                                     parse_mode='HTML',
+                                     )
+        except Exception:
+            pass
         _msg_ = f"""
 <b>✅ Promokod adminga muvafaqiyatli yuborildi!</b>
 
