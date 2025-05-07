@@ -442,7 +442,7 @@ def info_promo(update: Update, context: CallbackContext):
     if admins.exists():
         promo = context.args[0] if len(context.args) == 1 else False
         if promo:
-            get_db_promo = PromoCodes.objects.filter(name=promo)
+            get_db_promo = PromoCodes.objects.filter(name=promo, status=True)
             if get_db_promo.exists():
                 promo_code = get_db_promo.first()
                 promo_user = CustomUser.objects.get(chat_id=promo_code.chat_id)
@@ -459,6 +459,7 @@ def info_promo(update: Update, context: CallbackContext):
 📊 PromoSTATUS: <code>{status}</code>
 
 👨‍🦲 PromoUSER: {mention}
+🆔 PromoUSER_ID: <code>{promo_user.chat_id}</code>
 ☎️ PromoUSER_PHONE: +{promo_user.phone_number}
 """,
                     reply_markup=keyword.passive()

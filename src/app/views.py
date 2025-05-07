@@ -13,6 +13,8 @@ from .models import CustomUser, Settings, CustomUserAccount, TopUser
 from .bot.keyboards.base import Keyboards
 from django.conf import settings
 import requests
+from datetime import datetime, timedelta
+from collections import defaultdict
 
 
 def is_premium_user(user_id: int, bot_token: str) -> bool:
@@ -119,13 +121,15 @@ def register_device(request):
                     referral_user.invited_count += 1
                 referral_user.save()
                 custom_user.save()
+                fullname = f"{custom_user.first_name if custom_user.first_name else '-'} {custom_user.last_name if custom_user.last_name else '-'}"
+                minio = f"<a href='tg://user?id={custom_user.chat_id}'>{fullname}</a>"
                 bot.send_message(
                     chat_id=referral_user_account.chat_id,
                     text=f"""
-🎉 Tabriklaymiz!  Siz taklif qilgan foydalanuvchi ro'yxatdan o'tdi!
+🎉 Tabriklaymiz!  Siz {minio} ni taklif qilgan foydalanuvchi ro'yxatdan o'tdi!
 
 Sizga {custom_user_ref_price} so'm bonus berildi.
-            """
+            """, parse_mode="HTML"
                 )
             except Exception:
                 pass
@@ -140,3 +144,37 @@ Sizga {custom_user_ref_price} so'm bonus berildi.
         return JsonResponse({"status": "ok"}, status=201)
 
     return JsonResponse({"error": "POST method required"}, status=400)
+
+
+def user_stats_view(request):
+    last_month = datetime.today() - timedelta(days=31)
+    start_date = last_month
+    today = datetime.today().date()
+    days = (today - start_date.date()).days + 1
+
+    daily_data = []
+    max_added = 0
+    max_blocked = 0
+
+    for i in range(days):
+        day = (start_date + timedelta(days=i)).date()
+        day_start = datetime.combine(day, datetime.min.time())
+        day_end = datetime.combine(day, datetime.max.time())
+
+        added_count = CustomUser.objects.filter(created_at__range=(day_start, day_end), is_active=True).count()
+        blocked_count = CustomUser.objects.filter(is_blocked=True, created_at__range=(day_start, day_end)).count()
+
+        max_added = max(max_added, added_count)
+        max_blocked = max(max_blocked, blocked_count)
+
+        daily_data.append({
+            'date': day.strftime('%d-%m'),
+            'added': added_count,
+            'blocked': blocked_count
+        })
+
+    for item in daily_data:
+        item['added_percent'] = round((item['added'] / max_added) * 100, 1) if max_added > 0 else 0
+        item['blocked_percent'] = round((item['blocked'] / max_blocked) * 100, 1) if max_blocked > 0 else 0
+
+    return render(request, 'user_stats.html', {'daily_data': daily_data[::-1]})
