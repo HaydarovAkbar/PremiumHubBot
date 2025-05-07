@@ -8,7 +8,7 @@ import json
 import hashlib
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from .models import CustomUser, Settings, CustomUserAccount, TopUser
+from .models import CustomUser, Settings, CustomUserAccount, TopUser, DailyBonus, RewardsChannelBoost
 # from telegram import Bot
 from .bot.keyboards.base import Keyboards
 from django.conf import settings
@@ -36,8 +36,38 @@ class MainView(View):
         try:
             body = request.body
             body_json = json.loads(body)
-            update: Update = Update.de_json(body_json, bot)
-            dispatcher.process_update(update)
+            if "chat_boost" in body_json:
+                boost_data = body_json["chat_boost"]
+                user_id = boost_data["boost"]["source"]["user"]["id"]
+                reward_db = RewardsChannelBoost.objects.filter(is_active=True).last()
+                daily_bonus, _ = DailyBonus.objects.get_or_create(chat_id=user_id,
+                                                                  rewards_channel=reward_db)
+                custom_user = CustomUser.objects.get(chat_id=user_id)
+                fullname = f"{custom_user.first_name} {custom_user.last_name}"
+                daily_bonus.count = 1 + daily_bonus.count if daily_bonus.count else 0
+                daily_bonus.save()
+                custom_account, __ = CustomUserAccount.objects.get_or_create(chat_id=user_id)
+                price = 1 * int(reward_db.elementary_bonus)
+                custom_account.current_price = price + custom_account.current_price if custom_account.current_price else 0
+                custom_account.total_price = price + custom_account.total_price if custom_account.total_price else 0
+                custom_account.save()
+                top_user, a = TopUser.objects.get_or_create(
+                    chat_id=user_id,
+                    defaults={
+                        'fullname': fullname,
+                    }
+                )
+                top_user.balance = price + top_user.balance if top_user.balance else 0
+                top_user.weekly_earned = price + top_user.weekly_earned if top_user.weekly_earned else 0
+                top_user.monthly_earned = price + top_user.monthly_earned if top_user.monthly_earned else 0
+                top_user.save()
+                bot.send_message(chat_id=user_id,
+                                 text=f"🎉 Tabriklaymiz sizga {price} so'm kunlik bonus berildi.",
+                                 # reply_markup=keyword.base()
+                                 )
+            else:
+                update: Update = Update.de_json(body_json, bot)
+                dispatcher.process_update(update)
         except Exception as e:
             print(e)
         return HttpResponse('POST request')

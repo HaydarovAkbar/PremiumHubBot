@@ -41,7 +41,7 @@ def get_interesting_bonus_base(update: Update, context: CallbackContext):
             interesting_bonus = InterestingBonus.objects.filter().last()
             _msg_ = f"""
 <b>O'z telegram ismingizga bizning nomimizni qo'ying va {interesting_bonus.fullname} so'm bonus oling.</b>
-Ustiga bosib nusxalab olishingiz mumkin
+<i>Ustiga bosib nusxalab olishingiz mumkin</i>
                     
 <code>🅿️ PremiumHub</code> 📝
                     """
@@ -55,9 +55,9 @@ Ustiga bosib nusxalab olishingiz mumkin
             interesting_bonus = InterestingBonus.objects.filter().last()
             _msg_ = f"""
 <b>O'z telegram BIO ingizga bizning nomimizni qo'ying va {interesting_bonus.bio} so'm bonus oling.</b>
-Ustiga bosib nusxalab olishingiz mumkin
+<i>Ustiga bosib nusxalab olishingiz mumkin</i>
 
-<code>Tg Premium 👇  </code>https://t.me/HubPremiyumBot?start={update.effective_user.id} 📝
+<code>Telegram Premium 👇  https://t.me/HubPremiyumBot?start={update.effective_user.id}</code> 📝
                     """
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=_msg_,

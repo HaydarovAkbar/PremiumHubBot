@@ -72,23 +72,6 @@ class Keyboards:
     #
     #         return keyboard
 
-
-    # @staticmethod
-    # def referral(url):
-    #     share_text = f"""🎁 Sizga haligacha Telegram Premium sovgʻa qilishmadimi?
-    #
-    # ➖ Telegram Premium obunani sovgʻa sifatida tekinga olishni istaysizmi?
-    #
-    # 👉 Hoziroq oʻz sovgʻangiz sari olgʻa bosing:
-    # """
-    #
-    #     share_url = f"https://t.me/share/url?url={url}&text={quote(share_text)}"
-    #     keyboard = InlineKeyboardMarkup([
-    #         [InlineKeyboardButton("📤 Doʻstlarga ulashish", url=share_url)]
-    #     ])
-    #
-    #     return keyboard
-
     @staticmethod
     def referral(url):
         share_text = f"""🎁 Sizga haligacha Telegram Premium sovgʻa qilishmadimi?
@@ -195,10 +178,10 @@ class Keyboards:
                 "♻️ Tekshirish",
                 callback_data='check'
             )],
-            [InlineKeyboardButton(
-                "⬅️ Orqaga",
-                callback_data='back'
-            )],
+            # [InlineKeyboardButton(
+            #     "⬅️ Orqaga",
+            #     callback_data='back'
+            # )],
         ])
 
     @staticmethod
@@ -279,10 +262,10 @@ class Keyboards:
                 "💳 Promokod kod harid qilish",
                 callback_data='get_promo_code'
             )],
-            [InlineKeyboardButton(
-                "⬅️ Orqaga",
-                callback_data='back'
-            )]
+            # [InlineKeyboardButton(
+            #     "⬅️ Orqaga",
+            #     callback_data='back'
+            # )]
         ])
 
     @staticmethod
