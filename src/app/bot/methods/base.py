@@ -77,6 +77,7 @@ def start(update: Update, context: CallbackContext):
     })
     user.first_name = update.effective_user.first_name
     user.last_name = update.effective_user.last_name
+    user.username = update.effective_user.username
     user.save()
     all_channel = Channel.objects.filter(is_active=True)
     left_channel = []
@@ -85,8 +86,8 @@ def start(update: Update, context: CallbackContext):
             a = context.bot.get_chat_member(chat_id=channel.chat_id, user_id=update.effective_user.id)
             if a.status == 'left':
                 left_channel.append(channel)
-        except Exception as e:
-            print("Error:", e)
+        except Exception:
+            pass
     if left_channel:
         context.bot.send_message(chat_id=update.effective_user.id,
                                  text="Botni ishga tushirish uchun quyidagi kanallarga obuna bo’ling va “♻️ Tekshirish” tugmasini bosing",
