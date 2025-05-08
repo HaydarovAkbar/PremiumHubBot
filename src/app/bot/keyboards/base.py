@@ -318,11 +318,15 @@ class Keyboards:
         ])
 
     @staticmethod
-    def adm_url(url):
+    def adm_url(url, stat_url):
         return InlineKeyboardMarkup([
             [InlineKeyboardButton(
                 "WEB 🌐",
                 url=url
+            )],
+            [InlineKeyboardButton(
+                "WEB STATS 🌐",
+                url=stat_url
             )]
         ])
 

@@ -15,7 +15,7 @@ class CustomUserAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ("Asosiy ma'lumotlar", {
-            'fields': ('first_name', 'last_name', 'phone_number', 'is_active', 'is_blocked', 'is_admin')
+            'fields': ('first_name', 'last_name', 'phone_number', 'is_active', 'is_blocked', 'is_admin', 'username')
         }),
         ("Qo'shimcha ma'lumotlar", {
             'fields': ('chat_id', 'device_hash', 'invited_count', 'premium_count', 'referral')

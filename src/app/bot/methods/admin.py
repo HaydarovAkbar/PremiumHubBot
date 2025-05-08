@@ -93,9 +93,10 @@ def admin_base(update: Update, context: CallbackContext):
             reply_markup=keyword.admin_base()
         )
         adm_url = f"{settings.HOST}/admin/"
+        stat_url = f"{settings.HOST}/stats/"
         update.message.reply_html(
             "<b>Web adminkaga o'tish</b>",
-            reply_markup=keyword.adm_url(adm_url),
+            reply_markup=keyword.adm_url(adm_url, stat_url),
         )
         return state.ADMIN
 
@@ -394,7 +395,7 @@ def get_user(update, context):
             status = "Admin 👮‍♀️"
         else:
             status = "Passive"
-        custom_user_account = CustomUserAccount.objects.get(chat_id=user_db.chat_id)
+        custom_user_account,__ = CustomUserAccount.objects.get_or_create(chat_id=user_db.chat_id)
         context.chat_data['chat_id'] = user_db.chat_id
         story_ = StoryBonusAccounts.objects.filter(chat_id=user_db.chat_id)
         if story_:
@@ -410,10 +411,11 @@ def get_user(update, context):
         interesting_b = InterestingBonusUser.objects.filter(chat_id=user_db.chat_id)
         if interesting_b:
             interesting_b = interesting_b.first()
+            bio = True if interesting_b.bio else False
+            nik = True if interesting_b.fullname else False
         else:
-            interesting_b = True
-        bio = True if interesting_b.bio else False
-        nik = True if interesting_b.fullname else False
+            bio = False
+            nik = False
         msg = (
             f"🔍 Foydalanuvchi topildi!\n\n"
             f"👤 Foydalanuvchi: <a href='tg://user?id={user_db.chat_id}'>{full_name}</a>\n"
