@@ -20,6 +20,7 @@ def new_member_handler(update, context):
     if message.new_chat_members:
         added_users = message.new_chat_members
         inviter = message.from_user
+        print(inviter)
         last_group = Group.objects.filter(is_active=True).last()
 
         for new_user in added_users:
@@ -71,7 +72,7 @@ def get_group_base(update: Update, context: CallbackContext):
                     group=last_group,
                     # is_active=False
                 )
-                if invited_count.count() >= last_group.limit:
+                if invited_count.count() <= last_group.limit:
                     user_account, _ = CustomUserAccount.objects.get_or_create(
                         chat_id=update.effective_user.id,
                     )
@@ -115,11 +116,11 @@ def get_group_base(update: Update, context: CallbackContext):
                                                       "Har bir faol harakatingiz uchun sizni mukofotlar bilan rag‘batlantiramiz! 🏆",
                                                  parse_mode="HTML"
                                                  )
-                else:
-                    context.bot.send_message(chat_id=update.effective_user.id,
-                                             text=f"<b>Siz hali yetarlicha guruhga odam qo'shmadingiz ❗️</b>\n\nSiz yana {last_group.limit - invited_count.count()} ta qo'shishingiz kerak!",
-                                             parse_mode=ParseMode.HTML,
-                                             )
+                # else:
+                #     context.bot.send_message(chat_id=update.effective_user.id,
+                #                              text=f"<b>Siz hali yetarlicha guruhga odam qo'shmadingiz ❗️</b>\n\nSiz yana {last_group.limit - invited_count.count()} ta qo'shishingiz kerak!",
+                #                              parse_mode=ParseMode.HTML,
+                #                              )
             else:
                 context.bot.send_message(chat_id=update.effective_user.id,
                                          text="<b>👇 Hozircha bonus uchun guruh kiritilmagan ❗️</b>",
