@@ -8,7 +8,8 @@ import json
 import hashlib
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from .models import CustomUser, Settings, CustomUserAccount, TopUser, DailyBonus, RewardsChannelBoost
+from .models import CustomUser, Settings, CustomUserAccount, TopUser, DailyBonus, RewardsChannelBoost, Group, \
+    InvitedUser, InvitedBonusUser
 # from telegram import Bot
 from .bot.keyboards.base import Keyboards
 from django.conf import settings
@@ -65,6 +66,69 @@ class MainView(View):
                                  text=f"🎉 Tabriklaymiz sizga {price} so'm kunlik bonus berildi.",
                                  # reply_markup=keyword.base()
                                  )
+            elif "message" in body_json and "new_chat_members" in body_json["message"]:
+                update: Update = Update.de_json(body_json, bot)
+                message = update.message
+
+                new_members = message.new_chat_members
+                inviter = message.from_user
+
+                last_group = Group.objects.filter(is_active=True).last()
+                if not last_group:
+                    return HttpResponse('No active group')
+
+                # Foydalanuvchi allaqachon nechtasini qo‘shganligini tekshiramiz
+                current_invite_count = InvitedUser.objects.filter(
+                    inviter_chat_id=inviter.id,
+                    group=last_group
+                ).count()
+
+                if current_invite_count >= last_group.limit:
+                    return HttpResponse('Limit reached, bonus berilmaydi')
+
+                for new_user in new_members:
+                    if new_user.id != inviter.id:
+                        invite_db, created = InvitedUser.objects.get_or_create(
+                            new_user_chat_id=new_user.id,
+                            inviter_chat_id=inviter.id,
+                            group=last_group
+                        )
+
+                        # Bonus faqat yangi foydalanuvchi uchun beriladi
+                        if created:
+                            current_invite_count += 1
+
+                            # Agar yangi foydalanuvchi qo‘shilishi ham limiti ichida bo‘lsa
+                            if current_invite_count <= last_group.limit:
+                                plus_balance = int(last_group.price)
+
+                                # Pul qo‘shish
+                                user_acc, _ = CustomUserAccount.objects.get_or_create(chat_id=inviter.id)
+                                user_acc.current_price += plus_balance
+                                user_acc.total_price += plus_balance
+                                user_acc.save()
+
+                                # TopUser yangilash
+                                top_user, _ = TopUser.objects.get_or_create(
+                                    chat_id=inviter.id,
+                                    defaults={'fullname': inviter.full_name}
+                                )
+                                top_user.balance += plus_balance
+                                top_user.weekly_earned += plus_balance
+                                top_user.monthly_earned += plus_balance
+                                top_user.save()
+
+                                # Bonus statusi
+                                InvitedBonusUser.objects.get_or_create(chat_id=inviter.id, group=last_group)
+
+                                # Xabar yuborish
+                                bot.send_message(
+                                    chat_id=inviter.id,
+                                    text=f"🎉 Siz {new_user.full_name} ni guruhga qo‘shganingiz uchun {plus_balance} so‘m bonus oldingiz!",
+                                    parse_mode="HTML"
+                                )
+                            else:
+                                print(f"Limitdan oshib ketdi: {inviter.id}")
             else:
                 update: Update = Update.de_json(body_json, bot)
                 dispatcher.process_update(update)
