@@ -176,7 +176,7 @@ class Keyboards:
             )],
             [InlineKeyboardButton(
                 "♻️ Tekshirish",
-                callback_data='check'
+                callback_data='story_check'
             )],
             # [InlineKeyboardButton(
             #     "⬅️ Orqaga",
@@ -191,14 +191,14 @@ class Keyboards:
                 group.name,
                 url=group.link
             )],
-            [InlineKeyboardButton(
-                "♻️ Tekshirish",
-                callback_data='check'
-            )],
-            [InlineKeyboardButton(
-                "⬅️ Orqaga",
-                callback_data='back'
-            )]
+            # [InlineKeyboardButton(
+            #     "♻️ Tekshirish",
+            #     callback_data='group_check'
+            # )],
+            # [InlineKeyboardButton(
+            #     "⬅️ Orqaga",
+            #     callback_data='back'
+            # )]
         ])
 
     @staticmethod
@@ -212,10 +212,10 @@ class Keyboards:
                 "📥 Bio bonus",
                 callback_data='bio'
             )],
-            [InlineKeyboardButton(
-                "⬅️ Orqaga",
-                callback_data='back'
-            )]
+            # [InlineKeyboardButton(
+            #     "⬅️ Orqaga",
+            #     callback_data='back'
+            # )]
         ])
 
     @staticmethod
@@ -223,12 +223,25 @@ class Keyboards:
         return InlineKeyboardMarkup([
             [InlineKeyboardButton(
                 "♻️ Tekshirish",
-                callback_data='check'
+                callback_data='nik_check'
             )],
+            # [InlineKeyboardButton(
+            #     "⬅️ Orqaga",
+            #     callback_data='back'
+            # )]
+        ])
+
+    @staticmethod
+    def interesting_check_biobonus():
+        return InlineKeyboardMarkup([
             [InlineKeyboardButton(
-                "⬅️ Orqaga",
-                callback_data='back'
-            )]
+                "♻️ Tekshirish",
+                callback_data='bio_check'
+            )],
+            # [InlineKeyboardButton(
+            #     "⬅️ Orqaga",
+            #     callback_data='back'
+            # )]
         ])
 
     @staticmethod

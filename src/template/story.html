@@ -1,90 +1,183 @@
-{% load static %}
+<!--{% load static %}-->
+<!--<!DOCTYPE html>-->
+<!--<html lang="uz">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>🎁 Stories Bonus</title>-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <script src="https://telegram.org/js/telegram-web-app.js"></script>-->
+<!--    <style>-->
+<!--        body {-->
+<!--            margin: 0;-->
+<!--            font-family: 'Segoe UI', sans-serif;-->
+<!--            text-align: center;-->
+<!--            background: linear-gradient(to bottom right, #e0c3fc, #8ec5fc);-->
+<!--            padding: 20px;-->
+<!--            color: #333;-->
+<!--        }-->
+
+<!--        h2 {-->
+<!--            font-size: 28px;-->
+<!--            margin-top: 20px;-->
+<!--        }-->
+
+<!--        p {-->
+<!--            font-size: 18px;-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+
+<!--        video {-->
+<!--            max-width: 100%;-->
+<!--            border-radius: 12px;-->
+<!--            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+
+<!--        .btn {-->
+<!--            display: block;-->
+<!--            width: 90%;-->
+<!--            max-width: 320px;-->
+<!--            margin: 10px auto;-->
+<!--            padding: 12px 20px;-->
+<!--            font-size: 16px;-->
+<!--            border: none;-->
+<!--            border-radius: 10px;-->
+<!--            color: white;-->
+<!--            cursor: pointer;-->
+<!--            transition: background 0.3s;-->
+<!--        }-->
+
+<!--        .btn.download {-->
+<!--            background-color: #007bff;-->
+<!--        }-->
+
+<!--        .btn.share {-->
+<!--            background-color: #ff9800;-->
+<!--        }-->
+
+<!--        .btn:hover {-->
+<!--            opacity: 0.9;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<h2>🎁 Stories Bonus</h2>-->
+<!--<p>Ushbu videoni Telegram Story’ga joylashtiring va sovg‘ani qo‘lga kiriting!</p>-->
+
+<!--<video controls src="{% static 'videos/stories.mp4' %}"></video>-->
+
+<!--<a class="btn download" href="{% static 'videos/stories.mp4' %}" download>⬇️ Videoni yuklab olish</a>-->
+
+<!--<button class="btn share" onclick="shareToStory()">📤 Storyga joylash</button>-->
+
+<!--<button onclick="Telegram.WebApp.shareToStory('https://telegra.ph/file/5583ac37c90979f052b7b.png');">-->
+<!--    Test Share-->
+<!--</button>-->
+<!--<script>-->
+<!--    function shareToStory() {-->
+<!--        Telegram.WebApp.shareToStory(-->
+<!--            "{{ request.build_absolute_uri|slice:':-1' }}{% static 'videos/stories_new.mp4' %}",-->
+<!--            {-->
+<!--                text: "🎁 Bonus olish uchun Storyga joylashtiring!",-->
+<!--                widget_link: {-->
+<!--                    url: "https://t.me/AiGeneratedPhotoBot?start=758934089",-->
+<!--                    name: "🎁 Premium va Stars olish"-->
+<!--                }-->
+<!--            }-->
+<!--        );-->
+<!--    }-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
+
+
 <!DOCTYPE html>
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <title>🎁 Stories Bonus</title>
+    <title>🎁 Telegram Story Bonus</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #ffecd2, #fcb69f);
             font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
             text-align: center;
-            background: linear-gradient(to bottom right, #e0c3fc, #8ec5fc);
-            padding: 20px;
             color: #333;
         }
 
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            max-width: 340px;
+            width: 90%;
+        }
+
         h2 {
-            font-size: 28px;
-            margin-top: 20px;
+            font-size: 24px;
+            margin-bottom: 10px;
         }
 
         p {
-            font-size: 18px;
+            font-size: 16px;
             margin-bottom: 20px;
         }
 
-        video {
-            max-width: 100%;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            margin-bottom: 20px;
-        }
-
-        .btn {
-            display: block;
-            width: 90%;
-            max-width: 320px;
-            margin: 10px auto;
-            padding: 12px 20px;
+        .btn-share {
+            background-color: #0088cc;
+            color: white;
+            padding: 14px 24px;
             font-size: 16px;
             border: none;
-            border-radius: 10px;
-            color: white;
+            border-radius: 12px;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: background-color 0.3s ease;
+            width: 100%;
         }
 
-        .btn.download {
-            background-color: #007bff;
+        .btn-share:hover {
+            background-color: #007ab8;
         }
 
-        .btn.share {
-            background-color: #ff9800;
-        }
-
-        .btn:hover {
-            opacity: 0.9;
+        .checkmark {
+            font-size: 48px;
+            color: #4caf50;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
-<h2>🎁 Stories Bonus</h2>
-<p>Ushbu videoni Telegram Story’ga joylashtiring va sovg‘ani qo‘lga kiriting!</p>
+<div class="card">
+    <div class="checkmark">🎉</div>
+    <h2>🎁 Bonusni qo‘lga kiriting!</h2>
+    <p>Storyga tayyor rasm va matn bilan ulashing — sizga bonus beriladi!</p>
+    <button class="btn-share" onclick="shareToStory()">📤 Storyga ulashish</button>
+</div>
 
-<video controls src="{% static 'videos/stories.mp4' %}"></video>
-
-<a class="btn download" href="{% static 'videos/stories.mp4' %}" download>⬇️ Videoni yuklab olish</a>
-
-<button class="btn share" onclick="shareToStory()">📤 Storyga joylash</button>
-
-<button onclick="Telegram.WebApp.shareToStory('https://telegra.ph/file/5583ac37c90979f052b7b.png');">
-    Test Share
-</button>
 <script>
     function shareToStory() {
+        const userId = Telegram.WebApp.initDataUnsafe.user?.id || '0';
+        const botLink = `https://t.me/AiGeneratedPhotoBot?start=${userId}`;
+
         Telegram.WebApp.shareToStory(
-            "{{ request.build_absolute_uri|slice:':-1' }}{% static 'videos/stories_new.mp4' %}",
+            "https://premium24.uz/static/images/stories.jpg",
             {
-                text: "🎁 Bonus olish uchun Storyga joylashtiring!",
+                text: "🎁 Sovg‘a olish uchun ushbu Story’ni hoziroq ulashing!  " + botLink,
                 widget_link: {
-                    url: "https://t.me/AiGeneratedPhotoBot?start=758934089",
-                    name: "🎁 Premium va Stars olish"
+                    url: botLink,
+                    name: "🎁 Bonusni olish"
                 }
             }
-        );
+        )
     }
 </script>
 </body>

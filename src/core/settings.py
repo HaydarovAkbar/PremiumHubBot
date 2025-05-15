@@ -31,6 +31,7 @@ INSTALLED_APPS = [
 DEV_APPS = [
     'app',
     'django_celery_results',
+    'django_celery_beat',
 ]
 INSTALLED_APPS += DEV_APPS
 
@@ -115,7 +116,7 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-HOST = 'https://4cc3-213-230-69-88.ngrok-free.app'
+HOST = 'https://0d04-213-230-69-88.ngrok-free.app'
 USERNAME = 'AiGeneratedPhotoBot'
 ADMIN_USERNAME = 'premium_xizmatim'
 TOKEN = config('TOKEN')

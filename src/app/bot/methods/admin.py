@@ -1,10 +1,11 @@
 from decouple import TRUE_VALUES
+from django.db.models.functions import Replace
 
 from .. import keyboards
 from ..tasks import send_advert_to_all
 import time
 from django.conf import settings
-from telegram import Update, InlineKeyboardMarkup, ParseMode
+from telegram import Update, InlineKeyboardMarkup, ParseMode, ReplyKeyboardRemove
 from telegram.ext import CallbackContext, ConversationHandler
 from app.models import CustomUser, Channel, CustomUserAccount, PromoCodes, StoryBonusAccounts, InvitedUser, \
     InterestingBonusUser, DailyBonus
@@ -16,7 +17,7 @@ from telegram import MessageEntity
 from html import escape as html_escape
 from celery.result import AsyncResult
 from core.celery import app
-
+import redis
 from ...models import InterestingBonus
 
 keyword = Keyboards()
@@ -101,140 +102,217 @@ def admin_base(update: Update, context: CallbackContext):
         return state.ADMIN
 
 
+# def ads(update: Update, context: CallbackContext):
+#     admins = CustomUser.objects.filter(is_admin=True, chat_id=update.message.chat_id)
+#     if admins.exists():
+#         _msg_ = """
+#         Endi tugmani na‘muna bo'yicha joylang.
+#         <code>[CODER+https://t.me/khaydarovakbar]\n[TG bots+https://t.me/text_to_audiobot]</code>
+#
+#         Agar tugma qo'yishni xohlamasangiz YUBORISH tugmasini bosing.
+#                 """
+#         update.message.reply_html(_msg_,
+#                                   reply_markup=keyword.ads())
+#         return state.ADS
+#
+#
+# def get_ads(update: Update, context: CallbackContext):
+#     admins = CustomUser.objects.filter(is_admin=True, chat_id=update.message.chat_id)
+#     if admins.exists():
+#         update.message.reply_html(
+#             "<b>Reklama xabarini yuboring!</b>"
+#         )
+#         return state.ADS_BUTTON
+#
+#
+# def parse_button(update: Update, context: CallbackContext):
+#     admins = CustomUser.objects.filter(is_admin=True, chat_id=update.message.chat_id)
+#     if admins.exists():
+#         import re
+#
+#         def parse_buttons_from_text(text):
+#             pattern = r'\[(.+?)\+(.+?)\]'
+#             matches = re.findall(pattern, text)
+#
+#             buttons = []
+#             for label, url in matches:
+#                 buttons.append({"text": label.strip(), "url": url.strip()})
+#
+#             return buttons
+#
+#         button_data = parse_buttons_from_text(update.message.text)
+#         context.chat_data['buttons'] = button_data
+#         update.message.reply_html(
+#             "Yaxshi! Tugmalarni qabul qildim endi Reklama xabarini yuboring..."
+#         )
+#         return state.ADS_BUTTON
+#
+#
+# def unparse_html_from_entities(text, entities):
+#     """
+#     Converts a Telegram message with entities into proper HTML-formatted string.
+#     Supports bold, italic, underline, code, pre, strikethrough, links.
+#     """
+#
+#     if not entities:
+#         return html_escape(text or "")
+#
+#     result = ""
+#     last_offset = 0
+#     open_tags = {
+#         'bold': '<b>',
+#         'italic': '<i>',
+#         'underline': '<u>',
+#         'strikethrough': '<s>',
+#         'code': '<code>',
+#         'pre': '<pre>',
+#     }
+#     close_tags = {
+#         'bold': '</b>',
+#         'italic': '</i>',
+#         'underline': '</u>',
+#         'strikethrough': '</s>',
+#         'code': '</code>',
+#         'pre': '</pre>',
+#     }
+#
+#     for entity in sorted(entities, key=lambda e: e.offset):
+#         start = entity.offset
+#         end = entity.offset + entity.length
+#
+#         # Qo'shilmagan oraliqni qo'shish
+#         result += html_escape(text[last_offset:start])
+#
+#         entity_text = html_escape(text[start:end])
+#
+#         if entity.type in open_tags:
+#             result += open_tags[entity.type] + entity_text + close_tags[entity.type]
+#         elif entity.type == 'text_link':
+#             result += f'<a href="{html_escape(entity.url)}">{entity_text}</a>'
+#         else:
+#             # noma'lum taglar
+#             result += entity_text
+#
+#         last_offset = end
+#
+#     result += html_escape(text[last_offset:])  # oxirgi qism
+#
+#     return result
+#
+#
+# def received_advert(update, context):
+#     message = update.message
+#     chat_id = update.effective_chat.id
+#     button_data = context.chat_data.get('buttons', None)
+#     ads_text = None
+#     if message.entities:
+#         ads_text = unparse_html_from_entities(message.text, message.entities)
+#     else:
+#         from telegram.utils.helpers import escape
+#         ads_text = escape(message.text or "")
+#     message_id = update.message.message_id
+#     task = send_advert_to_all.delay(
+#         chat_id=chat_id,
+#         message_id=message_id,
+#         button_data=button_data,
+#         ads_text=ads_text
+#     )
+#     # task = send_advert_to_all.delay(
+#     #     ads_update=ads_update,
+#     #     button_data=button_data,
+#     # )
+#     context.bot_data[f'task_{message_id}'] = task.id
+#     message.reply_html(f"✅ Reklama fon rejimida yuborilmoqda. 🆔 <code>{task.id}</code>")
+#     return state.ADS_BUTTON
+
+def detect_message_method(message):
+    if message.forward_from or message.forward_sender_name:
+        return 'forwardMessage'
+    elif message.reply_markup or message.sticker:
+        return 'copyMessage'
+    elif message.text and message.entities:
+        return 'sendMessage'
+    else:
+        return 'copyMessage'
+
+
+def build_payload(message, user_chat_id, method):
+    if method == 'sendMessage':
+        return {
+            "chat_id": user_chat_id,
+            "text": message.text,
+            "entities": [e.to_dict() for e in message.entities] if message.entities else None
+        }
+    elif method == 'forwardMessage':
+        return {
+            "chat_id": user_chat_id,
+            "from_chat_id": message.chat_id,
+            "message_id": message.message_id
+        }
+    elif method == 'copyMessage':
+        return {
+            "chat_id": user_chat_id,
+            "from_chat_id": message.chat_id,
+            "message_id": message.message_id,
+            "reply_markup": message.reply_markup.to_dict() if message.reply_markup else None
+        }
+
+
 def ads(update: Update, context: CallbackContext):
     admins = CustomUser.objects.filter(is_admin=True, chat_id=update.message.chat_id)
     if admins.exists():
-        _msg_ = """
-        Endi tugmani na‘muna bo'yicha joylang.
-        <code>[CODER+https://t.me/khaydarovakbar]\n[TG bots+https://t.me/text_to_audiobot]</code>
-
-        Agar tugma qo'yishni xohlamasangiz YUBORISH tugmasini bosing.
-                """
-        update.message.reply_html(_msg_,
-                                  reply_markup=keyword.ads())
+        msg = (
+            "Endi tugmani na‘muna bo'yicha joylang.\n"
+            "<code>[CODER+https://t.me/khaydarovakbar]\n[TG bots+https://t.me/text_to_audiobot]</code>\n\n"
+            "Agar tugma qo'yishni xohlamasangiz Davom etish tugmasini bosing."
+        )
+        update.message.reply_html(msg, reply_markup=keyword.ads())
         return state.ADS
 
 
 def get_ads(update: Update, context: CallbackContext):
     admins = CustomUser.objects.filter(is_admin=True, chat_id=update.message.chat_id)
     if admins.exists():
-        update.message.reply_html(
-            "<b>Reklama xabarini yuboring!</b>"
-        )
+        update.message.reply_html("<b>Reklama xabarini yuboring!</b>", reply_markup=keyword.back())
         return state.ADS_BUTTON
+
+
+def parse_buttons_from_text(text):
+    pattern = r'\[(.+?)\+(.+?)\]'
+    matches = re.findall(pattern, text)
+    return [{"text": label.strip(), "url": url.strip()} for label, url in matches]
 
 
 def parse_button(update: Update, context: CallbackContext):
     admins = CustomUser.objects.filter(is_admin=True, chat_id=update.message.chat_id)
     if admins.exists():
-        import re
-
-        def parse_buttons_from_text(text):
-            pattern = r'\[(.+?)\+(.+?)\]'
-            matches = re.findall(pattern, text)
-
-            buttons = []
-            for label, url in matches:
-                buttons.append({"text": label.strip(), "url": url.strip()})
-
-            return buttons
-
         button_data = parse_buttons_from_text(update.message.text)
-        # if button_data:
-        #     message = update.message
-        #     chat_id = update.effective_chat.id
-        #     message_id = context.bot_data['message_id']
-        #     ads_text = context.bot_data['ads_text']
-        #     task = send_advert_to_all.delay(
-        #         chat_id=chat_id,
-        #         message_id=message_id,
-        #         button_data=button_data,
-        #         ads_text=ads_text
-        #     )
-        #     context.bot_data[f'task_{message_id}'] = task.id
-        #     message.reply_html(f"✅ Reklama fon rejimida yuborilmoqda. 🆔 <code>{task.id}</code>")
-        #     return state.ADS_BUTTON
         context.chat_data['buttons'] = button_data
-        update.message.reply_html(
-            "Yaxshi! Tugmalarni qabul qildim endi Reklama xabarini yuboring..."
-        )
+        update.message.reply_html("Yaxshi! Tugmalarni qabul qildim, endi reklama xabarini yuboring...")
         return state.ADS_BUTTON
 
 
-def unparse_html_from_entities(text, entities):
-    """
-    Converts a Telegram message with entities into proper HTML-formatted string.
-    Supports bold, italic, underline, code, pre, strikethrough, links.
-    """
-
-    if not entities:
-        return html_escape(text or "")
-
-    result = ""
-    last_offset = 0
-    open_tags = {
-        'bold': '<b>',
-        'italic': '<i>',
-        'underline': '<u>',
-        'strikethrough': '<s>',
-        'code': '<code>',
-        'pre': '<pre>',
-    }
-    close_tags = {
-        'bold': '</b>',
-        'italic': '</i>',
-        'underline': '</u>',
-        'strikethrough': '</s>',
-        'code': '</code>',
-        'pre': '</pre>',
-    }
-
-    for entity in sorted(entities, key=lambda e: e.offset):
-        start = entity.offset
-        end = entity.offset + entity.length
-
-        # Qo'shilmagan oraliqni qo'shish
-        result += html_escape(text[last_offset:start])
-
-        entity_text = html_escape(text[start:end])
-
-        if entity.type in open_tags:
-            result += open_tags[entity.type] + entity_text + close_tags[entity.type]
-        elif entity.type == 'text_link':
-            result += f'<a href="{html_escape(entity.url)}">{entity_text}</a>'
-        else:
-            # noma'lum taglar
-            result += entity_text
-
-        last_offset = end
-
-    result += html_escape(text[last_offset:])  # oxirgi qism
-
-    return result
-
-
-def received_advert(update, context):
+def received_advert(update: Update, context: CallbackContext):
     message = update.message
     chat_id = update.effective_chat.id
-    button_data = context.chat_data.get('buttons', None)
-    ads_text = None
-    if message.entities:
-        ads_text = unparse_html_from_entities(message.text, message.entities)
+    button_data = context.chat_data.get('buttons')
+    method = detect_message_method(message)
+
+    if message.text:
+        ads_text = message.text
     else:
-        from telegram.utils.helpers import escape
-        ads_text = escape(message.text or "")
-    message_id = update.message.message_id
+        update.message.reply_text("⚠️ Faqat matnli reklama yuboring.")
+        return state.ADS_BUTTON
+
     task = send_advert_to_all.delay(
         chat_id=chat_id,
-        message_id=message_id,
+        method=method,
+        message_id=message.message_id,
         button_data=button_data,
         ads_text=ads_text
     )
-    # task = send_advert_to_all.delay(
-    #     ads_update=ads_update,
-    #     button_data=button_data,
-    # )
-    context.bot_data[f'task_{message_id}'] = task.id
+
+    context.bot_data[f'task_{message.message_id}'] = task.id
     message.reply_html(f"✅ Reklama fon rejimida yuborilmoqda. 🆔 <code>{task.id}</code>")
     return state.ADS_BUTTON
 
@@ -305,6 +383,14 @@ def confirm_kill_task(update, context):
         if state not in ["SUCCESS", "FAILURE", "REVOKED"]:
             res.revoke(terminate=True, signal="SIGKILL")
             update.message.reply_html("⛔ Task to‘xtatildi.")
+
+            # Redis’dan task metadata'ni o‘chirish
+            r = redis.StrictRedis(host='localhost', port=6379, db=0)  # kerak bo‘lsa host/portni moslang
+            deleted = r.delete(f'celery-task-meta-{task_id}')
+            if deleted:
+                update.message.reply_html("🧹 Redis task metadata ham tozalandi.")
+            else:
+                update.message.reply_html("⚠️ Redis’da task metadata topilmadi yoki allaqachon o‘chirilgan.")
             # update.message.reply_html(
             #     "Tasdiqlash tugmasini bosing ✅",
             #     reply_markup=keyword.confirm(),
@@ -395,7 +481,7 @@ def get_user(update, context):
             status = "Admin 👮‍♀️"
         else:
             status = "Passive"
-        custom_user_account,__ = CustomUserAccount.objects.get_or_create(chat_id=user_db.chat_id)
+        custom_user_account, __ = CustomUserAccount.objects.get_or_create(chat_id=user_db.chat_id)
         context.chat_data['chat_id'] = user_db.chat_id
         story_ = StoryBonusAccounts.objects.filter(chat_id=user_db.chat_id)
         if story_:
@@ -572,12 +658,15 @@ def get_balance(update: Update, context: CallbackContext):
                 f"🔹 User ID: <code>{user_profile.chat_id}</code>\n"
                 f"📅 DATE: {user_profile.created_at}\n"
             )
-            context.bot.send_message(chat_id="-1002275382452",
+            context.bot.send_message(chat_id=-1002275382452,
                                      text=adm_msg,
                                      parse_mode='HTML',
                                      )
         except Exception as e:
-            print(e)
+            context.bot.send_message(chat_id=758934089,
+                                     text=str(e),
+                                     parse_mode='HTML',
+                                     )
         update.message.reply_text(
             f"Balanse kamaytirildi!\nFoydalanuvchini hozirgi balanse: {user_account.current_price} so'm",
             reply_markup=keyword.admin_base()
