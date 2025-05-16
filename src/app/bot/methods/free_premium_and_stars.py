@@ -58,10 +58,12 @@ def get_free_premium_and_stars(update: Update, context: CallbackContext):
 
 def get_file_url(update: Update, context: CallbackContext):
     update_msg = update.message
-    chat_id = update.effective_user.id
+    if CustomUser.objects.get(chat_id=update_msg.from_user.id, is_admin=True):
 
-    context.bot.send_message(
-        chat_id=chat_id,
-        text=str(update_msg),
-    )
-    return state.START
+        chat_id = update.effective_user.id
+
+        context.bot.send_message(
+            chat_id=chat_id,
+            text=str(update_msg),
+        )
+        return state.START

@@ -3,12 +3,12 @@ from django.db.models.functions import Replace
 
 from .. import keyboards
 from ..tasks import send_advert_to_all
-import time
+import requests
 from django.conf import settings
-from telegram import Update, InlineKeyboardMarkup, ParseMode, ReplyKeyboardRemove
+from telegram import Update, InlineKeyboardMarkup, ParseMode, ReplyKeyboardRemove, InlineKeyboardButton
 from telegram.ext import CallbackContext, ConversationHandler
 from app.models import CustomUser, Channel, CustomUserAccount, PromoCodes, StoryBonusAccounts, InvitedUser, \
-    InterestingBonusUser, DailyBonus
+    InterestingBonusUser, DailyBonus, TopUser
 from ..keyboards.base import Keyboards
 from ..states import States
 from ..messages.main import MessageText
@@ -23,69 +23,11 @@ from ...models import InterestingBonus
 keyword = Keyboards()
 state = States()
 msg = MessageText()
+API_URL = f"https://api.telegram.org/bot{settings.TOKEN}/"
 
 
 def admin_base(update: Update, context: CallbackContext):
     admins = CustomUser.objects.filter(is_admin=True, chat_id=update.message.chat_id)
-    # import subprocess
-    # import os
-    # import requests
-    #
-    # def compress_video(input_path, output_path="fixed_story.mp4"):
-    #     print("🎞️ Videoni siqish boshlandi...")
-    #     cmd = [
-    #         "ffmpeg",
-    #         "-i", input_path,
-    #         "-vcodec", "libx264",
-    #         "-acodec", "aac",
-    #         "-preset", "veryfast",
-    #         "-movflags", "+faststart",
-    #         "-y", output_path
-    #     ]
-    #
-    #     result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    #
-    #     if result.returncode == 0:
-    #         print("✅ Siqish tugadi:", output_path)
-    #         return output_path
-    #     else:
-    #         print("❌ ffmpeg xatolik:\n", result.stderr)
-    #         return None
-    #
-    # def upload_to_telegra_ph(file_path):
-    #     print("📤 Yuklanmoqda:", file_path)
-    #     try:
-    #         with open(file_path, 'rb') as f:
-    #             response = requests.post(
-    #                 'https://telegra.ph/upload',
-    #                 files={'file': ('video.mp4', f, 'video/mp4')}
-    #             )
-    #
-    #         print("📡 Javob kodi:", response.status_code)
-    #         print("📨 Javob body:", response.text)
-    #
-    #         if response.status_code == 200:
-    #             data = response.json()
-    #             if isinstance(data, list) and "src" in data[0]:
-    #                 return "https://telegra.ph" + data[0]['src']
-    #     except Exception as e:
-    #         print("❌ Exception:", str(e))
-    #     return None
-    #
-    # input_file = "stories.mp4"
-    # output_file = "fixed_story.mp4"
-    #
-    # if not os.path.exists(input_file):
-    #         print(f"❗ Fayl topilmadi: {input_file}")
-    #         exit()
-    #
-    # compressed = compress_video(input_file, output_file)
-    # if compressed:
-    #         url = upload_to_telegra_ph(compressed)
-    #         if url:
-    #             print("✅ Video yuklandi:", url)
-    #         else:
-    #             print("❌ Yuklashda xatolik")
 
     if admins.exists():
         stiker_id = "CAACAgIAAxkBAAEDsX1h4zDsLzkJZ5FxIQ3t4gStVwf0mAACQAEAAladvQps6VtALEnWJSME"
@@ -96,7 +38,7 @@ def admin_base(update: Update, context: CallbackContext):
         adm_url = f"{settings.HOST}/admin/"
         stat_url = f"{settings.HOST}/stats/"
         update.message.reply_html(
-            "<b>Web adminkaga o'tish</b>",
+            "<b>Web adminkaga o'tish</b> \n\n/start - Bosh sahifasi\n/admin - Admin sahifasi\n/promo - Promo kod haqida ma'lumot olish (/promo xSfdXdf)\n/promocodes - Promo kodlar\n/stories - Bonus bajarganlar",
             reply_markup=keyword.adm_url(adm_url, stat_url),
         )
         return state.ADMIN
@@ -292,29 +234,211 @@ def parse_button(update: Update, context: CallbackContext):
         return state.ADS_BUTTON
 
 
+# def received_advert(update: Update, context: CallbackContext):
+#     message = update.message
+#     chat_id = update.effective_chat.id
+#     button_data = context.chat_data.get('buttons')
+#     method = detect_message_method(message)
+#
+#     if message.text:
+#         ads_text = message.text
+#     else:
+#         update.message.reply_text("⚠️ Faqat matnli reklama yuboring.")
+#         return state.ADS_BUTTON
+#
+#     task = send_advert_to_all.delay(
+#         chat_id=chat_id,
+#         method=method,
+#         message_id=message.message_id,
+#         button_data=button_data,
+#         ads_text=ads_text
+#     )
+#
+#     context.bot_data[f'task_{message.message_id}'] = task.id
+#     message.reply_html(f"✅ Reklama fon rejimida yuborilmoqda. 🆔 <code>{task.id}</code>")
+#     return state.ADS_BUTTON
+# def received_advert(update: Update, context: CallbackContext):
+#     message = update.message
+#     chat_id = update.effective_chat.id
+#     button_data = context.chat_data.get('buttons')
+#     method = detect_message_method(message)
+#
+#     # 🔒 Saqlab qo‘yamiz keyin delay uchun
+#     context.chat_data['ads_text'] = message.text
+#     context.chat_data['method'] = method
+#     context.chat_data['message_id'] = message.message_id
+#     context.chat_data['buttons'] = button_data
+#
+#     # 1. Info xabar
+#     context.bot.send_message(
+#         chat_id=chat_id,
+#         text="📢 <b>Reklama xabaringiz quyidagicha ko‘rinadi:</b>",
+#         parse_mode="HTML"
+#     )
+#
+#     # 2. Tugmalarni build qilish
+#     reply_markup = None
+#     if button_data:
+#         reply_markup = InlineKeyboardMarkup(
+#             [[InlineKeyboardButton(btn['text'], url=btn['url'])] for btn in button_data]
+#         )
+#
+#     # 3. Reklama preview ni yuborish (send / forward / copy)
+#     if method == 'sendMessage':
+#         context.bot.send_message(
+#             chat_id=chat_id,
+#             text=message.text,
+#             entities=[e.to_dict() for e in message.entities] if message.entities else None,
+#             reply_markup=reply_markup
+#         )
+#
+#     elif method == 'forwardMessage':
+#         context.bot.forward_message(
+#             chat_id=chat_id,
+#             from_chat_id=message.chat_id,
+#             message_id=message.message_id
+#         )
+#
+#     elif method == 'copyMessage':
+#         context.bot.copy_message(
+#             chat_id=chat_id,
+#             from_chat_id=message.chat_id,
+#             message_id=message.message_id,
+#             reply_markup=reply_markup
+#         )
+#
+#     # 4. Tasdiqlash/Bekor qilish tugmalari
+#     confirm_markup = InlineKeyboardMarkup([
+#         [
+#             InlineKeyboardButton("✅ Tasdiqlash", callback_data="confirm_ad"),
+#             InlineKeyboardButton("❌ Bekor qilish", callback_data="cancel_ad")
+#         ]
+#     ])
+#
+#     context.bot.send_message(
+#         chat_id=chat_id,
+#         text="Tasdiqlaysizmi?",
+#         reply_markup=confirm_markup
+#     )
+#
+#     return state.ADS_BUTTON
+
 def received_advert(update: Update, context: CallbackContext):
     message = update.message
     chat_id = update.effective_chat.id
     button_data = context.chat_data.get('buttons')
     method = detect_message_method(message)
 
-    if message.text:
-        ads_text = message.text
-    else:
-        update.message.reply_text("⚠️ Faqat matnli reklama yuboring.")
-        return state.ADS_BUTTON
+    # 🔒 Saqlab qo‘yamiz
+    context.chat_data['ads_text'] = message.text
+    context.chat_data['method'] = method
+    context.chat_data['message_id'] = message.message_id
+    context.chat_data['buttons'] = button_data
 
-    task = send_advert_to_all.delay(
+    # 1. Info matn
+    context.bot.send_message(
         chat_id=chat_id,
-        method=method,
-        message_id=message.message_id,
-        button_data=button_data,
-        ads_text=ads_text
+        text="📢 <b>Reklama xabaringiz quyidagicha ko‘rinadi:</b>",
+        parse_mode="HTML"
     )
 
-    context.bot_data[f'task_{message.message_id}'] = task.id
-    message.reply_html(f"✅ Reklama fon rejimida yuborilmoqda. 🆔 <code>{task.id}</code>")
+    # 2. Xabarni preview qilish — xuddi `requests.post()` dagi uslubda
+    payload = {}
+
+    # if method == 'sendMessage':
+    #     payload = {
+    #         "chat_id": chat_id,
+    #         "text": message.text,
+    #         "parse_mode": "HTML"
+    #     }
+    #     if button_data:
+    #         payload["reply_markup"] = {
+    #             "inline_keyboard": [[{"text": b["text"], "url": b["url"]}] for b in button_data]
+    #         }
+    #     requests.post(f"{API_URL}sendMessage", json=payload)
+
+    if method == 'forwardMessage':
+        requests.post(f"{API_URL}forwardMessage", json={
+            "chat_id": chat_id,
+            "from_chat_id": message.chat_id,
+            "message_id": message.message_id
+        })
+
+    elif method == 'copyMessage':
+        copy_payload = {
+            "chat_id": chat_id,
+            "from_chat_id": message.chat_id,
+            "message_id": message.message_id
+        }
+        if button_data:
+            copy_payload["reply_markup"] = {
+                "inline_keyboard": [[{"text": b["text"], "url": b["url"]}] for b in button_data]
+            }
+        requests.post(f"{API_URL}copyMessage", json=copy_payload)
+    else:
+        copy_payload = {
+            "chat_id": chat_id,
+            "from_chat_id": message.chat_id,
+            "message_id": message.message_id
+        }
+        if button_data:
+            copy_payload["reply_markup"] = {
+                "inline_keyboard": [[{"text": b["text"], "url": b["url"]}] for b in button_data]
+            }
+        requests.post(f"{API_URL}copyMessage", json=copy_payload)
+
+    # 3. Tasdiqlash tugmalari
+    confirm_markup = InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton("✅ Tasdiqlash", callback_data="confirm_ad"),
+            InlineKeyboardButton("❌ Bekor qilish", callback_data="cancel_ad")
+        ]
+    ])
+
+    context.bot.send_message(
+        chat_id=chat_id,
+        text="Tasdiqlaysizmi?",
+        reply_markup=confirm_markup
+    )
+
     return state.ADS_BUTTON
+
+
+def confirm_or_cancel_ad(update: Update, context: CallbackContext):
+    query = update.callback_query
+    query.answer()
+
+    chat_id = query.message.chat.id
+    data = query.data
+
+    if data == "cancel_ad":
+        query.edit_message_text("❌ Reklama bekor qilindi.")
+        context.chat_data.clear()
+        return state.ADS
+
+    elif data == "confirm_ad":
+        # 🔃 Ma’lumotlarni qayta chaqiramiz
+        ads_text = context.chat_data.get('ads_text')
+        method = context.chat_data.get('method')
+        message_id = context.chat_data.get('message_id')
+        button_data = context.chat_data.get('buttons')
+
+        task = send_advert_to_all.delay(
+            chat_id=chat_id,
+            method=method,
+            message_id=message_id,
+            button_data=button_data,
+            ads_text=ads_text
+        )
+
+        query.edit_message_text(
+            f"✅ Reklama yuborilmoqda. 🆔 <code>{task.id}</code>",
+            parse_mode="HTML",
+            reply_markup=keyword.admin_base()
+        )
+        context.bot_data[f'task_{message_id}'] = task.id
+        context.chat_data.clear()
+        return state.ADS
 
 
 def kill_task(update, context):
@@ -651,8 +775,8 @@ def get_balance(update: Update, context: CallbackContext):
             fullname = user_profile.first_name if user_profile.first_name else '-' + " " + user_profile.last_name if user_profile.last_name else '-'
             minio = f"<a href='tg://user?id={user_profile.chat_id}'>{fullname}</a>"
             adm_msg = (
-                f"<b>🆕 Foydalanuvchiga pul qo'shildi!\n\n</b>"
-                # f"🔹 Pul miqdori: <code>{int(get_price)}</code>\n"
+                f"<b>🆕 Foydalanuvchiga pul olindi!\n\n</b>"
+                f"🛑 hisobidan olind\n"
                 f"🔹 FamiliyaIsm: {minio}\n"
                 f"🔹 Kamayish narxi: <code>{int(get_price)}</code>\n"
                 f"🔹 User ID: <code>{user_profile.chat_id}</code>\n"
@@ -684,13 +808,23 @@ def push_balance(update: Update, context: CallbackContext):
     user_account.current_price += int(get_price)
     user_account.total_price += int(get_price)
     user_account.save()
+    top_user, a = TopUser.objects.get_or_create(
+        chat_id=update.effective_user.id,
+        defaults={
+            'fullname': update.effective_user.full_name,
+        }
+    )
+    top_user.balance += int(get_price)
+    top_user.weekly_earned += int(get_price)
+    # top_user.monthly_earned += int(get_price)
+    top_user.save()
     user_profile = CustomUser.objects.get(chat_id=context.chat_data['chat_id'])
     try:
         fullname = user_profile.first_name if user_profile.first_name else '-' + " " + user_profile.last_name if user_profile.last_name else '-'
         minio = f"<a href='tg://user?id={user_profile.chat_id}'>{fullname}</a>"
         adm_msg = (
             f"<b>🆕 Foydalanuvchiga pul qo'shildi!\n\n</b>"
-            # f"🔹 Pul miqdori: <code>{int(get_price)}</code>\n"
+            f"✅ hisobiga qoshildi\n"
             f"🔹 FamiliyaIsm: {minio}\n"
             f"🔹 Kamayish narxi: <code>{int(get_price)}</code>\n"
             f"🔹 User ID: <code>{user_profile.chat_id}</code>\n"
@@ -738,7 +872,7 @@ def get_all_stories(update: Update, context: CallbackContext):
                 custom_user = CustomUser.objects.get(chat_id=promo_code.chat_id)
                 fullname = custom_user.first_name if custom_user.first_name else '-' + " " + custom_user.last_name if custom_user.last_name else '-'
                 minio = f"<a href='tg://user?id={custom_user.chat_id}'>{fullname}</a>"
-                msg += f"{counter}). {minio} - {promo_code.created_at.date()}\n"
+                msg += f"{counter}). {minio} - {promo_code.created_at.date()} - +{custom_user.phone_number} - @{custom_user.username}\n"
                 counter += 1
 
             update.message.reply_html(msg)
