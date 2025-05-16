@@ -70,17 +70,6 @@ class KeyboardText:
         'en': ["Add channel", "⬅️ Back"],
     }
 
-    # admin = {
-    #     'uz': ["Kanal qo'shish", "Kanal sozlamalari", "Foydalanuvchilar", "Kategoriya yaratish", "Kategoriya o'chirish",
-    #            "Mahsulot qo'shish", "Mahsulot o'chirsh", "Admin qo'shish", "Admin o'chirish", "Kuryer qo'shish",
-    #            "Kuryer o'chirish", "Menejer qo'shish", "Menejer o'chirish", "Reklama", "Tugatilmagan Zakaslar",
-    #            "Tugatilgan Zakaslar", "Rasmni IDsini olish"],
-    #     'ru': ["Добавить канал", "Настройки канала", "Пользователи", "Создать категорию", "Удалить категорию",
-    #            "Добавить продукт", "Удалить продукт", "Добавить админа", "Удалить админа", "Добавить курьера",
-    #            "Удалить курьера", "Добавить менеджера", "Удалить менеджера", "Реклама", "Незавершенные заказы",
-    #            "Завершенные заказы", "Получить ID фото"],
-    # }
-
     manager = {
         'uz': ["Zakaslar Statistikasi", "Foydalanuvchilar Statistikasi", "Kunlik hisobot olish"],
         'ru': ["Статистика заказов", "Статистика пользователей", "Получить ежедневный отчет"],

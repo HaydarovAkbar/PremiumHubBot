@@ -150,18 +150,18 @@ def send_advert_to_all(self, chat_id, message_id, method="copyMessage", button_d
             try:
                 payload = {}
 
-                if method == 'sendMessage':
-                    payload = {
-                        "chat_id": user.chat_id,
-                        "text": ads_text,
-                        "parse_mode": "HTML"
-                    }
-                    if button_data:
-                        payload["reply_markup"] = {
-                            "inline_keyboard": [[{"text": b["text"], "url": b["url"]}] for b in button_data]
-                        }
+                # if method == 'sendMessage':
+                #     payload = {
+                #         "chat_id": user.chat_id,
+                #         "text": ads_text,
+                #         "parse_mode": "HTML"
+                #     }
+                #     if button_data:
+                #         payload["reply_markup"] = {
+                #             "inline_keyboard": [[{"text": b["text"], "url": b["url"]}] for b in button_data]
+                #         }
 
-                elif method == 'copyMessage':
+                if method == 'copyMessage':
                     payload = {
                         "chat_id": user.chat_id,
                         "from_chat_id": chat_id,
@@ -178,6 +178,16 @@ def send_advert_to_all(self, chat_id, message_id, method="copyMessage", button_d
                         "from_chat_id": chat_id,
                         "message_id": message_id
                     }
+                else:
+                    payload = {
+                        "chat_id": user.chat_id,
+                        "from_chat_id": chat_id,
+                        "message_id": message_id
+                    }
+                    if button_data:
+                        payload["reply_markup"] = {
+                            "inline_keyboard": [[{"text": b["text"], "url": b["url"]}] for b in button_data]
+                        }
 
                 requests.post(f"{API_URL}{method}", json=payload)
                 count += 1
@@ -344,14 +354,12 @@ def reset_weekly_earned_and_send_report():
     if not top_users:
         return "Top userlar yo‘q"
 
-    # 1. Hisobot tuzish
     report_lines = ["📊 *Haftalik Top 10 foydalanuvchilar:*"]
     for idx, user in enumerate(top_users, 1):
         report_lines.append(f"{idx}. {user.fullname} — {user.weekly_earned:,} so'm")
 
     report = "\n".join(report_lines)
 
-    # 2. Telegram API orqali yuborish
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {
         'chat_id': GROUP_CHAT_ID,
@@ -363,7 +371,6 @@ def reset_weekly_earned_and_send_report():
     if response.status_code != 200:
         return f"Xabar yuborishda xatolik: {response.text}"
 
-    # 3. weekly_earned ni nolga tushurish
     TopUser.objects.update(weekly_earned=0)
 
     return "Top userlar yuborildi va weekly_earned tozalandi"

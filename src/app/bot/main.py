@@ -7,15 +7,15 @@ from django.conf import settings
 from .methods.base import start, check_channel, add_to_channel, get_contact, get_contact_text, manual, adminstrator
 from .methods.free_premium_and_stars import get_free_premium_and_stars, get_file_url
 from .methods.prices import get_premium_prices, get_stars_prices
-from .methods.rating import get_rating_base #, get_rating_type
-from .methods.bonus import get_bonus_base   # get_bonus_type, get_daily_bonus, get_stories_bonus
-from .methods.group import new_member_handler #get_group_base
+from .methods.rating import get_rating_base  # , get_rating_type
+from .methods.bonus import get_bonus_base  # get_bonus_type, get_daily_bonus, get_stories_bonus
+from .methods.group import new_member_handler  # get_group_base
 # from .methods.interesting_bonus import get_interesting_bonus_base , check_interesting_bonus_nik, \
 #     check_interesting_bonus_bio
-from .methods.account import my_account, universal_callback_data # spend, spend_field, get_promo_code, send_promo_code
+from .methods.account import my_account, universal_callback_data  # spend, spend_field, get_promo_code, send_promo_code
 from .methods.admin import admin_base, ads, get_ads, parse_button, received_advert, get_kill_id, kill_task, get_user_id, \
     get_user, confirm_kill_task, info_promo, get_all_promo_codes, passive, get_balance, push_balance, send_msg, \
-    user_profile, get_all_stories
+    user_profile, get_all_stories, confirm_or_cancel_ad
 import logging
 import time
 from telegram.error import RetryAfter
@@ -93,6 +93,7 @@ all_handler = ConversationHandler(
             CommandHandler('promo', info_promo),
             CommandHandler('promocodes', get_all_promo_codes),
             CommandHandler('stories', get_all_stories),
+            CallbackQueryHandler(universal_callback_data),
 
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][0] + ')$'), get_free_premium_and_stars),
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][1] + ')$'), get_premium_prices),
@@ -102,7 +103,6 @@ all_handler = ConversationHandler(
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][5] + ')$'), my_account),
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][6] + ')$'), manual),
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][7] + ')$'), adminstrator),
-            CallbackQueryHandler(universal_callback_data)
         ],
         state.RATING: [
             CommandHandler('start', start),
@@ -349,6 +349,7 @@ all_handler = ConversationHandler(
             CommandHandler('promo', info_promo),
             CommandHandler('promocodes', get_all_promo_codes),
             CommandHandler('stories', get_all_stories),
+            CallbackQueryHandler(confirm_or_cancel_ad),
 
             MessageHandler(Filters.regex('^(' + "💠 Xabar yuborish" + ')$'), ads),
             MessageHandler(Filters.regex('^(' + "🛑 Xabarni to'xtatish" + ')$'), kill_task),
@@ -445,7 +446,7 @@ all_handler = ConversationHandler(
                MessageHandler(Filters.regex('^(' + key_msg.base['uz'][5] + ')$'), my_account),
                MessageHandler(Filters.regex('^(' + key_msg.base['uz'][6] + ')$'), manual),
                MessageHandler(Filters.regex('^(' + key_msg.base['uz'][7] + ')$'), adminstrator),
-               # MessageHandler(Filters.all, get_file_url),
+               MessageHandler(Filters.all, get_file_url),
                ]
 )
 # new_member_handler = MessageHandler(Filters.status_update.new_chat_members, new_member_handler)

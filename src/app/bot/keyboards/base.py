@@ -99,6 +99,16 @@ class Keyboards:
         return InlineKeyboardMarkup([keyboard])
 
     @staticmethod
+    def admin_send_url(adm_username):
+        keyboard = [
+            InlineKeyboardButton(
+                "👮‍♀️ Adminga yuborish",
+                url=f"https://t.me/{adm_username}"
+            )
+        ]
+        return InlineKeyboardMarkup([keyboard])
+
+    @staticmethod
     def rating():
         return InlineKeyboardMarkup([
             [InlineKeyboardButton(
