@@ -10,7 +10,7 @@ from ..keyboards.base import Keyboards
 from ..states import States
 from ..messages.main import MessageText
 
-from .bonus import settings, is_premium_user_check, get_user_boosts
+from .bonus import settings, get_user_boosts
 import random
 from django.utils import timezone
 
@@ -513,10 +513,10 @@ Admin sizga taklif doirasidagi xizmatni faollashtiradi.
             query.delete_message()
             interesting_bonus = InterestingBonus.objects.filter().last()
             _msg_ = f"""
-        <b>O'z telegram ismingizga bizning nomimizni qo'ying va {interesting_bonus.fullname} so'm bonus oling.</b>
-        Ustiga bosib nusxalab olishingiz mumkin
+<b>O'z telegram ismingizga bizning nomimizni qo'ying va {interesting_bonus.fullname} so'm bonus oling.</b>
+Ustiga bosib nusxalab olishingiz mumkin
 
-        <code>🅿️ PremiumHub</code> 📝
+<code>🅿️ PremiumHub</code> 📝
                             """
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=_msg_,
@@ -524,7 +524,7 @@ Admin sizga taklif doirasidagi xizmatni faollashtiradi.
                                      reply_markup=keyword.interesting_check_bonus())
             return state.INTERESTING_BONUS_NIK
         elif query.data == 'nik_check':
-            query.delete_message()
+            # query.delete_message()
             interesting_bonus = InterestingBonus.objects.filter().last()
             interesting_bonus_user, _ = InterestingBonusUser.objects.get_or_create(
                 chat_id=update.effective_user.id
@@ -569,22 +569,17 @@ Admin sizga taklif doirasidagi xizmatni faollashtiradi.
                     parse_mode="HTML"
                 )
                 return state.INTERESTING_BONUS_NIK
-            _msg_ = f"""
-            <b>O'z telegram ismingizga bizning nomimizni qo'ying va {interesting_bonus.fullname} so'm bonus oling.</b>
-Ustiga bosib nusxalab olishingiz mumkin
-
-<code>🅿️ PremiumHub</code> 📝
-                                            """
+            _msg_ = f"<b>❗️ Kechirasiz tekshirish natijasida sizda talabga javob beradigan nikname aniqlanmadi</b>"
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=_msg_,
-                                     parse_mode="HTML",
-                                     reply_markup=keyword.interesting_check_bonus())
+                                     parse_mode="HTML", )
+            # reply_markup=keyword.interesting_check_bonus())
             return state.INTERESTING_BONUS_NIK
         elif query.data == 'bio':
             query.delete_message()
             interesting_bonus = InterestingBonus.objects.filter().last()
             _msg_ = f"""
-        <b>O'z telegram BIO ingizga bizning nomimizni qo'ying va {interesting_bonus.bio} so'm bonus oling.</b>
+<b>O'z telegram BIO ingizga bizning nomimizni qo'ying va {interesting_bonus.bio} so'm bonus oling.</b>
 Ustiga bosib nusxalab olishingiz mumkin
 
 <code>Tg Premium 👇  https://t.me/HubPremiyumBot?start={update.effective_user.id} </code>📝
@@ -639,7 +634,6 @@ Ustiga bosib nusxalab olishingiz mumkin
                                      # reply_markup=keyword.back()
                                      )
         elif query.data == 'bio_check':
-            query.delete_message()
             interesting_bonus = InterestingBonus.objects.filter().last()
             interesting_bonus_user, _ = InterestingBonusUser.objects.get_or_create(
                 chat_id=update.effective_user.id
@@ -648,6 +642,7 @@ Ustiga bosib nusxalab olishingiz mumkin
             required_text = f"Tg Premium 👇 https://t.me/{settings.USERNAME}?start={update.effective_user.id}"
             has_in_name = required_text.lower() in user_bio.lower()
             if has_in_name:
+                query.delete_message()
                 user_account = CustomUserAccount.objects.get(
                     chat_id=update.effective_user.id,
                 )
@@ -684,19 +679,11 @@ Ustiga bosib nusxalab olishingiz mumkin
                     parse_mode="HTML"
                 )
                 return state.INTERESTING_BONUS_BIO
-            _msg_ = f"""<b>
-            ❗️ Kechirasiz tekshirish natijasida sizda talabga javob beradigan nikname aniqlanmadi
-            O'z telegram BIO ingizga bizning nomimizni qo'ying va {interesting_bonus.bio} so'm bonus oling.</b>
-
-Ustiga bosib nusxalab olishingiz mumkin
-
-
-<code>Tg Premium 👇  https://t.me/{settings.USERNAME}?start={update.effective_user.id}</code> 📝
-                                    """
+            _msg_ = f"<b>❗️ Kechirasiz tekshirish natijasida sizda talabga javob beradigan bio aniqlanmadi</b>"
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=_msg_,
-                                     parse_mode="HTML",
-                                     reply_markup=keyword.interesting_check_bonus())
+                                     parse_mode="HTML", )
+            # reply_markup=keyword.interesting_check_bonus())
             return state.INTERESTING_BONUS_BIO
         elif query.data == 'premium_bonus':
             user_id = update.effective_user.id

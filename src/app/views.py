@@ -18,6 +18,18 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 
 
+def is_premium_user_check(user_id: int, bot_token: str, chat_id: int) -> bool:
+    url = f"https://api.telegram.org/bot{bot_token}/getChatMember"
+    response = requests.get(url, params={
+        "chat_id": chat_id,
+        "user_id": user_id
+    })
+
+    if response.status_code == 200:
+        data = response.json()
+        return data.get("result", {}).get("user", {}).get("is_premium", False)
+    return False
+
 def is_premium_user(user_id: int, bot_token: str) -> bool:
     url = f"https://api.telegram.org/bot{bot_token}/getChat"
     response = requests.post(url, data={"chat_id": user_id})
@@ -71,13 +83,13 @@ class MainView(View):
                 message = update.message
 
                 new_members = message.new_chat_members
+
                 inviter = message.from_user
 
                 last_group = Group.objects.filter(is_active=True).last()
                 if not last_group:
                     return HttpResponse('No active group')
 
-                # Foydalanuvchi allaqachon nechtasini qo‘shganligini tekshiramiz
                 current_invite_count = InvitedUser.objects.filter(
                     inviter_chat_id=inviter.id,
                     group=last_group
@@ -87,28 +99,24 @@ class MainView(View):
                     return HttpResponse('Limit reached, bonus berilmaydi')
 
                 for new_user in new_members:
-                    if new_user.id != inviter.id:
+                    if not new_user.is_bot and new_user.id != inviter.id:
                         invite_db, created = InvitedUser.objects.get_or_create(
                             new_user_chat_id=new_user.id,
                             inviter_chat_id=inviter.id,
                             group=last_group
                         )
 
-                        # Bonus faqat yangi foydalanuvchi uchun beriladi
                         if created:
                             current_invite_count += 1
 
-                            # Agar yangi foydalanuvchi qo‘shilishi ham limiti ichida bo‘lsa
                             if current_invite_count <= last_group.limit:
                                 plus_balance = int(last_group.price)
 
-                                # Pul qo‘shish
                                 user_acc, _ = CustomUserAccount.objects.get_or_create(chat_id=inviter.id)
                                 user_acc.current_price += plus_balance
                                 user_acc.total_price += plus_balance
                                 user_acc.save()
 
-                                # TopUser yangilash
                                 top_user, _ = TopUser.objects.get_or_create(
                                     chat_id=inviter.id,
                                     defaults={'fullname': inviter.full_name}
@@ -118,10 +126,8 @@ class MainView(View):
                                 top_user.monthly_earned += plus_balance
                                 top_user.save()
 
-                                # Bonus statusi
                                 InvitedBonusUser.objects.get_or_create(chat_id=inviter.id, group=last_group)
 
-                                # Xabar yuborish
                                 bot.send_message(
                                     chat_id=inviter.id,
                                     text=f"🎉 Siz {new_user.full_name} ni guruhga qo‘shganingiz uchun {plus_balance} so‘m bonus oldingiz!",
@@ -172,10 +178,11 @@ def register_device(request):
             bot.send_message(
                 chat_id=telegram_id,
                 text=(
-                    "❌ Bu qurilmadan allaqachon boshqa foydalanuvchi foydalanmoqda.\n\n"
-                    f"✅ Botdan faqat {bot_settings.device_count} ta qurilmada foydalanish mumkin.\n\n"
-                    "Agar buni xato deb hisoblasangiz, @hup_support ga murojaat qiling"
-                )
+                    "<b>Siz allaqachon boshqa profillaringiz orqali botimizdan foydalanmoqdasiz.</b>\n"
+                    f"Ushbu sababdan profilingiz botimizda blocklanadi.\n\n"
+                    "👨‍💻Agar buni xato deb hisoblasangiz @hup_support ga murojaat qiling."
+                ),
+                parse_mode='HTML'
             )
             return JsonResponse({
                 "error": "Bu qurilma boshqa foydalanuvchi tomonidan ishlatilgan."
@@ -220,9 +227,7 @@ def register_device(request):
                 bot.send_message(
                     chat_id=referral_user_account.chat_id,
                     text=f"""
-🎉 Tabriklaymiz!  Siz {minio} ni taklif qilgan foydalanuvchi ro'yxatdan o'tdi!
-
-Sizga {custom_user_ref_price} so'm bonus berildi.
+<b>🎉 Tabriklaymiz!  Siz {minio} ni taklif qilgan foydalanuvchi ro'yxatdan o'tdi va sizga {custom_user_ref_price} so'm bonus berildi.</b>
             """, parse_mode="HTML"
                 )
             except Exception:
