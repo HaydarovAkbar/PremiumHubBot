@@ -1,162 +1,303 @@
-{% load static %}
-<!DOCTYPE html>
+<!--{% load static %}-->
+<!--<!DOCTYPE html>-->
+<!--<html lang="uz">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Telegram PREMIUM</title>-->
+<!--    <script src="https://telegram.org/js/telegram-web-app.js?56"></script>-->
+<!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">-->
+
+<!--    <style>-->
+<!--        body {-->
+<!--            background-image: url('https://marketplace.canva.com/EAFt0-NXjbM/2/0/900w/canva-pink-purple-gradient-color-texture-and-style-mobile-video-background-OXlSIX1mXzw.jpg');-->
+<!--            background-size: cover;-->
+<!--            background-repeat: no-repeat;-->
+<!--            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;-->
+<!--            font-weight: 300;-->
+<!--            height: 100vh;-->
+<!--        }-->
+
+<!--        .content {-->
+<!--            color: white;-->
+<!--            margin-top: 30px;-->
+<!--        }-->
+
+<!--        .text {-->
+<!--            color: #000;-->
+<!--        }-->
+
+<!--        .btnreg {-->
+<!--            padding: 25px;-->
+<!--            position: relative;-->
+<!--            left: 20px;-->
+<!--        }-->
+
+<!--        .button {-->
+<!--            width: 90%;-->
+<!--            padding: 10px 20px;-->
+<!--            background-color: #F56FFB;-->
+<!--            border: none;-->
+<!--            color: #fff;-->
+<!--            font-size: 16px;-->
+<!--            text-decoration: none;-->
+<!--            cursor: pointer;-->
+<!--            border-radius: 30px;-->
+<!--            transition: background-color 0.3s;-->
+<!--        }-->
+
+<!--        .button:hover {-->
+<!--            background-color: #0056b3;-->
+<!--        }-->
+
+<!--        .hidden {-->
+<!--            display: none;-->
+<!--            color: #059;-->
+<!--            background-color: rgba(255, 255, 255, 0.5);-->
+<!--            border: 1px solid #F56FFB;-->
+<!--            padding: 10px 10px;-->
+<!--        }-->
+
+<!--        .info-msg {-->
+<!--            margin: 10px 0;-->
+<!--            padding: 10px;-->
+<!--            border-radius: 3px;-->
+<!--            color: #059;-->
+<!--            background-color: rgba(255, 255, 255, 0.5);-->
+<!--            border: 1px solid #F56FFB;-->
+<!--        }-->
+
+<!--        .wrapper {-->
+<!--            display: flex;-->
+<!--            justify-content: center;-->
+<!--            align-items: center;-->
+<!--            height: 250px;-->
+<!--        }-->
+
+<!--        .rotate {-->
+<!--            display: block;-->
+<!--            margin-left: auto;-->
+<!--            margin-right: auto;-->
+<!--            width: 600px;-->
+<!--            height: 350px;-->
+<!--            animation: rotate 5s linear infinite;-->
+<!--        }-->
+
+<!--        @keyframes rotate {-->
+<!--            0% {-->
+<!--                transform: rotate(0deg);-->
+<!--            }-->
+<!--            100% {-->
+<!--                transform: rotate(360deg);-->
+<!--            }-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+
+<!--<div class="content">-->
+<!--    <h1>Telegram PREMIUM bot</h1>-->
+
+<!--    <div class="wrapper">-->
+<!--        <img class="premiumlogo rotate" src="{% static 'images/IMG_8949.png' %}" alt="Premium Logo">-->
+<!--    </div>-->
+
+<!--    <div class="info-msg">-->
+<!--        <i class="fa fa-info-circle"></i>-->
+<!--        Ro'yhatdan o'tish uchun quyidagi tugmani bosing.-->
+
+<!--        <div class="btnreg">-->
+<!--            <button class="button" onclick="sendDeviceInfo()">Ro'yhatdan o'tish</button>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<div class="content">-->
+<!--    <p id="hiddenText" class="hidden">-->
+<!--        ✅Sizning so'rovingiz botga yuborildi, javobni bot orqali olasiz.-->
+<!--    </p>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    const sendDeviceInfo = async () => {-->
+<!--        if (window.Telegram && window.Telegram.WebApp) {-->
+<!--            const model = navigator.userAgent;-->
+<!--            const tur = window.Telegram.WebApp.platform;-->
+<!--            const width = window.innerWidth;-->
+<!--            const height = window.innerHeight;-->
+<!--            const til = navigator.language;-->
+<!--            const hotira = navigator.hardwareConcurrency;-->
+<!--            const telegram_id = window.Telegram.WebApp.initDataUnsafe.user?.id;-->
+
+<!--            const data = {-->
+<!--                model,-->
+<!--                tur,-->
+<!--                width,-->
+<!--                height,-->
+<!--                til,-->
+<!--                hotira,-->
+<!--                telegram_id,-->
+<!--            };-->
+
+<!--            await fetch("/device-register/", {-->
+<!--                method: "POST",-->
+<!--                headers: {-->
+<!--                    "Content-Type": "application/json",-->
+<!--                },-->
+<!--                body: JSON.stringify(data),-->
+<!--            });-->
+<!--            document.getElementById("hiddenText").classList.remove("hidden");-->
+<!--            if (window.Telegram && window.Telegram.WebApp) {-->
+<!--                window.Telegram.WebApp.close();-->
+<!--        }-->
+<!--        }-->
+<!--        else {-->
+<!--            alert("Iltimos, bu sahifani Telegram ichida oching.");-->
+<!--        }-->
+<!--    };-->
+<!--    // sendDeviceInfo();-->
+
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
+
+{% load static %}<!DOCTYPE html>
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram PREMIUM</title>
-    <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
-            background-image: url('https://marketplace.canva.com/EAFt0-NXjbM/2/0/900w/canva-pink-purple-gradient-color-texture-and-style-mobile-video-background-OXlSIX1mXzw.jpg');
-            background-size: cover;
-            background-repeat: no-repeat;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-weight: 300;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom right, #0e1e2e, #1e2450);
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             height: 100vh;
         }
 
-        .content {
-            color: white;
-            margin-top: 30px;
+        h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
         }
 
-        .text {
-            color: #000;
-        }
-
-        .btnreg {
-            padding: 25px;
-            position: relative;
-            left: 20px;
-        }
-
-        .button {
-            width: 90%;
-            padding: 10px 20px;
-            background-color: #F56FFB;
-            border: none;
-            color: #fff;
-            font-size: 16px;
-            text-decoration: none;
-            cursor: pointer;
-            border-radius: 30px;
-            transition: background-color 0.3s;
-        }
-
-        .button:hover {
-            background-color: #0056b3;
-        }
-
-        .hidden {
-            display: none;
-            color: #059;
-            background-color: rgba(255, 255, 255, 0.5);
-            border: 1px solid #F56FFB;
-            padding: 10px 10px;
-        }
-
-        .info-msg {
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 3px;
-            color: #059;
-            background-color: rgba(255, 255, 255, 0.5);
-            border: 1px solid #F56FFB;
-        }
-
-        .wrapper {
+        .icons {
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 250px;
+            gap: 18px;
+            margin: 25px 0;
+            flex-wrap: wrap;
         }
 
-        .rotate {
+        .icons img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .register-button {
+            background-color: #00c39a;
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .register-button:hover {
+            background-color: #00a885;
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 12px 16px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 15px;
+            color: #b9ffcb;
+            display: none;
+        }
+
+        .message.show {
             display: block;
-            margin-left: auto;
-            margin-right: auto;
-            width: 600px;
-            height: 350px;
-            animation: rotate 5s linear infinite;
+            animation: fadeIn 0.4s ease-in-out;
         }
 
-        @keyframes rotate {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
 
-<div class="content">
-    <h1>Telegram PREMIUM bot</h1>
+    <h1>Telegram PREMIUM Hub<br>Ro’yhatdan o‘tish</h1>
 
-    <div class="wrapper">
-        <img class="premiumlogo rotate" src="{% static 'images/IMG_8949.png' %}" alt="Premium Logo">
+    <div class="icons">
+        <img src="https://img.icons8.com/color/96/settings--v1.png" alt="sozlama">
+        <img src="https://img.icons8.com/color/96/internet--v1.png" alt="internet">
+        <img src="https://img.icons8.com/color/96/speaker.png" alt="speaker">
+        <img src="https://img.icons8.com/color/96/star--v1.png" alt="star">
+        <img src="https://img.icons8.com/color/96/iphone-x.png" alt="phone">
     </div>
 
-    <div class="info-msg">
-        <i class="fa fa-info-circle"></i>
-        Ro'yhatdan o'tish uchun quyidagi tugmani bosing.
+    <button class="register-button" onclick="sendDeviceInfo()">Ro’yhatdan o’tish</button>
 
-        <div class="btnreg">
-            <button class="button" onclick="sendDeviceInfo()">Ro'yhatdan o'tish</button>
-        </div>
+    <div id="hiddenMessage" class="message">
+        ✅ Sizning so‘rovingiz botga yuborildi, javobni bot orqali olasiz.
     </div>
-</div>
 
-<div class="content">
-    <p id="hiddenText" class="hidden">
-        ✅Sizning so'rovingiz botga yuborildi, javobni bot orqali olasiz.
-    </p>
-</div>
-
-<script>
-    const sendDeviceInfo = async () => {
-        if (window.Telegram && window.Telegram.WebApp) {
-            const model = navigator.userAgent;
-            const tur = window.Telegram.WebApp.platform;
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            const til = navigator.language;
-            const hotira = navigator.hardwareConcurrency;
-            const telegram_id = window.Telegram.WebApp.initDataUnsafe.user?.id;
-
-            const data = {
-                model,
-                tur,
-                width,
-                height,
-                til,
-                hotira,
-                telegram_id,
-            };
-
-            await fetch("/device-register/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            });
-            document.getElementById("hiddenText").classList.remove("hidden");
+    <script>
+        const sendDeviceInfo = async () => {
             if (window.Telegram && window.Telegram.WebApp) {
-                window.Telegram.WebApp.close();
-        }
-        }
-        else {
-            alert("Iltimos, bu sahifani Telegram ichida oching.");
-        }
-    };
-    // sendDeviceInfo();
+                const model = navigator.userAgent;
+                const tur = window.Telegram.WebApp.platform;
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+                const til = navigator.language;
+                const hotira = navigator.hardwareConcurrency;
+                const telegram_id = window.Telegram.WebApp.initDataUnsafe.user?.id;
 
-</script>
+                const data = {
+                    model,
+                    tur,
+                    width,
+                    height,
+                    til,
+                    hotira,
+                    telegram_id,
+                };
+
+                await fetch("/device-register/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                // Show confirmation message
+                document.getElementById("hiddenMessage").classList.add("show");
+
+                // Close WebApp after few seconds (optional)
+                setTimeout(() => {
+                    if (window.Telegram.WebApp) {
+                        window.Telegram.WebApp.close();
+                    }
+                }, 3000);
+            } else {
+                alert("Iltimos, sahifani Telegram ilovasida oching.");
+            }
+        };
+    </script>
+
 </body>
 </html>

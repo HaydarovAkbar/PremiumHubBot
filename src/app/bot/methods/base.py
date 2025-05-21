@@ -53,21 +53,6 @@ def add_to_channel(update: Update, context: CallbackContext):
 
 def start(update: Update, context: CallbackContext):
     payload = context.args[0] if context.args else None
-    if payload:
-        context.chat_data['payload'] = payload
-    #         try:
-    #             payload = int(payload)
-    #             user = update.effective_user
-    #             mention = f"<a href='tg://user?id={user.id}'>{user.full_name}</a>"
-    #             context.bot.send_message(chat_id=payload,
-    #                                      text=f"""
-    # 👏 Tabriklaymiz! Siz {mention}ni botga taklif qildingiz!
-    #
-    # Do'stingiz ro'yxatdan o'tganidan keyin, biz sizga referal puli taqdim etamiz!""",
-    #                                      parse_mode=ParseMode.HTML
-    #                                      )
-    #         except CustomUser.DoesNotExist:
-    #             payload = None
     user, _ = CustomUser.objects.get_or_create(chat_id=update.effective_user.id, defaults={
         'username': update.effective_user.username,
         'first_name': update.effective_user.first_name,
@@ -79,6 +64,22 @@ def start(update: Update, context: CallbackContext):
     user.last_name = update.effective_user.last_name
     user.username = update.effective_user.username
     user.save()
+    if _:
+        if payload:
+            context.chat_data['payload'] = payload
+            try:
+                payload = int(payload)
+                user = update.effective_user
+                mention = f"<a href='tg://user?id={user.id}'>{user.full_name}</a>"
+                context.bot.send_message(chat_id=payload,
+                                         text=f"""
+👏 Tabriklaymiz! Siz {mention}ni botga taklif qildingiz!
+
+<i>Do'stingiz ro'yxatdan o'tganidan keyin, biz sizga referal puli taqdim etamiz!</i>""",
+                                         parse_mode=ParseMode.HTML
+                                         )
+            except CustomUser.DoesNotExist:
+                payload = None
     all_channel = Channel.objects.filter(is_active=True)
     left_channel = []
     for channel in all_channel:
@@ -146,21 +147,21 @@ def get_contact(update: Update, context: CallbackContext):
         user.phone_number = update.message.contact.phone_number
         user.save()
         if not user.is_active:
-            payload = context.chat_data.get('payload', 0)
-            if payload:
-                try:
-                    payload = int(payload)
-                    user = update.effective_user
-                    mention = f"<a href='tg://user?id={user.id}'>{user.full_name}</a>"
-                    context.bot.send_message(chat_id=payload,
-                                             text=f"""
-                👏 Tabriklaymiz! Siz {mention}ni botga taklif qildingiz!
-    
-                Do'stingiz ro'yxatdan o'tganidan keyin, biz sizga referal puli taqdim etamiz!""",
-                                             parse_mode=ParseMode.HTML
-                                             )
-                except CustomUser.DoesNotExist:
-                    payload = None
+#             payload = context.chat_data.get('payload', 0)
+#             if payload:
+#                 try:
+#                     payload = int(payload)
+#                     user = update.effective_user
+#                     mention = f"<a href='tg://user?id={user.id}'>{user.full_name}</a>"
+#                     context.bot.send_message(chat_id=payload,
+#                                              text=f"""
+# 👏 Tabriklaymiz! Siz {mention}ni botga taklif qildingiz!
+#
+# <i>Do'stingiz ro'yxatdan o'tganidan keyin, biz sizga referal puli taqdim etamiz!</i>""",
+#                                              parse_mode=ParseMode.HTML
+#                                              )
+#                 except CustomUser.DoesNotExist:
+#                     payload = None
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text="""🔁Botimiz yangilangani va xavfsizlikni oshirish munosabati bilan quyidagi havola orqali ro’yxatdan o’ting va botni ishlatishda davom eting""",
                                      parse_mode='HTML',
