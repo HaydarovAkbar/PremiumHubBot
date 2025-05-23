@@ -7,7 +7,7 @@ from .models import CustomUser, Channel, Settings, Prices, StarsPrices, RewardsC
 
 
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ['first_name', 'last_name', 'phone_number', 'is_active', 'is_blocked']
+    list_display = ['first_name', 'last_name', 'phone_number', 'is_active', 'is_blocked', 'invited_count']
     list_filter = ['is_active', 'is_blocked', 'is_admin']
     list_per_page = 20
     search_fields = ['chat_id', 'phone_number']

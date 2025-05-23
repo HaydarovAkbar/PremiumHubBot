@@ -96,15 +96,20 @@ class Command(BaseCommand):
         # print(rows)
         counter = 0
         print("Migrating users from external MySQL database...")
-        for cus_user in CustomUser.objects.all():
-            referral_count = CustomUser.objects.filter(referral=cus_user.chat_id).count()
-            if referral_count > 0:
-                cus_user.invited_count = referral_count
-                cus_user.save()
-            counter += 1
-
-            if counter % 100 == 0:
-                time.sleep(1)
-                print("Migrated {} users".format(counter))
+        user_6283303160 = CustomUser.objects.filter(referral=6283303160)
+        for user in user_6283303160:
+            print(f"CHAT ID: {user.chat_id}, PHONE: {user.phone_number}")
+        print(f"Count users: {user_6283303160.count()}")
+        # for cus_user in CustomUser.objects.all():
+        #     referral_count = CustomUser.objects.filter(referral=cus_user.chat_id).count()
+        #     print("User: {}, referral: {}".format(cus_user.chat_id, referral_count))
+        # if referral_count > 0:
+        #     cus_user.invited_count = referral_count
+        #     cus_user.save()
+        # counter += 1
+        #
+        # if counter % 100 == 0:
+        #     time.sleep(1)
+        #     print("Migrated {} users".format(counter))
 
         print("End!")
