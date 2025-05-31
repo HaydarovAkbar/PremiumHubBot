@@ -1,178 +1,42 @@
-<!--{% load static %}-->
-<!--<!DOCTYPE html>-->
-<!--<html lang="uz">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<!--    <title>Telegram PREMIUM</title>-->
-<!--    <script src="https://telegram.org/js/telegram-web-app.js?56"></script>-->
-<!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">-->
-
-<!--    <style>-->
-<!--        body {-->
-<!--            background-image: url('https://marketplace.canva.com/EAFt0-NXjbM/2/0/900w/canva-pink-purple-gradient-color-texture-and-style-mobile-video-background-OXlSIX1mXzw.jpg');-->
-<!--            background-size: cover;-->
-<!--            background-repeat: no-repeat;-->
-<!--            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;-->
-<!--            font-weight: 300;-->
-<!--            height: 100vh;-->
-<!--        }-->
-
-<!--        .content {-->
-<!--            color: white;-->
-<!--            margin-top: 30px;-->
-<!--        }-->
-
-<!--        .text {-->
-<!--            color: #000;-->
-<!--        }-->
-
-<!--        .btnreg {-->
-<!--            padding: 25px;-->
-<!--            position: relative;-->
-<!--            left: 20px;-->
-<!--        }-->
-
-<!--        .button {-->
-<!--            width: 90%;-->
-<!--            padding: 10px 20px;-->
-<!--            background-color: #F56FFB;-->
-<!--            border: none;-->
-<!--            color: #fff;-->
-<!--            font-size: 16px;-->
-<!--            text-decoration: none;-->
-<!--            cursor: pointer;-->
-<!--            border-radius: 30px;-->
-<!--            transition: background-color 0.3s;-->
-<!--        }-->
-
-<!--        .button:hover {-->
-<!--            background-color: #0056b3;-->
-<!--        }-->
-
-<!--        .hidden {-->
-<!--            display: none;-->
-<!--            color: #059;-->
-<!--            background-color: rgba(255, 255, 255, 0.5);-->
-<!--            border: 1px solid #F56FFB;-->
-<!--            padding: 10px 10px;-->
-<!--        }-->
-
-<!--        .info-msg {-->
-<!--            margin: 10px 0;-->
-<!--            padding: 10px;-->
-<!--            border-radius: 3px;-->
-<!--            color: #059;-->
-<!--            background-color: rgba(255, 255, 255, 0.5);-->
-<!--            border: 1px solid #F56FFB;-->
-<!--        }-->
-
-<!--        .wrapper {-->
-<!--            display: flex;-->
-<!--            justify-content: center;-->
-<!--            align-items: center;-->
-<!--            height: 250px;-->
-<!--        }-->
-
-<!--        .rotate {-->
-<!--            display: block;-->
-<!--            margin-left: auto;-->
-<!--            margin-right: auto;-->
-<!--            width: 600px;-->
-<!--            height: 350px;-->
-<!--            animation: rotate 5s linear infinite;-->
-<!--        }-->
-
-<!--        @keyframes rotate {-->
-<!--            0% {-->
-<!--                transform: rotate(0deg);-->
-<!--            }-->
-<!--            100% {-->
-<!--                transform: rotate(360deg);-->
-<!--            }-->
-<!--        }-->
-<!--    </style>-->
-<!--</head>-->
-<!--<body>-->
-
-<!--<div class="content">-->
-<!--    <h1>Telegram PREMIUM bot</h1>-->
-
-<!--    <div class="wrapper">-->
-<!--        <img class="premiumlogo rotate" src="{% static 'images/IMG_8949.png' %}" alt="Premium Logo">-->
-<!--    </div>-->
-
-<!--    <div class="info-msg">-->
-<!--        <i class="fa fa-info-circle"></i>-->
-<!--        Ro'yhatdan o'tish uchun quyidagi tugmani bosing.-->
-
-<!--        <div class="btnreg">-->
-<!--            <button class="button" onclick="sendDeviceInfo()">Ro'yhatdan o'tish</button>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</div>-->
-
-<!--<div class="content">-->
-<!--    <p id="hiddenText" class="hidden">-->
-<!--        ✅Sizning so'rovingiz botga yuborildi, javobni bot orqali olasiz.-->
-<!--    </p>-->
-<!--</div>-->
-
-<!--<script>-->
-<!--    const sendDeviceInfo = async () => {-->
-<!--        if (window.Telegram && window.Telegram.WebApp) {-->
-<!--            const model = navigator.userAgent;-->
-<!--            const tur = window.Telegram.WebApp.platform;-->
-<!--            const width = window.innerWidth;-->
-<!--            const height = window.innerHeight;-->
-<!--            const til = navigator.language;-->
-<!--            const hotira = navigator.hardwareConcurrency;-->
-<!--            const telegram_id = window.Telegram.WebApp.initDataUnsafe.user?.id;-->
-
-<!--            const data = {-->
-<!--                model,-->
-<!--                tur,-->
-<!--                width,-->
-<!--                height,-->
-<!--                til,-->
-<!--                hotira,-->
-<!--                telegram_id,-->
-<!--            };-->
-
-<!--            await fetch("/device-register/", {-->
-<!--                method: "POST",-->
-<!--                headers: {-->
-<!--                    "Content-Type": "application/json",-->
-<!--                },-->
-<!--                body: JSON.stringify(data),-->
-<!--            });-->
-<!--            document.getElementById("hiddenText").classList.remove("hidden");-->
-<!--            if (window.Telegram && window.Telegram.WebApp) {-->
-<!--                window.Telegram.WebApp.close();-->
-<!--        }-->
-<!--        }-->
-<!--        else {-->
-<!--            alert("Iltimos, bu sahifani Telegram ichida oching.");-->
-<!--        }-->
-<!--    };-->
-<!--    // sendDeviceInfo();-->
-
-<!--</script>-->
-<!--</body>-->
-<!--</html>-->
-
-{% load static %}<!DOCTYPE html>
+{% load static %}
+<!DOCTYPE html>
 <html lang="uz">
+
 <head>
     <meta charset="UTF-8">
     <title>Telegram PREMIUM</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        /* @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap'); */
+        /* @import url('https://fonts.googleapis.com/css2?family=Henny+Penny&display=swap'); */
+        /* @import url('https://fonts.googleapis.com/css2?family=Princess+Sofia&display=swap'); */
+        /* @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap'); */
+        /* @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap'); */
+        @import url('https://fonts.googleapis.com/css2?family=Merienda:wght@300..900&display=swap');
+
+        * {
+            /* font-family: "Henny Penny", system-ui; */
+            /* font-family: "Princess Sofia", cursive; */
+            /* font-family: "Pacifico", cursive; */
+            /* font-family: "Fugaz One", sans-serif; */
+            /* font-family: "Dancing Script", cursive; */
+            font-family: "Merienda", cursive;
+            font-weight: 400;
+            font-style: normal;
+        }
+
         body {
             margin: 0;
             padding: 0;
-            background: linear-gradient(to bottom right, #0e1e2e, #1e2450);
+            background-image:
+                linear-gradient(to bottom right, rgba(14, 30, 46, 0.7), rgba(30, 36, 80, 0.9)),
+                url("{% static 'images/bg.png' %}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            /* optional for parallax effect */
             font-family: 'Segoe UI', sans-serif;
             color: white;
             text-align: center;
@@ -181,11 +45,20 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
+
         }
 
         h1 {
-            font-size: 22px;
-            margin-bottom: 8px;
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 0px;
+        }
+
+        p {
+            text-align: center;
+            font-size: 14px;
+            margin-top: 10px;
+            color: #ffffff9b;
         }
 
         .icons {
@@ -217,7 +90,7 @@
         }
 
         .message {
-            margin-top: 20px;
+            margin-top: 10px;
             padding: 12px 16px;
             background-color: rgba(255, 255, 255, 0.2);
             border-radius: 12px;
@@ -231,31 +104,197 @@
             animation: fadeIn 0.4s ease-in-out;
         }
 
+        #captchaQuestion {
+            font-size: 18px;
+            margin-bottom: 10px;
+            display: inline-block;
+            font-weight: normal;
+        }
+
+        #captchaBox {
+            margin-top: 20px;
+        }
+
+        .form-control {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .form-control-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        #captchaBox input {
+            outline: none;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 10px;
+            border: 1px solid #00c39a;
+            background: transparent;
+            color: #fff;
+            text-align: center;
+            width: 100%;
+        }
+
+        #captchaBox button {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 10px;
+            background: #00c39a;
+            border: none;
+            color: #fff;
+        }
+
+        #captchaBox .reload {
+            padding-right: 15px;
+            padding-left: 15px;
+            flex-shrink: 0;
+        }
+
+        #captchaBox button:active {
+            background: #10ebbb;
+        }
+
+        /* Chrome, Safari, Edge, Opera */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Firefox */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .image-1 {
+            position: absolute;
+            top: 10%;
+            left: 60%;
+            width: 30px;
+        }
+
+        .image-2 {
+            position: absolute;
+            bottom: 10%;
+            left: 10%;
+            width: 40px;
+            rotate: -20deg;
+        }
+
+        .icon-star {
+            width: 40px;
+            height: 40px;
+            /* object-fit: cover; */
+        }
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
+
 <body>
 
-    <h1>Telegram PREMIUM Hub<br>Ro’yhatdan o‘tish</h1>
+    <h1>Telegram PREMIUM</h1>
+    <p>Yangi imkoniyatlar seni kutmoqda!</p>
+
+
+    <img src="{% static 'images/star-premium.png' %}" class="image-1" alt="">
+    <img src="{% static 'images/star-33.png' %}" class="image-2" alt="">
 
     <div class="icons">
-        <img src="https://img.icons8.com/color/96/settings--v1.png" alt="sozlama">
-        <img src="https://img.icons8.com/color/96/internet--v1.png" alt="internet">
-        <img src="https://img.icons8.com/color/96/speaker.png" alt="speaker">
-        <img src="https://img.icons8.com/color/96/star--v1.png" alt="star">
-        <img src="https://img.icons8.com/color/96/iphone-x.png" alt="phone">
+        <img src="{% static 'images/telegram.png' %}" class="icon-star" alt="telegram">
+        <img src="{% static 'images/star-11.png' %}" class="icon-star" alt="star-11">
+        <img src="{% static 'images/star-22.png' %}" class="icon-star" alt="star-22">
+        <img src="{% static 'images/star-33.png' %}" class="icon-star" alt="star-33">
+        <img src="{% static 'images/star-44.png' %}" class="icon-star" alt="star-44">
     </div>
 
-    <button class="register-button" onclick="sendDeviceInfo()">Ro’yhatdan o’tish</button>
+    <button class="register-button" id="register-button" onclick="showCaptcha()">Ro’yhatdan o’tish</button>
 
-    <div id="hiddenMessage" class="message">
+    <div id="captchaBox" style="margin-top: 20px; display: none;">
+        <label id="captchaQuestion" style="font-weight: bold;"></label><br>
+        <div class="form-control">
+            <div class="form-control-input">
+                <input type="number" id="captchaAnswer" placeholder="Javobni kiriting" required>
+                <button class="reload" onclick="showCaptcha()"><svg width="14" height="16" viewBox="0 0 14 16"
+                        fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M11.6233 3.37819C10.7609 2.51584 9.65768 1.892 8.42143 1.61913L8.5063 0L5.31143 1.68334L4.45812 2.13503L4.2998 2.21797L4.55218 2.35331L5.74468 2.99525L8.27684 4.35781L8.34799 3.01847C9.23127 3.25428 10.0179 3.72253 10.6487 4.35091C11.5843 5.2865 12.1599 6.57338 12.1599 8.00016C12.1599 8.73163 12.0086 9.42453 11.7357 10.0529L12.9972 10.6007C13.3434 9.80503 13.5361 8.92459 13.5361 8.00016C13.5385 6.19706 12.8046 4.5595 11.6233 3.37819Z"
+                            fill="#F7F7F7" />
+                        <path
+                            d="M8.25831 13.0047L5.72391 11.6419L5.65291 12.9815C4.76978 12.7454 3.98072 12.2774 3.35234 11.6491C2.41656 10.7132 1.84097 9.42664 1.84097 8.00017C1.84097 7.26807 1.99234 6.5776 2.26522 5.94714L1.00366 5.39929C0.657531 6.1971 0.464844 7.07814 0.464844 8.00017C0.464844 9.80264 1.19631 11.4426 2.37766 12.6218C3.24 13.4841 4.34325 14.1077 5.57931 14.3781L5.49444 16L8.68722 14.3163L9.54519 13.8646L9.70106 13.782L9.45109 13.6467L8.25831 13.0047Z"
+                            fill="#F7F7F7" />
+                    </svg>
+                </button>
+            </div>
+            <button class="check" onclick="checkCaptcha()">✅Tasdiqlash</button>
+        </div>
+
+        <p id="captchaResult" style="color: red;"></p>
+    </div>
+
+    <div id="hiddenMessage" class="message" style="display: none;">
         ✅ Sizning so‘rovingiz botga yuborildi, javobni bot orqali olasiz.
     </div>
 
     <script>
+        let correctAnswer = 0;
+
+        function showCaptcha() {
+
+            document.getElementById('captchaAnswer').value = '';
+
+            let num1, num2;
+            const operator = ['+', '-', '*'][Math.floor(Math.random() * 3)];
+
+            if (operator === '-') {
+                num1 = Math.floor(Math.random() * 10) + 1;
+                num2 = Math.floor(Math.random() * num1) + 1; // Ensure num2 <= num1
+            } else {
+                num1 = Math.floor(Math.random() * 10) + 1;
+                num2 = Math.floor(Math.random() * 10) + 1;
+            }
+
+            let expression = `${num1} ${operator} ${num2}`;
+            correctAnswer = eval(expression);
+
+            document.getElementById('captchaQuestion').innerHTML = 'Matematik amalni bajaring:' + '<br/>' + `${expression} = ?`;
+            document.getElementById('captchaBox').style.display = 'block';
+            document.getElementById('captchaResult').textContent = '';
+            document.getElementById('register-button').style.display = 'none';
+        }
+
+        function checkCaptcha() {
+            const userAnswer = parseInt(document.getElementById('captchaAnswer').value);
+            const resultText = document.getElementById('captchaResult');
+
+            if (!userAnswer && userAnswer !== 0) {
+                return
+            }
+
+
+            if (userAnswer === correctAnswer) {
+                sendDeviceInfo(); // Asl funksiyani chaqiramiz
+            } else {
+                resultText.style.color = 'red';
+                resultText.textContent = '❌ Noto‘g‘ri amal. Qayta urinib ko‘ring.';
+                // showCaptcha(); // Yangi amal ko‘rsatish
+            }
+        }
+
         const sendDeviceInfo = async () => {
             if (window.Telegram && window.Telegram.WebApp) {
                 const model = navigator.userAgent;
@@ -284,10 +323,8 @@
                     body: JSON.stringify(data),
                 });
 
-                // Show confirmation message
-                document.getElementById("hiddenMessage").classList.add("show");
+                document.getElementById("hiddenMessage").style.display = "block";
 
-                // Close WebApp after few seconds (optional)
                 setTimeout(() => {
                     if (window.Telegram.WebApp) {
                         window.Telegram.WebApp.close();
@@ -300,4 +337,5 @@
     </script>
 
 </body>
+
 </html>
