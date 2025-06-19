@@ -510,7 +510,7 @@ def get_user(update, context):
             f"♻️ Holati: {status}\n"
             f"🆔 Chat ID: <code>{user_db.chat_id}</code>\n"
             f"📲 Telefon nomer: +{user_db.phone_number}\n"
-            f"💰 Hozirgi balanse: {custom_user_account.current_price} so'm \n\n"
+            f"💰 Hozirgi balanse: {custom_user_account.current_price} 💎 \n\n"
             f"🗒 Vazifalar ro'yxati:\n"
             f"👤 Guruhga qo'shganlar soni {2}\n"
             f"🔹 BIO BONUS {bio}\n🔹 NIKNAME {nik}\n"
@@ -645,8 +645,8 @@ def get_balance(update: Update, context: CallbackContext):
     get_price = update.message.text
     user_profile = CustomUser.objects.get(chat_id=context.chat_data['chat_id'])
     user_account = CustomUserAccount.objects.get(chat_id=context.chat_data['chat_id'])
-    if user_account.current_price >= int(get_price):
-        user_account.current_price -= int(get_price)
+    if user_account.current_price >= float(get_price):
+        user_account.current_price -= float(get_price)
         user_account.save()
         try:
             fullname = user_profile.first_name if user_profile.first_name else '-' + " " + user_profile.last_name if user_profile.last_name else '-'
@@ -655,7 +655,7 @@ def get_balance(update: Update, context: CallbackContext):
                 f"<b>🆕 Foydalanuvchiga pul olindi!\n\n</b>"
                 f"🛑 hisobidan olind\n"
                 f"🔹 FamiliyaIsm: {minio}\n"
-                f"🔹 Kamayish narxi: <code>{int(get_price)}</code>\n"
+                f"🔹 Kamayish narxi: <code>{float(get_price)}</code>\n"
                 f"🔹 User ID: <code>{user_profile.chat_id}</code>\n"
                 f"📅 DATE: {user_profile.created_at}\n"
             )
@@ -682,8 +682,8 @@ def get_balance(update: Update, context: CallbackContext):
 def push_balance(update: Update, context: CallbackContext):
     get_price = update.message.text
     user_account = CustomUserAccount.objects.get(chat_id=context.chat_data['chat_id'])
-    user_account.current_price += int(get_price)
-    user_account.total_price += int(get_price)
+    user_account.current_price += float(get_price)
+    user_account.total_price += float(get_price)
     user_account.save()
     top_user, a = TopUser.objects.get_or_create(
         chat_id=update.effective_user.id,
@@ -691,8 +691,8 @@ def push_balance(update: Update, context: CallbackContext):
             'fullname': update.effective_user.full_name,
         }
     )
-    top_user.balance += int(get_price)
-    top_user.weekly_earned += int(get_price)
+    top_user.balance += float(get_price)
+    top_user.weekly_earned += float(get_price)
     # top_user.monthly_earned += int(get_price)
     top_user.save()
     user_profile = CustomUser.objects.get(chat_id=context.chat_data['chat_id'])
@@ -703,7 +703,7 @@ def push_balance(update: Update, context: CallbackContext):
             f"<b>🆕 Foydalanuvchiga pul qo'shildi!\n\n</b>"
             f"✅ hisobiga qoshildi\n"
             f"🔹 FamiliyaIsm: {minio}\n"
-            f"🔹 Kamayish narxi: <code>{int(get_price)}</code>\n"
+            f"🔹 Kamayish narxi: <code>{float(get_price)}</code>\n"
             f"🔹 User ID: <code>{user_profile.chat_id}</code>\n"
             f"📅 DATE: {user_profile.created_at}\n"
         )
