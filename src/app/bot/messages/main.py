@@ -1,8 +1,11 @@
 class MessageText:
-    prem_photo_id = 'AgACAgIAAxkBAAIc6GgAAea7PjTk9Z15KiJC9FU8vGFL6gACIO4xG7QzCEhZvfmXA_tM6wEAAwIAA3gAAzYE'
-    star_photo_id = 'AgACAgIAAxkBAAIdA2gAAfEaEBGNpfMFJPLCAAH93M8n6aEAApjuMRu0MwhILAELcsCKtdcBAAMCAAN4AAM2BA'
-    channel_boost_id = 'AgACAgIAAxkBAAIdMGgDsap04ttehDgVD7PI_Bl_UhZAAAKY7TEbYdsgSOZtPnqRXZ2tAQADAgADeAADNgQ'
-    manual_video_id = 'BAACAgIAAxkBAAIe3mgHVa6tNrZlthnkqqVPbg3hawhwAALwcAACJNc5SsHnxklgBmrhNgQ'
+    prem_photo_id = 'AgACAgIAAxkBAAESbGxoJutPJGvObgTC_0-ZJHPzD8d7jwACXusxG7W5OUnJSYqm0M8XugEAAwIAA3gAAzYE'
+    star_photo_id = 'AgACAgIAAxkBAAESbHZoJuvuDPAyRiReDwOBV1mZg5exzAACbesxG7W5OUlezgnq4SAbPgEAAwIAA3gAAzYE'
+    channel_boost_id = 'AgACAgIAAxkBAAESbHtoJuwSLQ1Yxw6AOUS1LekbdgABxMwAAm7rMRu1uTlJNpNuG7vK9ZQBAAMCAAN4AAM2BA'
+    manual_video_id = 'BAACAgIAAxkBAAESbH1oJuwsTs_AkrlDBsAiUvCoQpIutgAC8HAAAiTXOUqF5oF6DK9MxTYE'
+    gift_photo_id = 'AgACAgIAAxkBAAI4j2hT2RwwLOEpooXE8zX7iF1EQ-kFAAKc8DEbAT-hSoaqTySH7gJ4AQADAgADeQADNgQ'
+    my_profile_id = 'AgACAgIAAxkBAAI4f2hT0nDUR4gFjTGliRUG-m-MUPZEAAJG8DEbAT-hSo2jfAHP4YsuAQADAgADeQADNgQ'
+    top_id = 'AgACAgIAAxkBAAI4lGhT2UmTBZEJ7Jy5KXcmQsq-oes-AAKe8DEbAT-hSgtb12QkY0ADAQADAgADeQADNgQ'
 
     BASE_MSG = """
 <b>Assalomu alaykum! PremiumHub botimizga xush kelibsiz!</b>

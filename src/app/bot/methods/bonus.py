@@ -14,6 +14,18 @@ keyword = Keyboards()
 state = States()
 msg = MessageText()
 
+def is_premium_user_check(user_id: int, bot_token: str, chat_id: int) -> bool:
+    url = f"https://api.telegram.org/bot{bot_token}/getChatMember"
+    response = requests.get(url, params={
+        "chat_id": chat_id,
+        "user_id": user_id
+    })
+
+    if response.status_code == 200:
+        data = response.json()
+        return data.get("result", {}).get("user", {}).get("is_premium", False)
+    return False
+
 
 def is_premium_user(user_id: int, bot_token: str) -> bool:
     url = f"https://api.telegram.org/bot{bot_token}/getChatMember"

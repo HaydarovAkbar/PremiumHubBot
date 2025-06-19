@@ -9,8 +9,8 @@ from app.models import CustomUser, Channel, Prices, StarsPrices, RewardsChannelB
 from ..keyboards.base import Keyboards
 from ..states import States
 from ..messages.main import MessageText
-
-from .bonus import settings, get_user_boosts
+from django.utils.timezone import timedelta
+from .bonus import settings, get_user_boosts, is_premium_user_check
 import random
 from django.utils import timezone
 
@@ -57,23 +57,37 @@ def my_account(update: Update, context: CallbackContext):
                                                              }
                                                              )
         group_added_count = InvitedUser.objects.filter(inviter_chat_id=update.effective_user.id).count()
-        _msg = f"""<b>
-{update.effective_chat.full_name} sizning balansingiz: {account.current_price} soʻm
-Taklif qilgan do‘stlaringiz: {user_db.invited_count} ta
-Premium doʻstlar: {user_db.premium_count} ta 
-Guruhimizga taklif qilgan do'stlaringiz: {group_added_count} ta 
-Sizning raqamingiz: +{user_db.phone_number}
-</b>
+        from django.utils.timezone import now
+
+        # Joriy haftaning boshidan boshlab taklif qilingan do‘stlar
+        start_of_week = now().date() - timedelta(days=now().weekday())  # dushanba
+        referrals_this_week = CustomUser.objects.filter(
+            referral=user_db.chat_id,
+            created_at__date__gte=start_of_week
+        ).count()
+
+        _msg = f"""
+✨ <b>Profile</b>
+_________________
+👤<b> Ism:</b> {update.effective_chat.full_name}
+🆔<b> ID:</b> {update.effective_user.id}
+_________________
+💰<b> Balans:</b> {account.current_price} 💎
+👥<b> Referral:</b> {user_db.invited_count + user_db.premium_count}
+📅<b> Joriy haftada:</b> {referrals_this_week}
+📣<b> Guruhga taklif qilganlar:</b> {group_added_count}
+_________________
 """
-        # promo_msg = ""
-        # my_promo_codes = PromoCodes.objects.filter(chat_id=update.effective_user.id, status=True)
-        # if my_promo_codes:
-        #     promo_msg = "🔷 <b>Sizning promokodlaringiz:</b> 🔷\n"
-        # for my_promo_code in my_promo_codes:
-        #     promo_msg += f"<code>{my_promo_code.name}</code>     -    Aktiv ✅\n"
-        # _msg += promo_msg
-        update.message.reply_html(
-            _msg,
+#         """
+#         {update.effective_chat.full_name} sizning balansingiz: {account.current_price} 💎
+# Taklif qilgan do‘stlaringiz: {user_db.invited_count} ta
+# Premium doʻstlar: {user_db.premium_count} ta
+# Guruhimizga taklif qilgan do'stlaringiz: {group_added_count} ta
+# Sizning raqamingiz: +{user_db.phone_number}"""
+        update.message.reply_photo(
+            photo=msg.my_profile_id,
+            caption=_msg,
+            parse_mode=ParseMode.HTML,
             reply_markup=keyword.my_account(),
         )
         return state.START
@@ -449,7 +463,7 @@ def universal_callback_data(update: Update, context: CallbackContext):
 Sizga <b>{spend_field.name}</b> uchun promokod berildi
 
 Sizning promokod 👉 <code>{promo_code}</code>
-Narxi: <b>{spend_field.price} so'm </b>
+Narxi: <b>{spend_field.price} 💎 </b>
 
 Ushbu promokodni adminga yuboring.
 Admin sizga taklif doirasidagi xizmatni faollashtiradi.
@@ -484,36 +498,111 @@ Admin sizga taklif doirasidagi xizmatni faollashtiradi.
                                          parse_mode='HTML',
                                          )
             return state.SEND_PROMO_CODE
+
         elif query.data == 'spend':
-            account, _ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id,
-                                                                 )
+            from django.utils.timezone import now
+
+            account, _ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id)
             settings_bot = Settings.objects.filter(is_active=True).last()
-            if account.current_price >= settings_bot.spend_price:
+            user = CustomUser.objects.filter(chat_id=update.effective_user.id).first()
+
+            if not user:
+                update.callback_query.answer("Foydalanuvchi topilmadi!", show_alert=True)
+                return state.START
+
+            # Joriy haftaning boshidan boshlab taklif qilingan do‘stlar
+            start_of_week = now().date() - timedelta(days=now().weekday())  # dushanba
+            referrals_this_week = CustomUser.objects.filter(
+                referral=user.chat_id,
+                created_at__date__gte=start_of_week
+            ).count()
+
+            required_referrals = int(settings_bot.spend_price)
+
+            if referrals_this_week >= required_referrals:
                 last_spend_price = SpendPrice.objects.filter(is_active=True).last()
                 if last_spend_price:
                     fields = SpendPriceField.objects.filter(spend_price=last_spend_price)
                     update.callback_query.delete_message()
-                    context.bot.send_message(chat_id=update.effective_user.id, text=last_spend_price.text,
-                                             parse_mode=ParseMode.HTML,
-                                             reply_markup=keyword.spend_fields(fields, account.current_price),
-                                             )
+                    context.bot.send_photo(
+                        photo=msg.gift_photo_id,
+                        chat_id=update.effective_user.id,
+                        caption=last_spend_price.text,
+                        parse_mode=ParseMode.HTML,
+                        reply_markup=keyword.spend_fields(fields, account.current_price),
+                    )
                     return state.MY_ACCOUNT
+
                 update.callback_query.answer(
                     f"Kechirasiz xizmat hali to'liq ishga tushmagan !",
                 )
             else:
                 update.callback_query.answer(
-                    f"Bu xizmatdan foydalanish uchun hisobingizda {settings_bot.spend_price - account.current_price} so'm yetishmayapti!",
+                    f"Bu xizmatdan foydalanish uchun joriy haftada kamida {required_referrals} ta do‘stingizni taklif qilishingiz kerak.\n\n"
+                    f"Siz taklif qilganlar: {referrals_this_week} ta",
                     show_alert=True,
                 )
 
             return state.START
+        # elif query.data == 'spend':
+        #     account, _ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id,
+        #                                                          )
+        #     settings_bot = Settings.objects.filter(is_active=True).last()
+        #     if account.current_price >= settings_bot.spend_price:
+        #         last_spend_price = SpendPrice.objects.filter(is_active=True).last()
+        #         if last_spend_price:
+        #             fields = SpendPriceField.objects.filter(spend_price=last_spend_price)
+        #             update.callback_query.delete_message()
+        #             context.bot.send_photo(photo=msg.gift_photo_id,
+        #                                    chat_id=update.effective_user.id,
+        #                                    caption=last_spend_price.text,
+        #                                    parse_mode=ParseMode.HTML,
+        #                                    reply_markup=keyword.spend_fields(fields, account.current_price),
+        #                                    )
+        #             return state.MY_ACCOUNT
+        #         update.callback_query.answer(
+        #             f"Kechirasiz xizmat hali to'liq ishga tushmagan !",
+        #         )
+        #     else:
+        #         update.callback_query.answer(
+        #             f"Bu xizmatdan foydalanish uchun hisobingizda {settings_bot.spend_price - account.current_price} 💎 yetishmayapti!",
+        #             show_alert=True,
+        #         )
+        #
+        #     return state.START
+
+        # elif query.data == 'gift':
+        #     account, _ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id,
+        #                                                          )
+        #     settings_bot = Settings.objects.filter(is_active=True).last()
+        #     if account.current_price >= settings_bot.spend_price:
+        #         last_spend_price = GiftsSpent.objects.filter(is_active=True).last()
+        #         if last_spend_price:
+        #             fields = Gifts.objects.filter(gifts_spent=last_spend_price)
+        #             update.callback_query.delete_message()
+        #             context.bot.send_message(
+        #                                      chat_id=update.effective_user.id,
+        #                                      text=last_spend_price.text,
+        #                                      parse_mode=ParseMode.HTML,
+        #                                      reply_markup=keyword.spend_fields(fields, account.current_price),
+        #                                      )
+        #             return state.MY_ACCOUNT
+        #         update.callback_query.answer(
+        #             f"Kechirasiz xizmat hali to'liq ishga tushmagan !",
+        #         )
+        #     else:
+        #         update.callback_query.answer(
+        #             f"Bu xizmatdan foydalanish uchun hisobingizda {settings_bot.spend_price - account.current_price} so'm yetishmayapti!",
+        #             show_alert=True,
+        #         )
+        #
+        #     return state.START
 
         elif query.data == 'nik':
             query.delete_message()
             interesting_bonus = InterestingBonus.objects.filter().last()
             _msg_ = f"""
-<b>O'z telegram ismingizga bizning nomimizni qo'ying va {interesting_bonus.fullname} so'm bonus oling.</b>
+<b>O'z telegram ismingizga bizning nomimizni qo'ying va {interesting_bonus.fullname} 💎 bonus oling.</b>
 Ustiga bosib nusxalab olishingiz mumkin
 
 <code>🅿️ PremiumHub</code> 📝
@@ -555,14 +644,14 @@ Ustiga bosib nusxalab olishingiz mumkin
                         'fullname': update.effective_user.full_name,
                     }
                 )
-                top_user.balance += int(bonus_amount)
-                top_user.weekly_earned += int(bonus_amount)
+                top_user.balance += bonus_amount
+                top_user.weekly_earned += bonus_amount
                 top_user.fullname = update.effective_user.full_name
-                top_user.monthly_earned += int(bonus_amount)
+                top_user.monthly_earned += bonus_amount
                 top_user.save()
                 interesting_bonus_user.fullname = True
                 interesting_bonus_user.save()
-                _msg_ = f"""✅ Tabriklaymiz! Siz {bonus_amount} so'm bonus qo'lga kiritdingiz."""
+                _msg_ = f"""✅ Tabriklaymiz! Siz {bonus_amount} 💎 bonus qo'lga kiritdingiz."""
                 context.bot.send_message(
                     chat_id=update.effective_user.id,
                     text=_msg_,
@@ -579,7 +668,7 @@ Ustiga bosib nusxalab olishingiz mumkin
             query.delete_message()
             interesting_bonus = InterestingBonus.objects.filter().last()
             _msg_ = f"""
-<b>O'z telegram BIO ingizga bizning nomimizni qo'ying va {interesting_bonus.bio} so'm bonus oling.</b>
+<b>O'z telegram BIO ingizga bizning nomimizni qo'ying va {interesting_bonus.bio} 💎 bonus oling.</b>
 Ustiga bosib nusxalab olishingiz mumkin
 
 <code>Tg Premium 👇  https://t.me/HubPremiyumBot?start={update.effective_user.id} </code>📝
@@ -608,7 +697,7 @@ Ustiga bosib nusxalab olishingiz mumkin
                 fullname += cus.last_name if cus.last_name else ' - '
                 if top_us.exists():
                     fullname = top_us.first().fullname
-                _msg_ += f"{medal}. {fullname} - {user.current_price} so'm\n"
+                _msg_ += f"{medal}. {fullname} - {user.current_price} 💎\n"
                 counter += 1
             # query.delete_message()
             context.bot.send_message(chat_id=update.effective_user.id,
@@ -626,7 +715,7 @@ Ustiga bosib nusxalab olishingiz mumkin
             }
             for user in top_20_user:
                 medal = top_3.get(str(counter), counter)
-                _msg_ += f"{medal}. {user.fullname} - {user.monthly_earned} so'm\n"
+                _msg_ += f"{medal}. {user.fullname} - {user.monthly_earned} 💎\n"
                 counter += 1
             # query.delete_message()
             context.bot.send_message(chat_id=update.effective_user.id,
@@ -665,14 +754,14 @@ Ustiga bosib nusxalab olishingiz mumkin
                         'fullname': update.effective_user.full_name,
                     }
                 )
-                top_user.balance += int(bonus_amount)
-                top_user.weekly_earned += int(bonus_amount)
+                top_user.balance += bonus_amount
+                top_user.weekly_earned += bonus_amount
                 top_user.fullname = update.effective_user.full_name
-                top_user.monthly_earned += int(bonus_amount)
+                top_user.monthly_earned += bonus_amount
                 top_user.save()
                 interesting_bonus_user.bio = True
                 interesting_bonus_user.save()
-                _msg_ = f"""✅ Tabriklaymiz! Siz {bonus_amount} so'm bonus qo'lga kiritdingiz."""
+                _msg_ = f"""✅ Tabriklaymiz! Siz {bonus_amount} 💎 bonus qo'lga kiritdingiz."""
                 context.bot.send_message(
                     chat_id=update.effective_user.id,
                     text=_msg_,
@@ -705,7 +794,7 @@ Ustiga bosib nusxalab olishingiz mumkin
                 return state.CHANNEL_BOOST_BONUS
         elif query.data == 'stories_bonus':
             story_bonus_price = StoryBonusPrice.objects.filter(is_active=True).last()
-            _msg_ = f"<b>👇Pastdaki WEBAPP dan foydalanib storiesingizga video joylang va {story_bonus_price.price} so'm bonus oling.</b>\n\n<code>Eslatib o'tamiz admin tomonidan tekshirilgach vazifa bajarilmagan xolatda akkountingiz BLOK qilinadi va botdan foydalanishingiz taqiqlanadi ❗️</code>"
+            _msg_ = f"<b>👇Pastdaki WEBAPP dan foydalanib storiesingizga video joylang va {story_bonus_price.price} 💎 bonus oling.</b>\n\n<code>Eslatib o'tamiz admin tomonidan tekshirilgach vazifa bajarilmagan xolatda akkountingiz BLOK qilinadi va botdan foydalanishingiz taqiqlanadi ❗️</code>"
             query.delete_message()
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=_msg_,
@@ -758,7 +847,7 @@ Ustiga bosib nusxalab olishingiz mumkin
                                                  parse_mode=ParseMode.HTML,
                                                  )
                     else:
-                        plus_balance = int(last_group.price) * invited_c.count()
+                        plus_balance = last_group.price * invited_c.count()
                         user_account.current_price += plus_balance
                         user_account.total_price += plus_balance
                         invited_c.update(is_active=True)
@@ -779,7 +868,7 @@ Ustiga bosib nusxalab olishingiz mumkin
                         invited_bonus_user.save()
                         context.bot.send_message(chat_id=update.effective_user.id,
                                                  text="<b>🎉 Tabriklaymiz!</b>\n\n"
-                                                      f"Siz guruhga yangi a'zolarni muvaffaqiyatli qo‘shdingiz va buning evaziga {plus_balance} so'mga ega bo‘ldingiz! 🔥\n\n"
+                                                      f"Siz guruhga yangi a'zolarni muvaffaqiyatli qo‘shdingiz va buning evaziga {plus_balance} 💎 ga ega bo‘ldingiz! 🔥\n\n"
                                                       "Doimiy ishtirok eting va yanada ko‘proq odamlarni qo‘shing — keyingi bonuslar sizni kutmoqda! 💰\n"
                                                       "Har bir faol harakatingiz uchun sizni mukofotlar bilan rag‘batlantiramiz! 🏆",
                                                  parse_mode="HTML"
@@ -821,14 +910,14 @@ Ustiga bosib nusxalab olishingiz mumkin
                 if not a:
                     top_user.fullname = update.effective_user.full_name
                     top_user.save()
-                top_user.balance += int(story_db.price)
-                top_user.weekly_earned += int(story_db.price)
+                top_user.balance += story_db.price
+                top_user.weekly_earned += story_db.price
                 top_user.fullname = update.effective_user.full_name
-                top_user.monthly_earned += int(story_db.price)
+                top_user.monthly_earned += story_db.price
                 top_user.save()
                 StoryBonusAccounts.objects.create(chat_id=update.effective_user.id)
                 context.bot.send_message(chat_id=update.effective_user.id,
-                                         text=f"🎉 Tabriklaymiz sizga {story_db.price} so'm kanalimizga ovoz berganingiz uchun bonus berildi.",
+                                         text=f"🎉 Tabriklaymiz sizga {story_db.price} 💎 kanalimizga ovoz berganingiz uchun bonus berildi.",
                                          # reply_markup=keyword.bonus()
                                          )
             else:
@@ -861,7 +950,7 @@ Ustiga bosib nusxalab olishingiz mumkin
                 if daily_bonus.last_bonus != datetime.today().date() and boost_count > 0:
                     daily_bonus.last_bonus = datetime.today().date()
                     daily_bonus.save()
-                    price = int(reward_db.daily_bonus) * boost_count
+                    price = reward_db.daily_bonus * boost_count
                     custom_account, __ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id)
                     custom_account.current_price += price
                     custom_account.total_price += price
@@ -878,7 +967,7 @@ Ustiga bosib nusxalab olishingiz mumkin
                     top_user.monthly_earned += price
                     top_user.save()
                     context.bot.send_message(chat_id=update.effective_user.id,
-                                             text=f"🎉 Tabriklaymiz sizga {price} so'm kunlik bonus berildi.",
+                                             text=f"🎉 Tabriklaymiz sizga {price} 💎 kunlik bonus berildi.",
                                              reply_markup=keyword.base()
                                              )
                 else:
@@ -904,7 +993,7 @@ Ustiga bosib nusxalab olishingiz mumkin
             <b>🎉 Siz ushbu taklifdan foydalana olasiz!</b>
 
             Promokod olish tugmasini bosing,
-            hisobingizdan {spend_field.price} so'm yechiladi va
+            hisobingizdan {spend_field.price} 💎 yechiladi va
             sizga promokod beriladi.
             """,
                     parse_mode=ParseMode.HTML,
@@ -915,9 +1004,9 @@ Ustiga bosib nusxalab olishingiz mumkin
                 if spend_field.price >= account.current_price:
                     context.bot.send_message(chat_id=update.effective_user.id,
                                              text=f"""
-            <b>❌ Afsuski sizning hisobingizda {account.current_price} so'm bor.
+            <b>❌ Afsuski sizning hisobingizda {account.current_price} 💎 bor.
 
-            Ush bu taklifdan foydalanish uchun sizga yana {spend_field.price - account.current_price} so'm yetishmayapti!
+            Ush bu taklifdan foydalanish uchun sizga yana {spend_field.price - account.current_price} 💎 yetishmayapti!
 
             Agarda ushbu taklifdan foydalanmoqchi bo'lsangiz admin bilan bog'laning, karta raqamga pul o'tkazing va taklifdan bemalol foydalanishingiz mumkin.
 

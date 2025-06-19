@@ -20,7 +20,7 @@ def new_member_handler(update, context):
     if message.new_chat_members:
         added_users = message.new_chat_members
         inviter = message.from_user
-        print(inviter)
+        # print(inviter)
         last_group = Group.objects.filter(is_active=True).last()
 
         for new_user in added_users:

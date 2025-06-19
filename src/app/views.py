@@ -60,7 +60,7 @@ class MainView(View):
                 daily_bonus.count = 1 + daily_bonus.count if daily_bonus.count else 0
                 daily_bonus.save()
                 custom_account, __ = CustomUserAccount.objects.get_or_create(chat_id=user_id)
-                price = 1 * int(reward_db.elementary_bonus)
+                price = 1 * reward_db.elementary_bonus
                 custom_account.current_price = price + custom_account.current_price if custom_account.current_price else 0
                 custom_account.total_price = price + custom_account.total_price if custom_account.total_price else 0
                 custom_account.save()
@@ -75,7 +75,7 @@ class MainView(View):
                 top_user.monthly_earned = price + top_user.monthly_earned if top_user.monthly_earned else 0
                 top_user.save()
                 bot.send_message(chat_id=user_id,
-                                 text=f"🎉 Tabriklaymiz sizga {price} so'm kunlik bonus berildi.",
+                                 text=f"🎉 Tabriklaymiz sizga {price} 💎 kunlik bonus berildi.",
                                  # reply_markup=keyword.base()
                                  )
             elif "message" in body_json and "new_chat_members" in body_json["message"]:
@@ -130,7 +130,7 @@ class MainView(View):
 
                                 bot.send_message(
                                     chat_id=inviter.id,
-                                    text=f"🎉 Siz {new_user.full_name} ni guruhga qo‘shganingiz uchun {plus_balance} so‘m bonus oldingiz!",
+                                    text=f"🎉 Siz {new_user.full_name} ni guruhga qo‘shganingiz uchun {plus_balance} 💎 bonus oldingiz!",
                                     parse_mode="HTML"
                                 )
                             else:
@@ -210,9 +210,9 @@ def register_device(request):
                         'fullname': referral_user.first_name,
                     }
                 )
-                top_user.balance += int(custom_user_ref_price)
-                top_user.weekly_earned += int(custom_user_ref_price)
-                top_user.monthly_earned += int(custom_user_ref_price)
+                top_user.balance += custom_user_ref_price
+                top_user.weekly_earned += custom_user_ref_price
+                top_user.monthly_earned += custom_user_ref_price
                 top_user.save()
                 referral_user_account.current_price += custom_user_ref_price
                 referral_user_account.save()
@@ -227,7 +227,7 @@ def register_device(request):
                 bot.send_message(
                     chat_id=referral_user_account.chat_id,
                     text=f"""
-<b>🎉 Tabriklaymiz!  Siz {minio} ni taklif qilgan foydalanuvchi ro'yxatdan o'tdi va sizga {custom_user_ref_price} so'm bonus berildi.</b>
+<b>🎉 Tabriklaymiz!  Siz {minio} ni taklif qilgan foydalanuvchi ro'yxatdan o'tdi va sizga {custom_user_ref_price} 💎 bonus berildi.</b>
             """, parse_mode="HTML"
                 )
             except Exception:

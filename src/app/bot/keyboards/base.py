@@ -5,6 +5,7 @@ from app.models import Channel
 from ..messages.main import KeyboardText
 import requests
 from urllib.parse import quote
+
 msg = KeyboardText()
 
 
@@ -258,20 +259,36 @@ class Keyboards:
     def my_account():
         return InlineKeyboardMarkup([
             [InlineKeyboardButton(
-                "Premium vs stars uchun sarflash",
+                "🌟 Premium va stars uchun sarflash",
                 callback_data='spend'
-            )]
+            )],
+            # [InlineKeyboardButton(
+            #     "🎁 Premium & 💝 Giftlar",
+            #     callback_data='gift'
+            # )],
         ])
 
     @staticmethod
     def spend_fields(fields, current_price):
         result = list()
-        for field in fields:
-            icon = "✅ " if current_price >= field.price else " ❌"
-            result.append([InlineKeyboardButton(
-                field.name + ' - ' + str(field.price)[:-3] + icon,
+        field = fields[0]
+        icon = "💎"
+        result.append([InlineKeyboardButton(
+            field.name.replace('.00', '') + ' - ' + str(field.price)[:-3] + icon,
+            callback_data=str(field.id)
+        )])
+        helper = list()
+        for field in fields[1:]:
+            # icon = "💎 ✅ " if current_price >= field.price else "💎 ❌"
+            helper.append(InlineKeyboardButton(
+                field.name.replace('.00', '') + ' - ' + str(field.price)[:-3] + icon,
                 callback_data=str(field.id)
-            )])
+            ))
+            if len(helper) == 2:
+                result.append(helper)
+                helper = list()
+        if helper:
+            result.append(helper)
         result.append([InlineKeyboardButton(
             "⬅️ Orqaga",
             callback_data='back'

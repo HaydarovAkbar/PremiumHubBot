@@ -36,12 +36,13 @@ def get_rating_base(update: Update, context: CallbackContext):
         _msg = """<b>🎉 Top Reytinglar</b>
 
 Haftalik va oylik konkurslarda qatnashing <b>Telegram Premium va Telegram stars⭐️</b> yutib oling.🎁"""
-        update.message.reply_html(
-            _msg,
+        update.message.reply_photo(
+            photo=msg.top_id,
+            parse_mode=ParseMode.HTML,
+            caption=_msg,
             reply_markup=keyword.rating(),
         )
         return state.RATING
-
 
 # def get_rating_type(update: Update, context: CallbackContext):
 #     all_channel = Channel.objects.filter(is_active=True)
