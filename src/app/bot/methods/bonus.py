@@ -72,14 +72,27 @@ def get_bonus_base(update: Update, context: CallbackContext):
 🔹 Ko‘rsatilgan vazifalarni to‘liq bajaring.
 🔹 Hammasini to‘g‘ri amalga oshirganingizdan so‘ng bonuslarni qo‘lga kiriting!
         """
+        photo_id= 'AgACAgIAAxkBAAI4lGhT2UmTBZEJ7Jy5KXcmQsq-oes-AAKe8DEbAT-hSgtb12QkY0ADAQADAgADeQADNgQ'
+        # requests.post(
+        #     f"https://api.telegram.org/bot{settings.TOKEN}/sendMessage",
+        #     json={
+        #         "chat_id": user_db.chat_id,
+        #         "text": str(msg),
+        #         "parse_mode": "HTML",
+        #         "reply_markup": keyword.bonus().to_dict(),
+        #         'message_effect_id': "5046509860389126442",  # 5104841245755180586 5046509860389126442
+        #     }
+        # )
+
         requests.post(
-            f"https://api.telegram.org/bot{settings.TOKEN}/sendMessage",
+            f"https://api.telegram.org/bot{settings.TOKEN}/sendPhoto",
             json={
                 "chat_id": user_db.chat_id,
-                "text": str(msg),
+                "photo": photo_id,
+                "caption": msg,
                 "parse_mode": "HTML",
                 "reply_markup": keyword.bonus().to_dict(),
-                'message_effect_id': "5046509860389126442",  # 5104841245755180586 5046509860389126442
+                "message_effect_id": "5046509860389126442",
             }
         )
         return state.BONUS
