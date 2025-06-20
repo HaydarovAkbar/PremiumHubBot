@@ -988,8 +988,9 @@ Ustiga bosib nusxalab olishingiz mumkin
                                                          ).count()
             if account.current_price >= spend_field.price and bot_setting.promo_limit > user_promo_count:
                 context.chat_data['promo_code'] = query.data
-                query.edit_message_text(
-                    f"""
+                query.delete_message()
+                context.bot.send_message(chat_id=update.effective_user.id,
+                                         text=f"""
             <b>🎉 Siz ushbu taklifdan foydalana olasiz!</b>
 
             Promokod olish tugmasini bosing,

@@ -40,7 +40,7 @@ def get_interesting_bonus_base(update: Update, context: CallbackContext):
             query.delete_message()
             interesting_bonus = InterestingBonus.objects.filter().last()
             _msg_ = f"""
-<b>O'z telegram ismingizga bizning nomimizni qo'ying va {interesting_bonus.fullname} so'm bonus oling.</b>
+<b>O'z telegram ismingizga bizning nomimizni qo'ying va {interesting_bonus.fullname} 💎 bonus oling.</b>
 <i>Ustiga bosib nusxalab olishingiz mumkin</i>
                     
 <code>🅿️ PremiumHub</code> 📝
@@ -54,7 +54,7 @@ def get_interesting_bonus_base(update: Update, context: CallbackContext):
             query.delete_message()
             interesting_bonus = InterestingBonus.objects.filter().last()
             _msg_ = f"""
-<b>O'z telegram BIO ingizga bizning nomimizni qo'ying va {interesting_bonus.bio} so'm bonus oling.</b>
+<b>O'z telegram BIO ingizga bizning nomimizni qo'ying va {interesting_bonus.bio} 💎 bonus oling.</b>
 <i>Ustiga bosib nusxalab olishingiz mumkin</i>
 
 <code>Telegram Premium 👇  https://t.me/HubPremiyumBot?start={update.effective_user.id}</code> 📝
