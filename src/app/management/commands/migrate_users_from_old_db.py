@@ -128,10 +128,10 @@ class Command(BaseCommand):
         top_users = TopUser.objects.all()
 
         for user in top_users:
-            user.balance = user.balance // 100
+            user.balance = user.balance // 10
             # user.total_earned = user.total_earned // 100
-            user.weekly_earned = user.weekly_earned // 100
-            user.monthly_earned = user.monthly_earned // 100
+            user.weekly_earned = user.weekly_earned // 10
+            user.monthly_earned = user.monthly_earned // 10
 
         TopUser.objects.bulk_update(top_users, ['balance', 'total_earned', 'weekly_earned', 'monthly_earned'])
         self.stdout.write(self.style.SUCCESS("TopUser balances updated."))
@@ -140,8 +140,8 @@ class Command(BaseCommand):
         accounts = CustomUserAccount.objects.all()
 
         for account in accounts:
-            account.total_price = account.total_price / 100
-            account.current_price = account.current_price / 100
+            account.total_price = account.total_price / 10
+            account.current_price = account.current_price / 10
 
         CustomUserAccount.objects.bulk_update(accounts, ['total_price', 'current_price'])
         self.stdout.write(self.style.SUCCESS("CustomUserAccount prices updated."))

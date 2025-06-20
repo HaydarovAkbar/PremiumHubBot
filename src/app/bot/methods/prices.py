@@ -18,14 +18,14 @@ def prem_message_generate(prices: Prices):
     msg = f"""
 <b>Profilga kirish orqali 👇</b>
 
-▪️ 1 oylik obuna — {number_format(prices.with_profile_1)} 💎
-▪️ 12 oylik obuna -  {number_format(prices.with_profile_12)} 💎
+▪️ 1 oylik obuna — {number_format(prices.with_profile_1)} so'm
+▪️ 12 oylik obuna -  {number_format(prices.with_profile_12)} so'm
  
 <b>Profilga kirmasdan Gift sifatida xam olib beriladi 👇</b>
  
-▪️ 3 oylik obuna -  {number_format(prices.with_gift_3)} 💎
-▪️ 6 oylik obuna -  {number_format(prices.with_gift_6)} 💎
-▪️ 12 oylik obuna -  {number_format(prices.with_gift_12)} 💎
+▪️ 3 oylik obuna -  {number_format(prices.with_gift_3)} so'm
+▪️ 6 oylik obuna -  {number_format(prices.with_gift_6)} so'm
+▪️ 12 oylik obuna -  {number_format(prices.with_gift_12)} so'm
  
 <pre>💠 Qadrdonlaringizga hadya qilishingiz ham mumkin.</pre>
 """
@@ -39,10 +39,10 @@ def star_message_generate(prices: StarsPrices):
     msg = f"""
 <b>Ishonchli va hamyonbop narxda, 100% kafolatli Telegram Stars 🤩</b>
 <i>
-⭐️ 50 Stars — {number_format(prices.price_50)} 💎 
-⭐️ 75 Stars — {number_format(prices.price_75)} 💎 
-⭐️ 100 Stars — {number_format(prices.price_100)} 💎 
-⭐️ 150 Stars — {number_format(prices.price_150)} 💎
+⭐️ 50 Stars — {number_format(prices.price_50)} so'm 
+⭐️ 75 Stars — {number_format(prices.price_75)} so'm 
+⭐️ 100 Stars — {number_format(prices.price_100)} so'm 
+⭐️ 150 Stars — {number_format(prices.price_150)} so'm
 
 Qolganlari admin bilan kelishikgan holda</i>
 
