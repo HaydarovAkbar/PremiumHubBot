@@ -1003,25 +1003,22 @@ Ustiga bosib nusxalab olishingiz mumkin
                 return state.GET_PROMO_CODE
             else:
                 if spend_field.price >= account.current_price:
-                    context.bot.send_message(chat_id=update.effective_user.id,
-                                             text=f"""
-            <b>❌ Afsuski sizning hisobingizda {account.current_price} 💎 bor.
-
-            Ush bu taklifdan foydalanish uchun sizga yana {spend_field.price - account.current_price} 💎 yetishmayapti!
-
-            Agarda ushbu taklifdan foydalanmoqchi bo'lsangiz admin bilan bog'laning, karta raqamga pul o'tkazing va taklifdan bemalol foydalanishingiz mumkin.
-
-            ADMIN: @Hup_Support </b>
-            """, parse_mode=ParseMode.HTML, )
-                #         query.answer(
-                #             text=f"""
-                #  <b>❌ Afsuski sizning hisobingizda {account.current_price} so'm bor.
-                #
-                #  Ush bu taklifdan foydalanish uchun sizga yana {spend_field.price - account.current_price} so'm yetishmayapti!
-                #
-                #  Agarda ushbu taklifdan foydalanmoqchi bo'lsangiz admin bilan bog'laning, karta raqamga pul o'tkazing va taklifdan bemalol foydalanishingiz mumkin.
-                #  """
-                #         )
+            #         _msg = f"""
+            # <b>❌ Afsuski sizning hisobingizda {account.current_price} 💎 bor.
+            #
+            # Ush bu taklifdan foydalanish uchun sizga yana {spend_field.price - account.current_price} 💎 yetishmayapti!
+            #
+            # Agarda ushbu taklifdan foydalanmoqchi bo'lsangiz admin bilan bog'laning, karta raqamga pul o'tkazing va taklifdan bemalol foydalanishingiz mumkin.
+            #
+            # ADMIN: @Hup_Support </b>
+            # """
+            #         context.bot.send_message(chat_id=update.effective_user.id,
+            #                                  text=_msg, parse_mode=ParseMode.HTML, )
+                    query.answer(
+                            f"""
+                 Ush bu taklifdan foydalanish uchun sizga yana {spend_field.price - account.current_price} 💎 yetishmayapti!
+                 """, show_alert=True
+                        )
                 else:
                     # context.bot.send_message(chat_id=update.effective_user.id,
                     #                          text=f"""
