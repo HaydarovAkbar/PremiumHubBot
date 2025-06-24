@@ -1,6 +1,6 @@
 from decouple import TRUE_VALUES
 from django.db.models.functions import Replace
-
+from decimal import Decimal
 from .. import keyboards
 from ..tasks import send_advert_to_all
 import requests
@@ -645,8 +645,8 @@ def get_balance(update: Update, context: CallbackContext):
     get_price = update.message.text
     user_profile = CustomUser.objects.get(chat_id=context.chat_data['chat_id'])
     user_account = CustomUserAccount.objects.get(chat_id=context.chat_data['chat_id'])
-    if user_account.current_price >= float(get_price):
-        user_account.current_price -= float(get_price)
+    if user_account.current_price >= Decimal(get_price):
+        user_account.current_price -= Decimal(get_price)
         user_account.save()
         try:
             fullname = user_profile.first_name if user_profile.first_name else '-' + " " + user_profile.last_name if user_profile.last_name else '-'
@@ -682,8 +682,8 @@ def get_balance(update: Update, context: CallbackContext):
 def push_balance(update: Update, context: CallbackContext):
     get_price = update.message.text
     user_account = CustomUserAccount.objects.get(chat_id=context.chat_data['chat_id'])
-    user_account.current_price += float(get_price)
-    user_account.total_price += float(get_price)
+    user_account.current_price += Decimal(get_price)
+    user_account.total_price += Decimal(get_price)
     user_account.save()
     top_user, a = TopUser.objects.get_or_create(
         chat_id=update.effective_user.id,
@@ -691,8 +691,8 @@ def push_balance(update: Update, context: CallbackContext):
             'fullname': update.effective_user.full_name,
         }
     )
-    top_user.balance += float(get_price)
-    top_user.weekly_earned += float(get_price)
+    top_user.balance += Decimal(get_price)
+    top_user.weekly_earned += Decimal(get_price)
     # top_user.monthly_earned += int(get_price)
     top_user.save()
     user_profile = CustomUser.objects.get(chat_id=context.chat_data['chat_id'])
