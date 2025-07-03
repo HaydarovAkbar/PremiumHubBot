@@ -4,22 +4,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 
-# class CustomUserManager(BaseUserManager):
-#     def create_user(self, username, email, password=None):
-#         if not email:
-#             raise ValueError('The Email field must be set')
-#         user = self.model(username=username, email=email)
-#         user.set_password(password)
-#         user.save(using=self._db)
-#         return user
-#
-#     def create_superuser(self, username, email, password=None):
-#         user = self.create_user(username, email, password)
-#         user.is_staff = True
-#         user.is_superuser = True
-#         user.save(using=self._db)
-#         return user
-
 
 class CustomUser(models.Model):
     chat_id = models.BigIntegerField(db_index=True, unique=True)
