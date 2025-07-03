@@ -147,21 +147,6 @@ def get_contact(update: Update, context: CallbackContext):
         user.phone_number = update.message.contact.phone_number
         user.save()
         if not user.is_active:
-#             payload = context.chat_data.get('payload', 0)
-#             if payload:
-#                 try:
-#                     payload = int(payload)
-#                     user = update.effective_user
-#                     mention = f"<a href='tg://user?id={user.id}'>{user.full_name}</a>"
-#                     context.bot.send_message(chat_id=payload,
-#                                              text=f"""
-# 👏 Tabriklaymiz! Siz {mention}ni botga taklif qildingiz!
-#
-# <i>Do'stingiz ro'yxatdan o'tganidan keyin, biz sizga referal puli taqdim etamiz!</i>""",
-#                                              parse_mode=ParseMode.HTML
-#                                              )
-#                 except CustomUser.DoesNotExist:
-#                     payload = None
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text="""🔁Botimiz yangilangani va xavfsizlikni oshirish munosabati bilan quyidagi havola orqali ro’yxatdan o’ting va botni ishlatishda davom eting""",
                                      parse_mode='HTML',

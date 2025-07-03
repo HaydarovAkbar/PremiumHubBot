@@ -371,6 +371,15 @@ class Keyboards:
         ])
 
     @staticmethod
+    def adm_url2(url, stat_url):
+        return InlineKeyboardMarkup([
+            [InlineKeyboardButton(
+                "WEB 🌐",
+                url=url
+            )]
+        ])
+
+    @staticmethod
     def adm_user_profile():
         return InlineKeyboardMarkup([
             [InlineKeyboardButton("BANLASH", callback_data='is_ban'),

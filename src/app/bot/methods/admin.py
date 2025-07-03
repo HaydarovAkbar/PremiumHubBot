@@ -1,7 +1,4 @@
-from decouple import TRUE_VALUES
-from django.db.models.functions import Replace
 from decimal import Decimal
-from .. import keyboards
 from ..tasks import send_advert_to_all
 import requests
 from django.conf import settings
@@ -13,12 +10,10 @@ from ..keyboards.base import Keyboards
 from ..states import States
 from ..messages.main import MessageText
 import re
-from telegram import MessageEntity
-from html import escape as html_escape
+
 from celery.result import AsyncResult
 from core.celery import app
 import redis
-from ...models import InterestingBonus
 
 keyword = Keyboards()
 state = States()
@@ -37,10 +32,16 @@ def admin_base(update: Update, context: CallbackContext):
         )
         adm_url = f"{settings.HOST}/admin/"
         stat_url = f"{settings.HOST}/stats/"
-        update.message.reply_html(
-            "<b>Web adminkaga o'tish</b> \n\n/start - Bosh sahifasi\n/admin - Admin sahifasi\n/promo - Promo kod haqida ma'lumot olish (/promo xSfdXdf)\n/promocodes - Promo kodlar\n/stories - Bonus bajarganlar",
-            reply_markup=keyword.adm_url(adm_url, stat_url),
-        )
+        if update.effective_chat.id == 749750897: # Akbar's chat_id or update.effective_chat.id == 758934089
+            update.message.reply_html(
+                "<b>Web adminkaga o'tish</b> \n\n/start - Bosh sahifasi\n/admin - Admin sahifasi\n/promo - Promo kod haqida ma'lumot olish (/promo xSfdXdf)\n/promocodes - Promo kodlar\n/stories - Bonus bajarganlar",
+                reply_markup=keyword.adm_url(adm_url, stat_url),
+            )
+        else:
+            update.message.reply_html(
+                "<b>Web adminkaga o'tish</b> \n\n/start - Bosh sahifasi\n/admin - Admin sahifasi\n/promo - Promo kod haqida ma'lumot olish (/promo xSfdXdf)\n/promocodes - Promo kodlar\n/stories - Bonus bajarganlar",
+                reply_markup=keyword.adm_url2(adm_url, stat_url),
+            )
         return state.ADMIN
 
 
@@ -111,95 +112,6 @@ def parse_button(update: Update, context: CallbackContext):
         return state.ADS_BUTTON
 
 
-# def received_advert(update: Update, context: CallbackContext):
-#     message = update.message
-#     chat_id = update.effective_chat.id
-#     button_data = context.chat_data.get('buttons')
-#     method = detect_message_method(message)
-#
-#     if message.text:
-#         ads_text = message.text
-#     else:
-#         update.message.reply_text("⚠️ Faqat matnli reklama yuboring.")
-#         return state.ADS_BUTTON
-#
-#     task = send_advert_to_all.delay(
-#         chat_id=chat_id,
-#         method=method,
-#         message_id=message.message_id,
-#         button_data=button_data,
-#         ads_text=ads_text
-#     )
-#
-#     context.bot_data[f'task_{message.message_id}'] = task.id
-#     message.reply_html(f"✅ Reklama fon rejimida yuborilmoqda. 🆔 <code>{task.id}</code>")
-#     return state.ADS_BUTTON
-# def received_advert(update: Update, context: CallbackContext):
-#     message = update.message
-#     chat_id = update.effective_chat.id
-#     button_data = context.chat_data.get('buttons')
-#     method = detect_message_method(message)
-#
-#     # 🔒 Saqlab qo‘yamiz keyin delay uchun
-#     context.chat_data['ads_text'] = message.text
-#     context.chat_data['method'] = method
-#     context.chat_data['message_id'] = message.message_id
-#     context.chat_data['buttons'] = button_data
-#
-#     # 1. Info xabar
-#     context.bot.send_message(
-#         chat_id=chat_id,
-#         text="📢 <b>Reklama xabaringiz quyidagicha ko‘rinadi:</b>",
-#         parse_mode="HTML"
-#     )
-#
-#     # 2. Tugmalarni build qilish
-#     reply_markup = None
-#     if button_data:
-#         reply_markup = InlineKeyboardMarkup(
-#             [[InlineKeyboardButton(btn['text'], url=btn['url'])] for btn in button_data]
-#         )
-#
-#     # 3. Reklama preview ni yuborish (send / forward / copy)
-#     if method == 'sendMessage':
-#         context.bot.send_message(
-#             chat_id=chat_id,
-#             text=message.text,
-#             entities=[e.to_dict() for e in message.entities] if message.entities else None,
-#             reply_markup=reply_markup
-#         )
-#
-#     elif method == 'forwardMessage':
-#         context.bot.forward_message(
-#             chat_id=chat_id,
-#             from_chat_id=message.chat_id,
-#             message_id=message.message_id
-#         )
-#
-#     elif method == 'copyMessage':
-#         context.bot.copy_message(
-#             chat_id=chat_id,
-#             from_chat_id=message.chat_id,
-#             message_id=message.message_id,
-#             reply_markup=reply_markup
-#         )
-#
-#     # 4. Tasdiqlash/Bekor qilish tugmalari
-#     confirm_markup = InlineKeyboardMarkup([
-#         [
-#             InlineKeyboardButton("✅ Tasdiqlash", callback_data="confirm_ad"),
-#             InlineKeyboardButton("❌ Bekor qilish", callback_data="cancel_ad")
-#         ]
-#     ])
-#
-#     context.bot.send_message(
-#         chat_id=chat_id,
-#         text="Tasdiqlaysizmi?",
-#         reply_markup=confirm_markup
-#     )
-#
-#     return state.ADS_BUTTON
-
 def received_advert(update: Update, context: CallbackContext):
     message = update.message
     chat_id = update.effective_chat.id
@@ -218,21 +130,6 @@ def received_advert(update: Update, context: CallbackContext):
         text="📢 <b>Reklama xabaringiz quyidagicha ko‘rinadi:</b>",
         parse_mode="HTML"
     )
-
-    # 2. Xabarni preview qilish — xuddi `requests.post()` dagi uslubda
-    payload = {}
-
-    # if method == 'sendMessage':
-    #     payload = {
-    #         "chat_id": chat_id,
-    #         "text": message.text,
-    #         "parse_mode": "HTML"
-    #     }
-    #     if button_data:
-    #         payload["reply_markup"] = {
-    #             "inline_keyboard": [[{"text": b["text"], "url": b["url"]}] for b in button_data]
-    #         }
-    #     requests.post(f"{API_URL}sendMessage", json=payload)
 
     if method == 'forwardMessage':
         requests.post(f"{API_URL}forwardMessage", json={
@@ -392,11 +289,6 @@ def confirm_kill_task(update, context):
                 update.message.reply_html("🧹 Redis task metadata ham tozalandi.")
             else:
                 update.message.reply_html("⚠️ Redis’da task metadata topilmadi yoki allaqachon o‘chirilgan.")
-            # update.message.reply_html(
-            #     "Tasdiqlash tugmasini bosing ✅",
-            #     reply_markup=keyword.confirm(),
-            # )
-            # return state.CONFIRM
         else:
             update.message.reply_html("ℹ️ Bu task allaqachon yakunlangan yoki to‘xtatilgan.")
 
@@ -419,48 +311,6 @@ def get_user(update, context):
 
     is_chat_id = re.fullmatch(r"\d{6,15}", user_msg)
 
-    # if is_phone:
-    #     update.message.reply_text(f"📱 Siz telefon raqam kiritdingiz: {user_msg}")
-    #     custom_user = CustomUser.objects.filter(phone_number=user_msg)
-    #     if custom_user:
-    #         user_db = custom_user.first()
-    #         full_name = f"{user_db.first_name} {user_db.last_name}"  # yoki update.effective_chat.full_name
-    #
-    #         msg = (
-    #             f"🔍 Foydalanuvchi topildi!\n\n"
-    #             f"👤 Foydalanuvchi: <a href='tg://user?id={user_db.chat_id}'>{full_name}</a>\n"
-    #             f"🆔 Chat ID: <code>{user_db.chat_id}</code>\n"
-    #             f"📲 Telefon nomer: +{user_db.phone_number}\n"
-    #         )
-    #
-    #         update.message.reply_html(msg)
-    #     else:
-    #         update.message.reply_text(
-    #             "🚯 Siz kiritgan telefon nomer orqali bazada foydalanuvchi topilmadi")
-    #         return state.USER_ID
-    # elif is_chat_id:
-    #     update.message.reply_text(f"🆔 Siz Telegram chat ID kiritdingiz: {user_msg}")
-    #     custom_user = CustomUser.objects.filter(chat_id=user_msg)
-    #
-    #     if custom_user:
-    #         user_db = custom_user.first()
-    #         full_name = f"{user_db.first_name} {user_db.last_name}"  # yoki update.effective_chat.full_name
-    #
-    #         msg = (
-    #             f"🔍 Foydalanuvchi topildi!\n\n"
-    #             f"👤 Foydalanuvchi: <a href='tg://user?id={user_db.chat_id}'>{full_name}</a>\n"
-    #             f"🆔 Chat ID: <code>{user_db.chat_id}</code>\n"
-    #             f"📲 Telefon nomer: +{user_db.phone_number}\n"
-    #         )
-    #         update.message.reply_html(msg)
-    #     else:
-    #         update.message.reply_text(
-    #             "🚯 Siz kiritgan TELEGRAM ID orqali bazada foydalanuvchi topilmadi")
-    #         return state.USER_ID
-    # else:
-    #     update.message.reply_text(
-    #         "❌ Noto‘g‘ri format. Iltimos, faqat 998 bilan boshlanuvchi telefon raqam yoki chat ID kiriting.")
-    #     return state.USER_ID
     if is_phone:
         update.message.reply_text(f"📱 Siz telefon raqam kiritdingiz: {user_msg}")
         custom_user = CustomUser.objects.filter(phone_number=user_msg)
@@ -693,7 +543,6 @@ def push_balance(update: Update, context: CallbackContext):
     )
     top_user.balance += Decimal(get_price)
     top_user.weekly_earned += Decimal(get_price)
-    # top_user.monthly_earned += int(get_price)
     top_user.save()
     user_profile = CustomUser.objects.get(chat_id=context.chat_data['chat_id'])
     try:
@@ -741,7 +590,7 @@ def send_msg(update: Update, context: CallbackContext):
 def get_all_stories(update: Update, context: CallbackContext):
     admins = CustomUser.objects.filter(is_admin=True, chat_id=update.message.chat_id)
     if admins.exists():
-        promo_codes = StoryBonusAccounts.objects.filter(is_active=True).order_by('created_at')[:100]
+        promo_codes = StoryBonusAccounts.objects.filter(is_active=True).order_by('created_at')[:50]
         if promo_codes.exists():
             msg = f"✅ <b>Oxirgi 100 ta aktiv storieslar</b>\n\n"
             counter = 1
