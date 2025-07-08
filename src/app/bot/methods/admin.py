@@ -32,7 +32,7 @@ def admin_base(update: Update, context: CallbackContext):
         )
         adm_url = f"{settings.HOST}/admin/"
         stat_url = f"{settings.HOST}/stats/"
-        if update.effective_chat.id == 749750897: # Akbar's chat_id or update.effective_chat.id == 758934089
+        if update.effective_chat.id == 749750897:  # Akbar's chat_id or update.effective_chat.id == 758934089
             update.message.reply_html(
                 "<b>Web adminkaga o'tish</b> \n\n/start - Bosh sahifasi\n/admin - Admin sahifasi\n/promo - Promo kod haqida ma'lumot olish (/promo xSfdXdf)\n/promocodes - Promo kodlar\n/stories - Bonus bajarganlar",
                 reply_markup=keyword.adm_url(adm_url, stat_url),
@@ -46,9 +46,9 @@ def admin_base(update: Update, context: CallbackContext):
 
 
 def detect_message_method(message):
-    if message.forward_from or message.forward_sender_name:
+    if message.forward_from or message.forward_sender_name or message.forward_from_chat or message.forward_signature:
         return 'forwardMessage'
-    elif message.reply_markup or message.sticker:
+    elif message.reply_markup or message.sticker or message.video or message.document or message.audio or message.voice or message.animation:
         return 'copyMessage'
     elif message.text and message.entities:
         return 'sendMessage'
@@ -205,8 +205,15 @@ def confirm_or_cancel_ad(update: Update, context: CallbackContext):
             ads_text=ads_text
         )
 
-        query.edit_message_text(
-            f"✅ Reklama yuborilmoqda. 🆔 <code>{task.id}</code>",
+        # query.edit_message_text(
+        #     f"✅ Reklama yuborilmoqda. 🆔 <code>{task.id}</code>",
+        #     parse_mode="HTML",
+        #     reply_markup=keyword.admin_base()
+        # )
+        query.delete_message()
+        context.bot.send_message(
+            chat_id=chat_id,
+            text=f"✅ Reklama yuborilmoqda. 🆔 <code>{task.id}</code>",
             parse_mode="HTML",
             reply_markup=keyword.admin_base()
         )
