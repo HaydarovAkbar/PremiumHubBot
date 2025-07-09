@@ -475,10 +475,16 @@ def user_profile(update: Update, context: CallbackContext):
         )
         return state.PUSH_BALANCE
     elif callback_query.data == "send_msg":
-        callback_query.edit_message_text(
-            "Foydalanuvchiga qanday xabar yubormoqchisiz yuboring!"
-        )
-        return state.SEND_MSG
+        if update.effective_chat.id == 749750897 or update.effective_chat.id == 758934089:  # Akbar's chat_id
+            callback_query.edit_message_text(
+                "Foydalanuvchiga qanday xabar yubormoqchisiz yuboring!"
+            )
+            return state.SEND_MSG
+        else:
+            callback_query.answer(
+                "Sizga bu funksiya taqiqlangan, admin bilan bog'laning!", show_alert=True
+            )
+            return state.ADMIN
     elif callback_query.data == "referral":
         user_referrals = CustomUser.objects.filter(referral=user_db.chat_id)
         if user_referrals.exists():

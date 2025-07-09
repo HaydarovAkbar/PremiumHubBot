@@ -59,8 +59,10 @@ class MainView(View):
                 fullname = f"{custom_user.first_name} {custom_user.last_name}"
                 daily_bonus.count = 1 + daily_bonus.count if daily_bonus.count else 0
                 daily_bonus.save()
+                if daily_bonus.count  > 5:
+                    return HttpResponse('Limit reached, bonus berilmaydi')
                 custom_account, __ = CustomUserAccount.objects.get_or_create(chat_id=user_id)
-                price = 1 * reward_db.elementary_bonus
+                price = reward_db.elementary_bonus
                 custom_account.current_price = price + custom_account.current_price if custom_account.current_price else 0
                 custom_account.total_price = price + custom_account.total_price if custom_account.total_price else 0
                 custom_account.save()
