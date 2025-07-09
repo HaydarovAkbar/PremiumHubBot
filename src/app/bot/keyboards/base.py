@@ -330,6 +330,14 @@ class Keyboards:
         ], resize_keyboard=True)
 
     @staticmethod
+    def admin_base2():
+        return ReplyKeyboardMarkup([
+            # ["💠 Xabar yuborish"],
+            # ["🛑 Xabarni to'xtatish"],
+            ["🔍 Foydalanuvchi qidirish"]
+        ], resize_keyboard=True)
+
+    @staticmethod
     def back():
         return ReplyKeyboardMarkup([
             ["⬅️ Orqaga"]

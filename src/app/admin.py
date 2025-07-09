@@ -73,7 +73,8 @@ class GroupAdmin(admin.ModelAdmin):
 class InvitedUserAdmin(admin.ModelAdmin):
     list_display = ['inviter_chat_id', 'new_user_chat_id', 'created_at']
     list_per_page = 20
-
+    search_fields = ['inviter_chat_id', 'new_user_chat_id']
+    search_help_text = "inviter_chat_id, new_user_chat_id"
 
 class PromoCodesAdmin(admin.ModelAdmin):
     list_display = ['name', 'chat_id', 'created_at', 'reward',
