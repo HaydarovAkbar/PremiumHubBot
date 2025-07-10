@@ -444,22 +444,23 @@ Ustiga bosib nusxalab olishingiz mumkin
                                      )
             return state.STORY_BONUS
         elif query.data == 'add_group_bonus':
-            query.delete_message()
-            group = Group.objects.filter(is_active=True).last()
-            if group:
-                _msg_ = f"""<b>Quyidagi guruhga do'stlaringiz qo'shing va bonusga ega bo'ling: 👇</b>"""
-                context.bot.send_message(chat_id=update.effective_user.id,
-                                         text=_msg_,
-                                         parse_mode="HTML",
-                                         reply_markup=keyword.groups(group)
-                                         )
-                return state.GROUP_BONUS
-            else:
-                context.bot.send_message(chat_id=update.effective_user.id,
-                                         text="👇 Hozircha bonus uchun guruh kiritilmagan!",
-                                         parse_mode="HTML",
-                                         reply_markup=keyword.groups(group)
-                                         )
+            # query.delete_message()
+            # group = Group.objects.filter(is_active=True).last()
+            # if group:
+            #     _msg_ = f"""<b>Quyidagi guruhga do'stlaringiz qo'shing va bonusga ega bo'ling: 👇</b>"""
+            #     context.bot.send_message(chat_id=update.effective_user.id,
+            #                              text=_msg_,
+            #                              parse_mode="HTML",
+            #                              reply_markup=keyword.groups(group)
+            #                              )
+            #     return state.GROUP_BONUS
+            # else:
+            #     context.bot.send_message(chat_id=update.effective_user.id,
+            #                              text="👇 Hozircha bonus uchun guruh kiritilmagan!",
+            #                              parse_mode="HTML",
+            #                              reply_markup=keyword.groups(group)
+            #                              )
+            query.answer("Bu bo'lim vaqtinchalik ishlamayabdi tez orada tuzatiladi", show_alert=True)
         elif query.data == 'group_check':
             query.delete_message()
             last_group = Group.objects.filter(is_active=True).last()

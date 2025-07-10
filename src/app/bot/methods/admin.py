@@ -603,7 +603,7 @@ def send_msg(update: Update, context: CallbackContext):
 def get_all_stories(update: Update, context: CallbackContext):
     admins = CustomUser.objects.filter(is_admin=True, chat_id=update.message.chat_id)
     if admins.exists():
-        promo_codes = StoryBonusAccounts.objects.filter(is_active=True).order_by('created_at')[:50]
+        promo_codes = StoryBonusAccounts.objects.filter(is_active=True).order_by('-created_at')[:50]
         if promo_codes.exists():
             msg = f"✅ <b>Oxirgi 100 ta aktiv storieslar</b>\n\n"
             counter = 1
