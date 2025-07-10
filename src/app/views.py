@@ -112,7 +112,7 @@ class MainView(View):
                             current_invite_count += 1
 
                             if current_invite_count <= last_group.limit:
-                                plus_balance = int(last_group.price)
+                                plus_balance = last_group.price
 
                                 user_acc, _ = CustomUserAccount.objects.get_or_create(chat_id=inviter.id)
                                 user_acc.current_price += plus_balance
@@ -128,7 +128,7 @@ class MainView(View):
                                 top_user.monthly_earned += plus_balance
                                 top_user.save()
 
-                                InvitedBonusUser.objects.get_or_create(chat_id=inviter.id, group=last_group)
+                                # InvitedBonusUser.objects.get_or_create(chat_id=inviter.id, group=last_group)
 
                                 bot.send_message(
                                     chat_id=inviter.id,
@@ -141,7 +141,10 @@ class MainView(View):
                 update: Update = Update.de_json(body_json, bot)
                 dispatcher.process_update(update)
         except Exception as e:
-            print(e)
+            bot.send_message(
+                chat_id=758934089,
+                text=f"🎉 xatolik {e}!",
+            )
         return HttpResponse('POST request')
 
 
