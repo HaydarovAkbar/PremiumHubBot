@@ -3,9 +3,9 @@ class MessageText:
     star_photo_id = 'AgACAgIAAxkBAAESbHZoJuvuDPAyRiReDwOBV1mZg5exzAACbesxG7W5OUlezgnq4SAbPgEAAwIAA3gAAzYE'
     channel_boost_id = 'AgACAgIAAxkBAAESbHtoJuwSLQ1Yxw6AOUS1LekbdgABxMwAAm7rMRu1uTlJNpNuG7vK9ZQBAAMCAAN4AAM2BA'
     manual_video_id = 'BAACAgIAAxkBAAESbH1oJuwsTs_AkrlDBsAiUvCoQpIutgAC8HAAAiTXOUqF5oF6DK9MxTYE'
-    gift_photo_id = 'AgACAgIAAxkBAAI4j2hT2RwwLOEpooXE8zX7iF1EQ-kFAAKc8DEbAT-hSoaqTySH7gJ4AQADAgADeQADNgQ'
-    my_profile_id = 'AgACAgIAAxkBAAI4f2hT0nDUR4gFjTGliRUG-m-MUPZEAAJG8DEbAT-hSo2jfAHP4YsuAQADAgADeQADNgQ'
-    top_id = 'AgACAgIAAxkBAAI4lGhT2UmTBZEJ7Jy5KXcmQsq-oes-AAKe8DEbAT-hSgtb12QkY0ADAQADAgADeQADNgQ'
+    gift_photo_id = 'AgACAgIAAxkBAAEULRJoU-LoXnfBiFDdg0ty9JNP27JIQgACnPAxGwE_oUpaHlzctlRYTQEAAwIAA3kAAzYE'
+    my_profile_id = 'AgACAgIAAxkBAAEULRtoU-MzwQ7beZ0C5efXN1XSRrTo2wACwvIxG3EOoEpa81gpcKOQwgEAAwIAA3kAAzYE'
+    top_id = 'AgACAgIAAxkBAAEULRRoU-MFD7cfnIKEJm2YELu1gi50MAACnvAxGwE_oUpRS_1RGCh28QEAAwIAA3kAAzYE'
 
     BASE_MSG = """
 <b>Assalomu alaykum! PremiumHub botimizga xush kelibsiz!</b>

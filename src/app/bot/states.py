@@ -15,6 +15,7 @@ class States:
     MY_ACCOUNT = 14
     GET_PROMO_CODE = 15
     SEND_PROMO_CODE = 16
+    ADD_CUSTOM_PROMO = 17
 
     # admin states
     ADMIN = 17
@@ -28,3 +29,6 @@ class States:
     GET_BALANCE = 25
     PUSH_BALANCE = 26
     SEND_MSG = 27
+    ADD_PROMO_CODE = 28
+    CHECK_CUSTOM_PROMO_CODE = 29
+    CANCEL_UNBAN = 30

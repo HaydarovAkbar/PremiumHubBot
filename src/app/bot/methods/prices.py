@@ -21,7 +21,7 @@ def prem_message_generate(prices: Prices):
 ▪️ 1 oylik obuna — {number_format(prices.with_profile_1)} so'm
 ▪️ 12 oylik obuna -  {number_format(prices.with_profile_12)} so'm
  
-<b>Profilga kirmasdan Gift sifatida xam olib beriladi 👇</b>
+<b>Profilga kirmasdan Sovg'a (Xadya) sifatida xam olib beriladi 👇</b>
  
 ▪️ 3 oylik obuna -  {number_format(prices.with_gift_3)} so'm
 ▪️ 6 oylik obuna -  {number_format(prices.with_gift_6)} so'm

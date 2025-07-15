@@ -4,6 +4,22 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 
+# class CustomUserManager(BaseUserManager):
+#     def create_user(self, username, email, password=None):
+#         if not email:
+#             raise ValueError('The Email field must be set')
+#         user = self.model(username=username, email=email)
+#         user.set_password(password)
+#         user.save(using=self._db)
+#         return user
+#
+#     def create_superuser(self, username, email, password=None):
+#         user = self.create_user(username, email, password)
+#         user.is_staff = True
+#         user.is_superuser = True
+#         user.save(using=self._db)
+#         return user
+
 
 class CustomUser(models.Model):
     chat_id = models.BigIntegerField(db_index=True, unique=True)
@@ -362,3 +378,23 @@ class TopUser(models.Model):
         verbose_name_plural = 'Top userlar'
         verbose_name = 'Top user'
         db_table = 'top_user'
+
+
+class CustomPromoCode(models.Model):
+    name = models.CharField(max_length=45, null=True, blank=True)
+    count = models.PositiveIntegerField(default=0)
+    default = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    status = models.BooleanField(default=False)
+
+    reward = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.name)
+
+    class Meta:
+        verbose_name_plural = 'Custom Promo kodlar'
+        verbose_name = 'Custom Promo kod'
+        db_table = 'custom_promo_codes'
