@@ -73,7 +73,7 @@ def start(update: Update, context: CallbackContext):
                 mention = f"<a href='tg://user?id={user.id}'>{user.full_name}</a>"
                 context.bot.send_message(chat_id=payload,
                                          text=f"""
-👏 Tabriklaymiz! Siz {mention}ni botga taklif qildingiz!
+👏 Tabriklaymiz! Siz {mention} ni botga taklif qildingiz!
 
 <i>Do'stingiz ro'yxatdan o'tganidan keyin, biz sizga referal puli taqdim etamiz!</i>""",
                                          parse_mode=ParseMode.HTML
@@ -185,25 +185,23 @@ def get_contact_text(update: Update, context: CallbackContext):
 def manual(update: Update, context: CallbackContext):
     file_id = msg.manual_video_id
     _msg_ = """
-1. Doʻstlaringizni taklif qiling va pul yigʻing. Yigʻilgan pulni <b>«Telegram Premium yoki Telegram Stars»</b>ga almashtiring.
+1. Doʻstlaringizni taklif qiling  <b>«Telegram Premium yoki Telegram Stars» </b>oling .
 
-2. Premiumingiz boʻlsa, kanalimizga ovoz berish orqali har kunlik bonuslarni olishingiz va <b>«Telegram Premium yoki Telegram Stars»</b>ga ishlatishingiz mumkin
+2. Bonuslar orqali turlixil topshiriqlarni bajarib ossongina olmoslar yig'ing 
 
 3. Referal yigʻish maqsadida turli xil yolgʻon soʻzlar bilan reklama tarqatmang! Zero, qalb xotirjamligining asosi rostgoʻylikdir.
 
 Bular haqida toʻliq maʼlumot olish uchun maxsus qoʻllanmalar bilan tanishib chiqing 👇
 
 <b>• Botda roʻyxatdan oʻtish uchun qoʻllanma: </b>
-t.me/premium_olish_qollanmasi/3
+t.me/premium_olish_qollanmasi/21
 
-<b>• Premium olish uchun botda pul ishlash ketma-ketligi: </b>
-t.me/premium_olish_qollanmasi/4
+<b>• Botda foydalanish hamda olmoslar yigib  Premium va Stars olish usuli: </b>
+t.me/premium_olish_qollanmasi/22
 
-<b>• Botda pul yigʻib Premium olish usuli: </b>
-t.me/premium_olish_qollanmasi/5
+<b>• Topshiriqlar hamda Kunlik Bonuslar: </b>
+t.me/premium_olish_qollanmasi/23
 
-<b>• Menga uzoq muddatli Premium obunasi kerak desangiz: </b>
-t.me/premium_olish_qollanmasi/6
     """
     update.message.reply_video(
         video=file_id,
@@ -213,8 +211,7 @@ t.me/premium_olish_qollanmasi/6
 
 
 def adminstrator(update: Update, context: CallbackContext):
-    _msg_ = """<b>
-📞 Premium uchun: @Premium_xizmatim
+    _msg_ = """<b> 📞 Premium uchun: @Premium_xizmatim
 
 🛠 Savollar uchun: @Hup_support
 

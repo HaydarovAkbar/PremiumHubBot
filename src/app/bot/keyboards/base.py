@@ -15,21 +15,49 @@ class Keyboards:
 
     @staticmethod
     def channels(channels: List[Channel]):
-        keyboards = list()
-        for channel in channels:
-            keyboards.append(
-                [
-                    InlineKeyboardButton(
-                        text=channel.name,
-                        url=channel.link,
-                    )
-                ]
+        keyboards = []
+        row = []
+
+        for idx, channel in enumerate(channels, 1):
+            row.append(
+                InlineKeyboardButton(
+                    text=channel.name,
+                    url=channel.link,
+                )
             )
+            # Har 2 ta tugmadan keyin yangi qatorga o'tkazamiz
+            if idx % 2 == 0:
+                keyboards.append(row)
+                row = []
+
+        # Agar oxirgi qatorda bitta tugma qolib ketsa, uni ham qo'shamiz
+        if row:
+            keyboards.append(row)
+
+        # Tekshirish tugmasini oxirida qo'shamiz
         keyboards.append(
             [InlineKeyboardButton(text='♻️ Tekshirish', callback_data='check')]
         )
 
         return InlineKeyboardMarkup(keyboards)
+
+    # @staticmethod
+    # def channels(channels: List[Channel]):
+    #     keyboards = list()
+    #     for channel in channels:
+    #         keyboards.append(
+    #             [
+    #                 InlineKeyboardButton(
+    #                     text=channel.name,
+    #                     url=channel.link,
+    #                 )
+    #             ]
+    #         )
+    #     keyboards.append(
+    #         [InlineKeyboardButton(text='♻️ Tekshirish', callback_data='check')]
+    #     )
+    #
+    #     return InlineKeyboardMarkup(keyboards)
 
     @staticmethod
     def phone_number():
@@ -54,24 +82,6 @@ class Keyboards:
             [InlineKeyboardButton("📮 Ro’yxatdan o’tish", web_app=WebAppInfo(url=url))]
         ]
         return InlineKeyboardMarkup(keyboard)
-
-    #     @staticmethod
-    #     def referral(url):
-    #         share_text = f"""
-    # 🎁 Sizga haligacha Telegram Premium sovgʻa qilishmadimi?
-    #
-    # ➖ Telegram Premium obunani sovgʻa sifatida tekinga olishni istaysizmi?
-    #
-    # 👉 Hoziroq oʻz sovgʻangiz sari olgʻa bosing:
-    # {url} havola
-    # """
-    #
-    #         share_url = f"https://t.me/share/url?url={url}&text={share_text}"
-    #         keyboard = InlineKeyboardMarkup([
-    #             [InlineKeyboardButton("📤 Doʻstlarga ulashish", url=share_url)]
-    #         ])
-    #
-    #         return keyboard
 
     @staticmethod
     def referral(url):
@@ -119,11 +129,7 @@ class Keyboards:
             [InlineKeyboardButton(
                 "🏆 Haftalik TOP Reyting",
                 callback_data='weekly_rating'
-            )],
-            # [InlineKeyboardButton(
-            #     "⬅️ Orqaga",
-            #     callback_data='back'
-            # )],
+            )]
         ])
 
     @staticmethod
@@ -141,10 +147,6 @@ class Keyboards:
                 "🔗 Stories bonus",
                 callback_data='stories_bonus'
             )],
-            # [InlineKeyboardButton(
-            #     "😉 Qiziqarli bonuslar",
-            #     callback_data='qiziq_bonus'
-            # )],
             [InlineKeyboardButton(
                 "📤 Nickname bonus",
                 callback_data='nik',
@@ -153,10 +155,6 @@ class Keyboards:
                 "📥 Bio bonus",
                 callback_data='bio'
             )],
-            # [InlineKeyboardButton(
-            #     "⬅️ Orqaga",
-            #     callback_data='back'
-            # )],
         ])
 
     @staticmethod
@@ -169,11 +167,7 @@ class Keyboards:
             [InlineKeyboardButton(
                 "♻️ Kunlik bonus",
                 callback_data='daily_bonus'
-            )],
-            # [InlineKeyboardButton(
-            #     "⬅️ Orqaga",
-            #     callback_data='back'
-            # )],
+            )]
         ])
 
     delete = ReplyKeyboardRemove()
@@ -188,11 +182,7 @@ class Keyboards:
             [InlineKeyboardButton(
                 "♻️ Tekshirish",
                 callback_data='story_check'
-            )],
-            # [InlineKeyboardButton(
-            #     "⬅️ Orqaga",
-            #     callback_data='back'
-            # )],
+            )]
         ])
 
     @staticmethod
@@ -201,15 +191,7 @@ class Keyboards:
             [InlineKeyboardButton(
                 group.name,
                 url=group.link
-            )],
-            # [InlineKeyboardButton(
-            #     "♻️ Tekshirish",
-            #     callback_data='group_check'
-            # )],
-            # [InlineKeyboardButton(
-            #     "⬅️ Orqaga",
-            #     callback_data='back'
-            # )]
+            )]
         ])
 
     @staticmethod
@@ -222,11 +204,7 @@ class Keyboards:
             [InlineKeyboardButton(
                 "📥 Bio bonus",
                 callback_data='bio'
-            )],
-            # [InlineKeyboardButton(
-            #     "⬅️ Orqaga",
-            #     callback_data='back'
-            # )]
+            )]
         ])
 
     @staticmethod
@@ -235,11 +213,7 @@ class Keyboards:
             [InlineKeyboardButton(
                 "♻️ Tekshirish",
                 callback_data='nik_check'
-            )],
-            # [InlineKeyboardButton(
-            #     "⬅️ Orqaga",
-            #     callback_data='back'
-            # )]
+            )]
         ])
 
     @staticmethod
@@ -248,11 +222,7 @@ class Keyboards:
             [InlineKeyboardButton(
                 "♻️ Tekshirish",
                 callback_data='bio_check'
-            )],
-            # [InlineKeyboardButton(
-            #     "⬅️ Orqaga",
-            #     callback_data='back'
-            # )]
+            )]
         ])
 
     @staticmethod
@@ -262,10 +232,10 @@ class Keyboards:
                 "🌟 Premium va stars uchun sarflash",
                 callback_data='spend'
             )],
-            # [InlineKeyboardButton(
-            #     "🎁 Premium & 💝 Giftlar",
-            #     callback_data='gift'
-            # )],
+            [InlineKeyboardButton(
+                "🗳 Promokod kiritish 💳",
+                callback_data='add_custom_promo'
+            )]
         ])
 
     @staticmethod
@@ -301,11 +271,7 @@ class Keyboards:
             [InlineKeyboardButton(
                 "💳 Promokod kod harid qilish",
                 callback_data='get_promo_code'
-            )],
-            # [InlineKeyboardButton(
-            #     "⬅️ Orqaga",
-            #     callback_data='back'
-            # )]
+            )]
         ])
 
     @staticmethod
@@ -314,11 +280,7 @@ class Keyboards:
             [InlineKeyboardButton(
                 "💳 Adminga yuborish",
                 callback_data='send_admin'
-            )],
-            # [InlineKeyboardButton(
-            #     "⬅️ Orqaga",
-            #     callback_data='back'
-            # )]
+            )]
         ])
 
     @staticmethod
@@ -326,7 +288,9 @@ class Keyboards:
         return ReplyKeyboardMarkup([
             ["💠 Xabar yuborish"],
             ["🛑 Xabarni to'xtatish"],
-            ["🔍 Foydalanuvchi qidirish"]
+            ["🔍 Foydalanuvchi qidirish"],
+            ["📊 Umumiy Statistika", "🔓 Bandan olish"],
+            ["📤 Promo kod kiritish", "💳 Promo kod tekshirish"],
         ], resize_keyboard=True)
 
     @staticmethod
@@ -400,3 +364,9 @@ class Keyboards:
              InlineKeyboardButton("REFFERAL SISTEM", callback_data='referral'),
              ],
         ])
+
+    @staticmethod
+    def confirm_unban():
+        return ReplyKeyboardMarkup([
+            ["✅ Tasdiqlash", "❌ Bekor qilish"]
+        ], resize_keyboard=True)

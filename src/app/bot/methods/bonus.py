@@ -1,3 +1,5 @@
+from datetime import datetime
+import requests
 from django.conf import settings
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
@@ -38,7 +40,6 @@ def is_premium_user(user_id: int, bot_token: str) -> bool:
     return False
 
 
-
 def get_bonus_base(update: Update, context: CallbackContext):
     all_channel = Channel.objects.filter(is_active=True)
     left_channel = []
@@ -62,8 +63,7 @@ def get_bonus_base(update: Update, context: CallbackContext):
 🔹 Ko‘rsatilgan vazifalarni to‘liq bajaring.
 🔹 Hammasini to‘g‘ri amalga oshirganingizdan so‘ng bonuslarni qo‘lga kiriting!
         """
-        photo_id= 'AgACAgIAAxkBAAI4lGhT2UmTBZEJ7Jy5KXcmQsq-oes-AAKe8DEbAT-hSgtb12QkY0ADAQADAgADeQADNgQ'
-
+        photo_id= 'AgACAgIAAxkBAAEUOXZoVPuCBoSM6f_K4_zBnnBRnnU8ywACxPMxG3EOqEpeQ26aAxj0AwEAAwIAA3kAAzYE'
 
         requests.post(
             f"https://api.telegram.org/bot{settings.TOKEN}/sendPhoto",
@@ -76,6 +76,7 @@ def get_bonus_base(update: Update, context: CallbackContext):
                 "message_effect_id": "5046509860389126442",
             }
         )
+
         return state.BONUS
 
 
