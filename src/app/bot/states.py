@@ -15,7 +15,7 @@ class States:
     MY_ACCOUNT = 14
     GET_PROMO_CODE = 15
     SEND_PROMO_CODE = 16
-    ADD_CUSTOM_PROMO = 17
+    CHECK_PROMO = 17
 
     # admin states
     ADMIN = 17

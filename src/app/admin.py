@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 
 from .models import CustomUser, Channel, Settings, Prices, StarsPrices, RewardsChannelBoost, DailyBonus, \
     StoryBonusPrice, StoryBonusAccounts, Group, InvitedUser, InterestingBonus, InterestingBonusUser, CustomUserAccount, \
-    SpendPrice, SpendPriceField, PromoCodes, TopUser, CustomPromoCode
+    SpendPrice, SpendPriceField, PromoCodes, TopUser, CustomPromoCode, CustomUserPromoCode
 
 
 class CustomUserAdmin(admin.ModelAdmin):
@@ -118,3 +118,10 @@ class CustomPromoCodeAdmin(admin.ModelAdmin):
     search_fields = ['name',]
     list_per_page = 20
     list_filter = ['status',]
+
+
+@admin.register(CustomUserPromoCode)
+class CustomUserPromoCodeAdmin(admin.ModelAdmin):
+    list_display = ['chat_id', 'promo_code', 'created_at']
+    search_fields = ['chat_id', 'promo_code__name']
+    list_per_page = 20

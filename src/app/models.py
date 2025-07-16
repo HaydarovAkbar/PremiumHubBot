@@ -398,3 +398,19 @@ class CustomPromoCode(models.Model):
         verbose_name_plural = 'Custom Promo kodlar'
         verbose_name = 'Custom Promo kod'
         db_table = 'custom_promo_codes'
+
+
+class CustomUserPromoCode(models.Model):
+    chat_id = models.BigIntegerField(db_index=True, unique=True, null=True, blank=True)
+    promo_code = models.ForeignKey(CustomPromoCode, on_delete=models.SET_NULL, null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.chat_id} - {self.promo_code.name if self.promo_code else 'No Promo Code'}"
+
+    class Meta:
+        verbose_name_plural = 'Custom Promo kod userlar'
+        verbose_name = 'Custom Promo kod user'
+        db_table = 'custom_user_promo_codes'
