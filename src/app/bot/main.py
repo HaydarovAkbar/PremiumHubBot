@@ -254,7 +254,7 @@ all_handler = ConversationHandler(
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][6] + ')$'), manual),
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][7] + ')$'), adminstrator),
         ],
-        state.ADD_CUSTOM_PROMO: [
+        state.CHECK_PROMO: [
             CommandHandler('start', start),
             CommandHandler('admin', admin_base),
             CommandHandler('promo', info_promo),
@@ -270,7 +270,7 @@ all_handler = ConversationHandler(
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][6] + ')$'), manual),
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][7] + ')$'), adminstrator),
 
-            MessageHandler(Filters.all, get_custom_promo),
+            MessageHandler(Filters.text, get_custom_promo),
         ],
         state.GET_PROMO_CODE: [
             CommandHandler('start', start),
@@ -509,6 +509,7 @@ all_handler = ConversationHandler(
                MessageHandler(Filters.regex('^(' + key_msg.base['uz'][6] + ')$'), manual),
                MessageHandler(Filters.regex('^(' + key_msg.base['uz'][7] + ')$'), adminstrator),
                # MessageHandler(Filters.all, get_file_url),
+               MessageHandler(Filters.text, get_custom_promo),
                ]
 )
 # new_member_handler = MessageHandler(Filters.status_update.new_chat_members, new_member_handler)

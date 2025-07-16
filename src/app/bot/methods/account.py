@@ -4,7 +4,7 @@ from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 from app.models import CustomUser, Channel, Prices, StarsPrices, RewardsChannelBoost, DailyBonus, StoryBonusPrice, \
     StoryBonusAccounts, Group, CustomUserAccount, InvitedUser, Settings, SpendPrice, SpendPriceField, PromoCodes, \
-    InterestingBonus, TopUser, InvitedBonusUser, InterestingBonusUser, CustomPromoCode
+    InterestingBonus, TopUser, InvitedBonusUser, InterestingBonusUser, CustomPromoCode, CustomUserPromoCode
 
 from ..keyboards.base import Keyboards
 from ..states import States
@@ -78,18 +78,18 @@ _________________
 📣<b> Guruhga taklif qilganlar:</b> {group_added_count}
 _________________
 """
-        # update.message.reply_photo(
-        #     photo=msg.my_profile_id,
-        #     caption=_msg,
-        #     parse_mode=ParseMode.HTML,
-        #     reply_markup=keyword.my_account(),
-        # )
-        update.message.reply_text(_msg,
-                                  # photo=msg.my_profile_id,
-                                  # caption=_msg,
-                                  parse_mode=ParseMode.HTML,
-                                  reply_markup=keyword.my_account(),
-                                  )
+        update.message.reply_photo(
+            photo=msg.my_profile_id,
+            caption=_msg,
+            parse_mode=ParseMode.HTML,
+            reply_markup=keyword.my_account(),
+        )
+        # update.message.reply_text(_msg,
+        #                           # photo=msg.my_profile_id,
+        #                           # caption=_msg,
+        #                           parse_mode=ParseMode.HTML,
+        #                           reply_markup=keyword.my_account(),
+        #                           )
         return state.START
 
 
@@ -161,7 +161,7 @@ def universal_callback_data(update: Update, context: CallbackContext):
                 text="Promo kodni yuboring:",
             )
             print("User is adding a custom promo code")
-            return state.ADD_CUSTOM_PROMO
+            return state.CHECK_PROMO
 
         elif query.data == 'get_promo_code':
             spend_field = SpendPriceField.objects.get(id=context.chat_data['promo_code'])
@@ -674,18 +674,23 @@ Agarda ushbu taklifdan foydalanmoqchi bo'lsangiz admin bilan bog'laning.
 
 
 def get_custom_promo(update: Update, context: CallbackContext):
-    print("shu joyda")
     promo = update.message.text
-    print(promo)
     custom_promo_codes = CustomPromoCode.objects.filter(name=promo, status=True)
-
-    if not custom_promo_codes:
+    if not custom_promo_codes.exists():
         update.message.reply_text(
             "❌ Kechirasiz, bu promo kod mavjud emas yoki ishlamayapti.",
         )
+        return state.CHECK_PROMO
 
     first_promo = custom_promo_codes.first()
-
+    custom_promo_code_account = CustomUserPromoCode.objects.filter(chat_id=update.effective_user.id,
+                                                                   promo_code=first_promo)
+    if custom_promo_code_account.exists():
+        update.message.reply_text(
+            "❌ Siz allaqachon ushbu promo kodni ishlatgansiz.",
+            reply_markup=keyword.base()
+        )
+        return state.CHECK_PROMO
     if first_promo.count > 0:
         first_promo.count -= 1
         first_promo.save()
@@ -707,14 +712,31 @@ def get_custom_promo(update: Update, context: CallbackContext):
         top_user.monthly_earned += first_promo.reward
         top_user.save()
 
+        CustomUserPromoCode.objects.create(
+            chat_id=update.effective_user.id,
+            promo_code=first_promo,
+        )
+
         update.message.reply_text(
             f"✅ Tabriklaymiz! Siz {first_promo.reward} 💎 bonus oldingiz.",
             reply_markup=keyword.base()
         )
+        try:
+
+            context.bot.send_message(chat_id=-1002144716834,
+                                     text=f"Yangi promo kod ishlatildi: {first_promo.name}\n"
+                                          f"Foydalanuvchi: <a href='tg://user?id={update.effective_user.id}'>"
+                                          f"{update.effective_user.full_name}</a>\n"
+                                          f"Bonus: {first_promo.reward} 💎",
+                                     parse_mode='HTML',
+                                     disable_web_page_preview=True)
+        except Exception:
+            pass
+
     else:
         update.message.reply_text(
             "❌ Kechirasiz, bu promo kodning limitlari tugagan.",
             reply_markup=keyword.base()
         )
 
-    return state.ADD_CUSTOM_PROMO
+    return state.CHECK_PROMO
