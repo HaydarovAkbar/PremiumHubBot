@@ -44,9 +44,13 @@ def my_account(update: Update, context: CallbackContext):
         except Exception as e:
             print(e)
     if left_channel:
-        context.bot.send_message(chat_id=update.effective_user.id,
-                                 text="Botdan foydalanish uchun barcha kanallarga a'zo bo'ling)",
-                                 reply_markup=keyword.channels(left_channel))
+        # context.bot.send_message(chat_id=update.effective_user.id,
+        #                          text="Botdan foydalanish uchun barcha kanallarga a'zo bo'ling)",
+        #                          reply_markup=keyword.channels(left_channel))
+        context.bot.send_photo(chat_id=update.effective_user.id,
+                               photo='AgACAgIAAxkBAAEaMCdoeJzgVCgsP05l79z72EpYtLSnfAACB_oxG14bwUsodGhV1zrgcAEAAwIAA3kAAzYE',
+                               caption="Botni ishga tushirish uchun quyidagi kanallarga obuna bo’ling va “♻️ Tekshirish” tugmasini bosing",
+                               reply_markup=keyword.channels(left_channel))
         return state.CHECK_CHANNEL
     user_db = CustomUser.objects.get(chat_id=update.effective_user.id)
     if user_db.is_active:
@@ -105,9 +109,13 @@ def universal_callback_data(update: Update, context: CallbackContext):
         except Exception as e:
             print(e)
     if left_channel:
-        context.bot.send_message(chat_id=update.effective_user.id,
-                                 text="Botdan foydalanish uchun barcha kanallarga a'zo bo'ling",
-                                 reply_markup=keyword.channels(left_channel))
+        # context.bot.send_message(chat_id=update.effective_user.id,
+        #                          text="Botdan foydalanish uchun barcha kanallarga a'zo bo'ling",
+        #                          reply_markup=keyword.channels(left_channel))
+        context.bot.send_photo(chat_id=update.effective_user.id,
+                               photo='AgACAgIAAxkBAAEaMCdoeJzgVCgsP05l79z72EpYtLSnfAACB_oxG14bwUsodGhV1zrgcAEAAwIAA3kAAzYE',
+                               caption="Botni ishga tushirish uchun quyidagi kanallarga obuna bo’ling va “♻️ Tekshirish” tugmasini bosing",
+                               reply_markup=keyword.channels(left_channel))
         return state.CHECK_CHANNEL
     user_db = CustomUser.objects.get(chat_id=update.effective_user.id)
     if user_db.is_active:
@@ -161,7 +169,6 @@ def universal_callback_data(update: Update, context: CallbackContext):
                 chat_id=update.effective_user.id,
                 text="Promo kodni yuboring:",
             )
-            print("User is adding a custom promo code")
             return state.CHECK_PROMO
 
         elif query.data == 'get_promo_code':
