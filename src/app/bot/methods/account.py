@@ -722,17 +722,14 @@ def get_custom_promo(update: Update, context: CallbackContext):
             f"✅ Tabriklaymiz! Siz {first_promo.reward} 💎 bonus oldingiz.",
             reply_markup=keyword.base()
         )
-        try:
-
-            context.bot.send_message(chat_id=-1002144716834,
-                                     text=f"Yangi promo kod ishlatildi: {first_promo.name}\n"
-                                          f"Foydalanuvchi: <a href='tg://user?id={update.effective_user.id}'>"
-                                          f"{update.effective_user.full_name}</a>\n"
-                                          f"Bonus: {first_promo.reward} 💎",
-                                     parse_mode='HTML',
-                                     disable_web_page_preview=True)
-        except Exception:
-            pass
+        # try:
+        #
+        #     context.bot.send_message(chat_id=-1002144716834,
+        #                              text=f"🎁 <code>{first_promo.count}/{first_promo.default}</code> <b>Promokod qoldi</b>",
+        #                              parse_mode='HTML',
+        #                              disable_web_page_preview=True)
+        # except Exception:
+        #     pass
 
     else:
         update.message.reply_text(

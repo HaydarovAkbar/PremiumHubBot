@@ -401,7 +401,7 @@ class CustomPromoCode(models.Model):
 
 
 class CustomUserPromoCode(models.Model):
-    chat_id = models.BigIntegerField(db_index=True, unique=True, null=True, blank=True)
+    chat_id = models.BigIntegerField(db_index=True, null=True, blank=True)
     promo_code = models.ForeignKey(CustomPromoCode, on_delete=models.SET_NULL, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
