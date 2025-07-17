@@ -63,7 +63,8 @@ def my_account(update: Update, context: CallbackContext):
         start_of_week = now().date() - timedelta(days=now().weekday())  # dushanba
         referrals_this_week = CustomUser.objects.filter(
             referral=user_db.chat_id,
-            created_at__date__gte=start_of_week
+            created_at__date__gte=start_of_week,
+            is_active=True,
         ).count()
 
         _msg = f"""
