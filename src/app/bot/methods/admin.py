@@ -368,6 +368,8 @@ def get_user(update, context):
         else:
             bio = False
             nik = False
+        invited_group_count = InvitedUser.objects.filter(inviter_chat_id=user_db.chat_id).count()
+
         msg = (
             f"🔍 Foydalanuvchi topildi!\n\n"
             f"👤 Foydalanuvchi: <a href='tg://user?id={user_db.chat_id}'>{full_name}</a>\n"
@@ -377,7 +379,8 @@ def get_user(update, context):
             f"📲 Telefon nomer: +{user_db.phone_number}\n"
             f"💰 Hozirgi balanse: {custom_user_account.current_price} 💎 \n\n"
             f"🗒 Vazifalar ro'yxati:\n"
-            f"👤 Guruhga qo'shganlar soni {2}\n"
+            f"👤 Taklif qilganlar soni {user_db.invited_count}\n"
+            f"👤 Guruhga qo'shganlar soni {invited_group_count}\n"
             f"🔹 BIO BONUS {bio}\n🔹 NIKNAME {nik}\n"
             f"💫 Stories bonus: {True if story_ else False}\n"
             f"💫 Reward bonus: {True if boost else False}\n"
