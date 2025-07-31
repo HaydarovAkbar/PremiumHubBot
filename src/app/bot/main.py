@@ -18,7 +18,7 @@ import time
 from telegram.error import RetryAfter
 from .states import States
 from .messages.main import KeyboardText
-
+from telegram.utils.request import Request
 key_msg = KeyboardText()
 
 # Enable logging
@@ -38,10 +38,10 @@ def run():
         time.sleep(e.retry_after)
         bot.set_webhook(webhook_url)
 
-
+request = Request(con_pool_size=20)
 TOKEN = settings.TOKEN
 
-bot: Bot = Bot(token=TOKEN)
+bot: Bot = Bot(token=TOKEN, request=request)
 state = States()
 
 dispatcher = Dispatcher(bot, None)
