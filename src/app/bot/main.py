@@ -19,6 +19,7 @@ from telegram.error import RetryAfter
 from .states import States
 from .messages.main import KeyboardText
 from telegram.utils.request import Request
+
 key_msg = KeyboardText()
 
 # Enable logging
@@ -28,7 +29,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 
-def run():
+def run2():
     webhook_url = settings.HOST + '/premium/'
     print('started webhook')
     try:
@@ -37,6 +38,30 @@ def run():
     except RetryAfter as e:
         time.sleep(e.retry_after)
         bot.set_webhook(webhook_url)
+
+
+def run():
+    webhook_url = settings.HOST + '/premium/'
+    current = bot.get_webhook_info()
+
+    if current.url == webhook_url:
+        print("Webhook already set.")
+        return
+
+    print('Setting webhook...')
+    while True:
+        try:
+            bot.set_webhook(webhook_url, allowed_updates=[
+                "message", "callback_query", "chat_boost", "removed_chat_boost",
+                "chat_join_request", "chat_member", "my_chat_member"
+            ])
+            print("✅ Webhook set successfully.")
+            break
+        except RetryAfter as e:
+            wait_time = e.retry_after
+            print(f"Flood control. Retry after {wait_time} seconds.")
+            time.sleep(wait_time)
+
 
 request = Request(con_pool_size=20)
 TOKEN = settings.TOKEN
@@ -510,7 +535,8 @@ all_handler = ConversationHandler(
                MessageHandler(Filters.regex('^(' + key_msg.base['uz'][7] + ')$'), adminstrator),
                # MessageHandler(Filters.all, get_file_url),
                MessageHandler(Filters.text, get_custom_promo),
-               ]
+               ],
+    per_message=True,
 )
 # new_member_handler = MessageHandler(Filters.status_update.new_chat_members, new_member_handler)
 # dispatcher.add_handler(new_member_handler)
