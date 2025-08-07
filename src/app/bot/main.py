@@ -29,7 +29,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 
-def run2():
+def run():
     webhook_url = settings.HOST + '/premium/'
     print('started webhook')
     try:
@@ -40,7 +40,7 @@ def run2():
         bot.set_webhook(webhook_url)
 
 
-def run():
+def run2():
     webhook_url = settings.HOST + '/premium/'
     current = bot.get_webhook_info()
 
@@ -295,7 +295,7 @@ all_handler = ConversationHandler(
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][6] + ')$'), manual),
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][7] + ')$'), adminstrator),
 
-            MessageHandler(Filters.text, get_custom_promo),
+            MessageHandler(Filters.all, get_custom_promo),
         ],
         state.GET_PROMO_CODE: [
             CommandHandler('start', start),
@@ -534,7 +534,7 @@ all_handler = ConversationHandler(
                MessageHandler(Filters.regex('^(' + key_msg.base['uz'][6] + ')$'), manual),
                MessageHandler(Filters.regex('^(' + key_msg.base['uz'][7] + ')$'), adminstrator),
                # MessageHandler(Filters.all, get_file_url),
-               MessageHandler(Filters.text, get_custom_promo),
+               # MessageHandler(Filters.text, get_custom_promo),
                ],
     per_message=True,
 )

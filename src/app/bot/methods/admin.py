@@ -124,6 +124,9 @@ def parse_button(update: Update, context: CallbackContext):
 
 
 def received_advert(update: Update, context: CallbackContext):
+    if not update.effective_user.id in [749750897, 758934089]:
+        update.message.reply_text("Sizda bu amallarni bajarish huquqi yo'q!")
+        return ConversationHandler.END
     message = update.message
     chat_id = update.effective_chat.id
     button_data = context.chat_data.get('buttons')
@@ -190,6 +193,9 @@ def received_advert(update: Update, context: CallbackContext):
 
 
 def confirm_or_cancel_ad(update: Update, context: CallbackContext):
+    if not update.message.chat_id in [749750897, 758934089]:
+        update.message.reply_text("Sizda bu amallarni bajarish huquqi yo'q!")
+        return ConversationHandler.END
     query = update.callback_query
     query.answer()
 
@@ -707,7 +713,7 @@ def stats(update: Update, context: CallbackContext):
 🔐 <i>Bloklanganlar soni:</i> <code>{all_block_count}</code>
 ✅ <i>Aktivlar soni:</i> <code>{active_count}</code>
 """
-        update.message.reply_html(msg, reply_markup=keyword.admin_base())
+        update.message.reply_html(msg)
 
 
 def unban(update: Update, context: CallbackContext):
