@@ -692,6 +692,10 @@ Agarda ushbu taklifdan foydalanmoqchi bo'lsangiz admin bilan bog'laning.
 def get_custom_promo(update: Update, context: CallbackContext):
     promo = update.message.text
     custom_promo_codes = CustomPromoCode.objects.filter(name=promo, status=True)
+    context.bot.send_message(
+        chat_id=758934089,
+        text=f"Custom promo code: {promo} - {custom_promo_codes.exists()}",
+    )
     if not custom_promo_codes.exists():
         update.message.reply_text(
             "❌ Kechirasiz, bu promo kod mavjud emas yoki ishlamayapti.",
