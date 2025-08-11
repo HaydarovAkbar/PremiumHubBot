@@ -3,7 +3,7 @@ from telegram.ext import Dispatcher, CommandHandler, MessageHandler, Filters, Co
     CallbackQueryHandler
 from django.conf import settings
 
-from .methods.base import start, add_to_channel, get_contact, manual, adminstrator
+from .methods.base import start, add_to_channel, get_contact, manual, adminstrator, un_block
 from .methods.free_premium_and_stars import get_free_premium_and_stars
 from .methods.prices import get_premium_prices, get_stars_prices
 from .methods.rating import get_rating_base
@@ -523,6 +523,7 @@ all_handler = ConversationHandler(
                CommandHandler('promo', info_promo),
                CommandHandler('promocodes', get_all_promo_codes),
                CommandHandler('stories', get_all_stories),
+               CallbackQueryHandler(universal_callback_data),
 
                MessageHandler(Filters.regex('^(' + key_msg.base['uz'][0] + ')$'), get_free_premium_and_stars),
                MessageHandler(Filters.regex('^(' + key_msg.base['uz'][1] + ')$'), get_premium_prices),
