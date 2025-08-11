@@ -96,6 +96,7 @@ _________________
 
 
 def universal_callback_data(update: Update, context: CallbackContext):
+    print(update)
     all_channel = Channel.objects.filter(is_active=True)
     left_channel = []
     for channel in all_channel:
@@ -116,6 +117,7 @@ def universal_callback_data(update: Update, context: CallbackContext):
         query = update.callback_query
         account, _ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id, )
         if query.data == 'back':
+            query.answer()
             query.delete_message()
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text="Menyuga qaytdik!",
@@ -687,6 +689,19 @@ Ustiga bosib nusxalab olishingiz mumkin
 Agarda ushbu taklifdan foydalanmoqchi bo'lsangiz admin bilan bog'laning.
                                                 """, show_alert=True
                     )
+    else:
+        query = update.callback_query
+        query.answer()
+        query.delete_message()
+        user_db.is_blocked = False
+        user_db.is_active = True
+        user_db.referral = None
+        user_db.save()
+        context.bot.send_message(chat_id=update.effective_user.id,
+                                     text="Blokdan yechildingiz ✅",
+                                     parse_mode='HTML',
+                                     reply_markup=keyword.base())
+        return state.START
 
 
 def get_custom_promo(update: Update, context: CallbackContext):

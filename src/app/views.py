@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from telegram import Update
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from .bot.main import bot, dispatcher
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -31,6 +31,7 @@ def is_premium_user(user_id: int, bot_token: str) -> bool:
         return data.get("result", {}).get("user", {}).get("is_premium", False)
     return False
 
+
 @method_decorator(csrf_exempt, name='dispatch')
 class MainView(View):
     def get(self, request, *args, **kwargs):
@@ -50,7 +51,7 @@ class MainView(View):
                 fullname = f"{custom_user.first_name} {custom_user.last_name}"
                 daily_bonus.count = 1 + daily_bonus.count if daily_bonus.count else 0
                 daily_bonus.save()
-                if daily_bonus.count  > 5:
+                if daily_bonus.count > 5:
                     return HttpResponse('Limit reached, bonus berilmaydi')
                 custom_account, __ = CustomUserAccount.objects.get_or_create(chat_id=user_id)
                 price = reward_db.elementary_bonus
@@ -123,8 +124,8 @@ class MainView(View):
                                 top_user.monthly_earned += plus_balance
                                 top_user.save()
 
-#                                # Bonus statusi
-#                                InvitedBonusUser.objects.get_or_create(chat_id=inviter.id, group=last_group)
+                                #                                # Bonus statusi
+                                #                                InvitedBonusUser.objects.get_or_create(chat_id=inviter.id, group=last_group)
 
                                 # Xabar yuborish
                                 bot.send_message(
@@ -193,14 +194,30 @@ def register_device(request):
                     custom_user.is_active = False
                     custom_user.save()
 
+                    un_ban_button = InlineKeyboardMarkup(
+                        inline_keyboard=[
+                            [
+                                InlineKeyboardButton(
+                                    text="Profilni blokdan chiqarish 🔐",
+                                    callback_data=f"un_ban_"
+                                )
+                            ]
+                        ]
+                    )
+
                     bot.send_message(
                         chat_id=telegram_id,
+                        # text=(
+                        #     "<b>Siz allaqachon boshqa profillaringiz orqali botimizdan foydalanmoqdasiz.</b>\n"
+                        #     "Ushbu sababdan profilingiz blocklandi.\n\n"
+                        #     "👨‍💻 @hup_support ga murojaat qiling."
+                        # ),
                         text=(
                             "<b>Siz allaqachon boshqa profillaringiz orqali botimizdan foydalanmoqdasiz.</b>\n"
-                            "Ushbu sababdan profilingiz blocklandi.\n\n"
-                            "👨‍💻 @hup_support ga murojaat qiling."
+                            "Agar bu xato bo'lsa blokdan chiqish uchun tugmani bosing\n\n"
                         ),
-                        parse_mode="HTML"
+                        parse_mode="HTML",
+                        reply_markup=un_ban_button
                     )
 
                 return JsonResponse({
@@ -218,7 +235,8 @@ def register_device(request):
                     keyword = Keyboards()
                     try:
                         referral_user = CustomUser.objects.select_for_update().get(chat_id=custom_user.referral)
-                        referral_user_account, _ = CustomUserAccount.objects.get_or_create(chat_id=referral_user.chat_id)
+                        referral_user_account, _ = CustomUserAccount.objects.get_or_create(
+                            chat_id=referral_user.chat_id)
                         top_user, _ = TopUser.objects.get_or_create(
                             chat_id=referral_user.chat_id,
                             defaults={'fullname': referral_user.first_name}

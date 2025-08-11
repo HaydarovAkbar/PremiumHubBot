@@ -116,7 +116,7 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-HOST = 'https://7fd19b40ecb0.ngrok-free.app'
+HOST = 'https://977a15c7906d.ngrok-free.app'
 
 USERNAME = 'AiGeneratedPhotoBot'
 ADMIN_USERNAME = 'premium_xizmatim'
