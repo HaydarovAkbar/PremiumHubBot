@@ -15,10 +15,10 @@ from .methods.admin import admin_base, ads, get_ads, parse_button, received_adve
     get_custom_promo_code, unban, cancel_unban
 import logging
 import time
+from telegram.utils.request import Request
 from telegram.error import RetryAfter
 from .states import States
 from .messages.main import KeyboardText
-from telegram.utils.request import Request
 
 key_msg = KeyboardText()
 
@@ -29,7 +29,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 
-def run():
+def run2():
     webhook_url = settings.HOST + '/premium/'
     print('started webhook')
     try:
@@ -39,11 +39,10 @@ def run():
         time.sleep(e.retry_after)
         bot.set_webhook(webhook_url)
 
-
-def run2():
+def run():
     webhook_url = settings.HOST + '/premium/'
     current = bot.get_webhook_info()
-
+    
     if current.url == webhook_url:
         print("Webhook already set.")
         return
@@ -63,7 +62,7 @@ def run2():
             time.sleep(wait_time)
 
 
-request = Request(con_pool_size=20)
+request = Request(con_pool_size=30)
 TOKEN = settings.TOKEN
 
 bot: Bot = Bot(token=TOKEN, request=request)
@@ -534,9 +533,8 @@ all_handler = ConversationHandler(
                MessageHandler(Filters.regex('^(' + key_msg.base['uz'][6] + ')$'), manual),
                MessageHandler(Filters.regex('^(' + key_msg.base['uz'][7] + ')$'), adminstrator),
                # MessageHandler(Filters.all, get_file_url),
-               # MessageHandler(Filters.text, get_custom_promo),
+               MessageHandler(Filters.text, get_custom_promo),
                ],
-    per_message=True,
 )
 # new_member_handler = MessageHandler(Filters.status_update.new_chat_members, new_member_handler)
 # dispatcher.add_handler(new_member_handler)

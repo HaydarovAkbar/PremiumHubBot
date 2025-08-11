@@ -4,6 +4,7 @@ from telegram import Update
 from .bot.main import bot, dispatcher
 from django.utils.decorators import method_decorator
 from django.views import View
+from django.db import transaction
 import json
 import hashlib
 from django.views.decorators.csrf import csrf_exempt
@@ -158,6 +159,127 @@ def stories_bonus(request):
 
 @csrf_exempt
 def register_device(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST method required"}, status=400)
+
+    try:
+        data = json.loads(request.body)
+        model = data.get("model")
+        d_type = data.get("tur")
+        lang = data.get("til")
+        memory = str(data.get("hotira"))
+        telegram_id = int(data.get("telegram_id"))
+    except Exception:
+        return JsonResponse({"error": "Yaroqsiz ma'lumotlar"}, status=400)
+
+    raw_string = model + d_type + lang + memory
+    fingerprint_hash = hashlib.sha256(raw_string.encode()).hexdigest()
+
+    try:
+        with transaction.atomic():
+            # Lock user row for the transaction
+            custom_user = CustomUser.objects.select_for_update().get(chat_id=telegram_id)
+
+            # Check device already used
+            existing = CustomUser.objects.filter(
+                device_hash=fingerprint_hash
+            ).exclude(chat_id=telegram_id).count()
+
+            bot_settings = Settings.objects.filter(is_active=True).last()
+
+            if existing >= bot_settings.device_count:
+                if not custom_user.is_blocked:
+                    custom_user.is_blocked = True
+                    custom_user.is_active = False
+                    custom_user.save()
+
+                    bot.send_message(
+                        chat_id=telegram_id,
+                        text=(
+                            "<b>Siz allaqachon boshqa profillaringiz orqali botimizdan foydalanmoqdasiz.</b>\n"
+                            "Ushbu sababdan profilingiz blocklandi.\n\n"
+                            "👨‍💻 @hup_support ga murojaat qiling."
+                        ),
+                        parse_mode="HTML"
+                    )
+
+                return JsonResponse({
+                    "error": "Bu qurilma boshqa foydalanuvchi tomonidan ishlatilgan."
+                }, status=403)
+
+            # Faqat hali aktiv bo‘lmagan foydalanuvchilarga ishlov beramiz
+            if not (custom_user.device_hash and custom_user.is_active):
+                custom_user.device_hash = fingerprint_hash
+                custom_user.is_active = True
+                custom_user.save()
+
+                # Bonus va xabarlar
+                if custom_user.id >= 95000:
+                    keyword = Keyboards()
+                    try:
+                        referral_user = CustomUser.objects.select_for_update().get(chat_id=custom_user.referral)
+                        referral_user_account, _ = CustomUserAccount.objects.get_or_create(chat_id=referral_user.chat_id)
+                        top_user, _ = TopUser.objects.get_or_create(
+                            chat_id=referral_user.chat_id,
+                            defaults={'fullname': referral_user.first_name}
+                        )
+
+                        # Bonus qiymati
+                        custom_is_premium = is_premium_user(custom_user.chat_id, settings.TOKEN)
+                        bonus_amount = bot_settings.referral_prem_price if custom_is_premium else bot_settings.referral_price
+
+                        # Hisobga pul qo‘shish
+                        referral_user_account.current_price += bonus_amount
+                        referral_user_account.save()
+
+                        top_user.balance += bonus_amount
+                        top_user.weekly_earned += bonus_amount
+                        top_user.monthly_earned += bonus_amount
+                        top_user.save()
+
+                        if custom_is_premium:
+                            referral_user.premium_count += 1
+                        else:
+                            referral_user.invited_count += 1
+                        referral_user.save()
+
+                        # Referralga xabar
+                        fullname = f"{custom_user.first_name or '-'} {custom_user.last_name or '-'}"
+                        minio = f"<a href='tg://user?id={custom_user.chat_id}'>{fullname}</a>"
+                        bot.send_message(
+                            chat_id=referral_user.chat_id,
+                            text=f"""
+<b>🎉 Tabriklaymiz!</b>
+{minio} ro'yxatdan o'tdi va sizga {bonus_amount} 💎 bonus berildi.
+                            """,
+                            parse_mode="HTML"
+                        )
+                    except CustomUser.DoesNotExist:
+                        pass  # referral bo‘lmasligi mumkin
+
+                    # Foydalanuvchining o‘ziga xabar
+                    bot.send_message(
+                        chat_id=telegram_id,
+                        text=(
+                            "🎉 Tabriklaymiz! Qurilmangiz muvaffaqiyatli ro'yxatdan o'tdi.\n"
+                            "👉 Endi keyingi bosqichga o'tishingiz mumkin."
+                        ),
+                        reply_markup=keyword.base()
+                    )
+
+        return JsonResponse({"status": "ok"}, status=201)
+
+    except CustomUser.DoesNotExist:
+        return JsonResponse({"error": "Foydalanuvchi topilmadi"}, status=404)
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.exception("❌ Ro‘yxatdan o‘tishda xatolik:")
+        return JsonResponse({"error": "Ichki server xatosi"}, status=500)
+
+
+@csrf_exempt
+def register_device2(request):
     if request.method == "POST":
         data = json.loads(request.body)
 
