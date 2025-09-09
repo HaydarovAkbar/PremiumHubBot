@@ -1,1 +1,4 @@
 -e "src/data.xml\nsrc/cleaned_data.xml\nsrc/data.json" 
+src/data.xml
+src/cleaned_data.xml
+src/data.json
