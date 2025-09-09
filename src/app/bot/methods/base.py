@@ -118,7 +118,6 @@ def start(update: Update, context: CallbackContext):
             ]
         )
         update.message.reply_text(
-            # "Siz botdan ko’p marta ro’yxatdan o’tganingiz uchun bot sizni bloklagan, agar buni xato deb hisoblasangiz, @hup_support ga murojaat qiling",
             (
                 "<b>Siz allaqachon boshqa profillaringiz orqali botimizdan foydalanmoqdasiz.</b>\n"
                 "Agar bu xato bo'lsa blokdan chiqish uchun tugmani bosing\n\n"
@@ -246,23 +245,3 @@ def adminstrator(update: Update, context: CallbackContext):
 💬 Chat: @Premiumhub_chat</b>
     """
     update.message.reply_html(_msg_)
-
-
-def un_block(update: Update, context: CallbackContext):
-    user = CustomUser.objects.get(chat_id=update.effective_user.id)
-    if user.is_blocked:
-        query = update.callback_query
-        query.answer()
-        if query.data == 'un_ban_':
-            query.delete_message()
-            user.is_blocked = False
-            user.is_active = True
-            user.referral = None
-            user.save()
-            # update.message.reply_html("Blokdan yechildingiz ✅", reply_markup=keyword.base())
-            context.bot.send_message(chat_id=update.effective_user.id,
-                                     text="Blokdan yechildingiz ✅",
-                                     parse_mode='HTML',
-                                     reply_markup=keyword.base())
-            return state.START
-        query.delete_message()

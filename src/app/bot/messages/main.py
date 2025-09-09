@@ -40,7 +40,7 @@ Shunchaki pastdagi havola orqali doʻstlaringizni taklif qiling. Botning oʻzi s
 class KeyboardText:
     base = {
         'uz': ["🌟 Bepul Premium va Stars olish 🌟", "💸 Premium narxlari", "⭐ Stars Narxlari", "🏆 TOP Reyting",
-               "🎁 Bonus olish", "💳 Mening Hisobim", "📝 Qo'llanma", "👨‍💻 Administrator"],
+               "🎁 Bonus olish", "💳 Mening Hisobim", "📝 Qo'llanma", "👨‍💻 Administrator", "💎 Test ishlab bonus olish 🆕"],
         'ru': ["Личный кабинет", "Отправить отзыв", "Посмотреть статистику", "Настройки ⚙️"],
         'en': ["Personal account", "Send feedback", "View statistics", "Settings ⚙️"],
     }

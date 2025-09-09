@@ -69,6 +69,7 @@ class Keyboards:
         _msg = msg.base['uz']
         keyboard = [
             [_msg[0]],
+            [_msg[8]],
             [_msg[1], _msg[2]],
             [_msg[3]],
             [_msg[4], _msg[5]],
@@ -291,6 +292,8 @@ class Keyboards:
             ["🔍 Foydalanuvchi qidirish"],
             ["📊 Umumiy Statistika", "🔓 Bandan olish"],
             ["📤 Promo kod kiritish", "💳 Promo kod tekshirish"],
+            ["➕ Test qo'shish", "➖ Test o'chirish"],
+            ["📈 Test Reyting", "⚙️ Test Sozlamalar"],
         ], resize_keyboard=True)
 
     @staticmethod

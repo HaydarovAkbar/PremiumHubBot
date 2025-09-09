@@ -2,7 +2,8 @@ from celery.worker.strategy import default
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-
+from django.core.validators import MinValueValidator
+from decimal import Decimal
 
 # class CustomUserManager(BaseUserManager):
 #     def create_user(self, username, email, password=None):
@@ -414,3 +415,82 @@ class CustomUserPromoCode(models.Model):
         verbose_name_plural = 'Custom Promo kod userlar'
         verbose_name = 'Custom Promo kod user'
         db_table = 'custom_user_promo_codes'
+
+
+class Quiz(models.Model):
+    title = models.CharField(max_length=255)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self): return self.title
+
+
+class Question(models.Model):
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="questions")
+    text = models.TextField()
+    options_text = models.TextField()  # "javob1|javob2|javob3|..."
+    order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def options(self):
+        return [o.strip() for o in self.options_text.split("|") if o.strip()]
+
+    def correct_index(self):
+        return 1  # doim birinchi variant to‘g‘ri
+
+
+class UserAnswer(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    correct_count = models.PositiveIntegerField(default=0)
+    total_count = models.PositiveIntegerField(default=0)
+    last_answered_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_winner = models.BooleanField(default=False)
+
+    total_attempts = models.PositiveIntegerField(default=0)  # jami nechta test ishlagan
+    daily_attempts = models.PositiveIntegerField(default=0)  # bugun nechta test ishlagan
+    daily_attempts_date = models.DateField(null=True, blank=True)  # bu counter qaysi kunga tegishli
+
+
+class GlobalTestSettings(models.Model):
+    """
+    Hamma quizlar uchun amal qiladigan yagona sozlama.
+    Admin paneldan faqat bitta yozuvni tahrirlaysiz.
+    """
+    question_limit = models.PositiveIntegerField(
+        default=10, validators=[MinValueValidator(1)],
+        help_text="Har bir test sessiyasida nechta savol random tushadi"
+    )
+    per_correct_bonus = models.DecimalField(
+        max_digits=12, decimal_places=2, default=Decimal('0.00'),
+        help_text="Har to‘g‘ri javob uchun bonus (decimal)"
+    )
+    full_completion_bonus = models.DecimalField(
+        max_digits=12, decimal_places=2, default=Decimal('0.00'),
+        help_text="Hammasi to‘g‘ri bo‘lsa bonus (decimal)"
+    )
+    time_limit_seconds = models.PositiveIntegerField(
+        null=True, blank=True, help_text="Butun test uchun vaqt limiti (sekundlarda)"
+    )
+    max_attempts_per_user = models.PositiveIntegerField(
+        null=True, blank=True, help_text="Foydalanuvchi uchun maksimal urinishlar soni"
+    )
+    daily_attempt_limit = models.PositiveIntegerField(
+        null=True, blank=True, help_text="Kuniga maksimal urinishlar soni"
+    )
+    pass_threshold_correct = models.PositiveIntegerField(
+        null=True, blank=True, help_text="O‘tish uchun zarur to‘g‘ri javoblar soni"
+    )
+    shuffle_options = models.BooleanField(default=True)
+    allow_repeat_questions = models.BooleanField(default=False)
+
+    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "Global Test Sozlamalari"
+
+    class Meta:
+        verbose_name = "Global Test Sozlamasi"
+        verbose_name_plural = "Global Test Sozlamalari"

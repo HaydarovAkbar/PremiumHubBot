@@ -1,11 +1,8 @@
-from decouple import TRUE_VALUES
-from django.db.models.functions import Replace
 from decimal import Decimal
-from .. import keyboards
 from ..tasks import send_advert_to_all
 import requests
 from django.conf import settings
-from telegram import Update, InlineKeyboardMarkup, ParseMode, ReplyKeyboardRemove, InlineKeyboardButton
+from telegram import Update, InlineKeyboardMarkup, ParseMode, InlineKeyboardButton
 from telegram.ext import CallbackContext, ConversationHandler
 from app.models import CustomUser, Channel, CustomUserAccount, PromoCodes, StoryBonusAccounts, InvitedUser, \
     InterestingBonusUser, DailyBonus, TopUser, CustomPromoCode
@@ -13,12 +10,9 @@ from ..keyboards.base import Keyboards
 from ..states import States
 from ..messages.main import MessageText
 import re
-from telegram import MessageEntity
-from html import escape as html_escape
 from celery.result import AsyncResult
 from core.celery import app
 import redis
-from ...models import InterestingBonus
 
 keyword = Keyboards()
 state = States()
@@ -194,8 +188,12 @@ def received_advert(update: Update, context: CallbackContext):
 
 def confirm_or_cancel_ad(update: Update, context: CallbackContext):
     admins = CustomUser.objects.filter(is_admin=True, chat_id=update.effective_chat.id)
-    if admins.exists():
-        update.message.reply_text("Sizda bu amallarni bajarish huquqi yo'q!")
+    if not admins.exists():
+        context.bot.send_message(
+        	chat_id=update.effective_chat.id,
+        	text="📢 <b>Sizda bu amallarni bajarish huquqi yo'q!</b>",
+        	parse_mode="HTML"
+    		)
         return ConversationHandler.END
     query = update.callback_query
     query.answer()

@@ -96,7 +96,6 @@ _________________
 
 
 def universal_callback_data(update: Update, context: CallbackContext):
-    print(update)
     all_channel = Channel.objects.filter(is_active=True)
     left_channel = []
     for channel in all_channel:
@@ -117,12 +116,13 @@ def universal_callback_data(update: Update, context: CallbackContext):
         query = update.callback_query
         account, _ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id, )
         if query.data == 'back':
-            query.answer()
             query.delete_message()
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text="Menyuga qaytdik!",
                                      reply_markup=keyword.base())
             return state.START
+
+
         elif query.data == 'send_admin':
             query.answer()
             promo_code = context.chat_data['promo_code']
