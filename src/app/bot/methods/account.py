@@ -443,7 +443,7 @@ Ustiga bosib nusxalab olishingiz mumkin
             }
             for user in top_20_user:
                 medal = top_3.get(str(counter), counter)
-                _msg_ += f"{medal}. {user.fullname} - {user.monthly_earned} 💎\n"
+                _msg_ += f"{medal}. {user.fullname} - {user.weekly_earned} 💎\n"
                 counter += 1
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text=_msg_,
@@ -774,10 +774,10 @@ def get_custom_promo(update: Update, context: CallbackContext):
                                                                    promo_code=first_promo)
     if custom_promo_code_account.exists():
         update.message.reply_text(
-            "❌ Siz allaqachon ushbu promo kodni ishlatgansiz.",
+            "Hmm ayyorlik qilmang) Siz allaqachon ushbu promo kodni ishlatgansiz😏",
             reply_markup=keyword.base()
         )
-        return state.CHECK_PROMO
+        return state.CHECK_PROMO    `
     if first_promo.count > 0:
         first_promo.count -= 1
         first_promo.save()
@@ -819,7 +819,7 @@ def get_custom_promo(update: Update, context: CallbackContext):
 
     else:
         update.message.reply_text(
-            "❌ Kechirasiz, bu promo kodning limitlari tugagan.",
+            "Bu promo kodni limiti tugagan. Ulgurmagan — kutadi 😉.",
             reply_markup=keyword.base()
         )
 

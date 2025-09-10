@@ -5,7 +5,7 @@ from app.models import CustomUser, TopUser
 from celery.result import AsyncResult
 from django.conf import settings
 import requests
-
+from html import escape
 
 # ---------------------------------------------->
 API_TOKEN = settings.TOKEN
@@ -94,34 +94,66 @@ def send_advert_to_all(self, chat_id, message_id, method="copyMessage", button_d
 TELEGRAM_BOT_TOKEN = settings.TOKEN
 GROUP_CHAT_ID = -1002275382452  # O'zgartiring
 
+MAX_TG_LEN = 4096
+SAFE_MARGIN = 200  # sarlavha/formatlash uchun buffer
+
+def _chunk_and_send(text: str) -> None:
+    """
+    Telegram 4096 limitini hisobga olib, matnni bo'lib-bo'lib yuboradi.
+    """
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    start = 0
+    while start < len(text):
+        end = min(len(text), start + MAX_TG_LEN - SAFE_MARGIN)
+        # bo'lakni qator bo'yicha bo'lib yuboramiz
+        if end < len(text):
+            nl = text.rfind("\n", start, end)
+            if nl > start:
+                end = nl
+        chunk = text[start:end]
+        r = requests.post(url, data={
+            "chat_id": GROUP_CHAT_ID,
+            "text": chunk,
+            "parse_mode": "HTML",
+            "disable_web_page_preview": True,
+        }, timeout=20)
+        r.raise_for_status()
+        start = end
 
 @shared_task
-def reset_weekly_earned_and_send_report():
-    top_users = TopUser.objects.order_by('-weekly_earned')[:10]
+def reset_weekly_earned_and_send_report() -> str:
+    """
+    Haftalik Top 10 hisobotini guruhga yuboradi va so'ng weekly_earned ni 0 ga tushiradi.
+    HTML-escape qo'llangan; xabar uzun bo'lsa bo'lib yuboriladi.
+    """
+    # 1) Top10 ni o'qiymiz
+    top_users = list(TopUser.objects.order_by('-weekly_earned')[:10])
 
+    # Top bo'sh bo'lsa – faqat xabar yuboramiz
     if not top_users:
-        return "Top userlar yo‘q"
+        info = "📊 <b>Haftalik Top:</b>\n\nHali natijalar yo‘q."
+        try:
+            _chunk_and_send(info)
+        except Exception as e:
+            return f"Xabar yuborishda xatolik (bo'sh): {e}"
+        # Reset shart emas, lekin baribir:
+        TopUser.objects.update(weekly_earned=0)
+        return "Bo'sh top yuborildi va weekly_earned tozalandi"
 
-    # 1. Hisobot tuzish
-    report_lines = ["📊 *Haftalik Top 10 foydalanuvchilar:*"]
-    for idx, user in enumerate(top_users, 1):
-        report_lines.append(f"{idx}. {user.fullname} — {user.weekly_earned:,} so'm")
+    # 2) Hisobot matni (HTML-escape!)
+    lines = ["📊 <b>Haftalik Top 10 foydalanuvchilar:</b>", ""]
+    for idx, u in enumerate(top_users, 1):
+        name = escape(u.fullname or str(u.chat_id))
+        # 💎 ishlatayotganingiz uchun “so'm” emas, emoji qoldirdim; xohlasangiz ' so\'m' deb yozing
+        lines.append(f"{idx}. {name} — {u.weekly_earned:,} 💎")
+    report = "\n".join(lines)
 
-    report = "\n".join(report_lines)
+    # 3) Yuborish (bo'lib yuboradi)
+    try:
+        _chunk_and_send(report)
+    except Exception as e:
+        return f"Xabar yuborishda xatolik: {e}"
 
-    # 2. Telegram API orqali yuborish
-    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    payload = {
-        'chat_id': GROUP_CHAT_ID,
-        'text': report,
-        'parse_mode': 'Markdown'
-    }
-    response = requests.post(url, data=payload)
-
-    if response.status_code != 200:
-        return f"Xabar yuborishda xatolik: {response.text}"
-
-    # 3. weekly_earned ni nolga tushurish
+    # 4) Reset
     TopUser.objects.update(weekly_earned=0)
-
-    return "Top userlar yuborildi va weekly_earned tozalandi"
+    return "Top yuborildi va weekly_earned tozalandi"

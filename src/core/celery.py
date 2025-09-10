@@ -12,6 +12,6 @@ from celery.schedules import crontab
 app.conf.beat_schedule = {
     'reset-weekly-topusers-every-sunday-night': {
         'task': 'app.bot.tasks.reset_weekly_earned_and_send_report',
-        'schedule': crontab(hour=23, minute=59, day_of_week=6),  # har yakshanba, 23:59 da
+        'schedule': crontab(hour=23, minute=59, day_of_week='sunday'),  # har yakshanba, 23:59 da
     },
 }
