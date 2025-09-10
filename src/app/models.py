@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.validators import MinValueValidator
 from decimal import Decimal
 
+
 # class CustomUserManager(BaseUserManager):
 #     def create_user(self, username, email, password=None):
 #         if not email:
@@ -451,6 +452,9 @@ class UserAnswer(models.Model):
     total_attempts = models.PositiveIntegerField(default=0)  # jami nechta test ishlagan
     daily_attempts = models.PositiveIntegerField(default=0)  # bugun nechta test ishlagan
     daily_attempts_date = models.DateField(null=True, blank=True)  # bu counter qaysi kunga tegishli
+
+    def __str__(self):
+        return f"{self.user.chat_id} - Correct: {self.correct_count}, Total: {self.total_count}"
 
 
 class GlobalTestSettings(models.Model):

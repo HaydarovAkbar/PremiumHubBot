@@ -96,11 +96,22 @@ def _progress_header(data: dict) -> str:
     start_balance = data.get("start_balance", Decimal("0.00"))
 
     earned_so_far = per * Decimal(correct)
+    if step == 1:
+        icon = "😴"
+    else:
+        accuracy = (correct / (step - 1) * 100) if step > 0 else 0.0
+        accuracy = max(0.0, min(accuracy, 100.0))  # clamp 0..100
+
+        EMOJI_BUCKETS = ["😡", "😕", "🙂", "😃", "🤩"]  # 0-19,20-39,40-59,60-79,80-100
+        idx = min(int(accuracy) // 20, 4)
+        icon = EMOJI_BUCKETS[idx]
+        icon = f"{accuracy:.1f}%  {icon}"
 
     header = f"""
-🎮 <b>TEST BOSHLANDI!</b> ({step}/{total})  
+🎮 <b>TEST BOSHLANDI!</b> ({step}/{total}) 
 _________________________
-⭐️ To‘g‘ri: {correct}  
+⭐️ To‘g‘ri: {correct}
+📉 Aniqlik: {icon}
 💎 Bonus: {earned_so_far}  
 💳 Balans: {start_balance + earned_so_far}
 _________________________
@@ -137,10 +148,6 @@ def _send_next(update: Update, context: CallbackContext) -> int:
             row = []
     if row:
         buttons.append(row)
-    # buttons.append([InlineKeyboardButton("🏁 Yakunlash va balansga o'tkazish", callback_data="tb_finish")])
-    # is_last = (i + 1 == len(qids))
-    # if is_last:  # faqat oxirgi savolda chiqaramiz
-    #     buttons.append([InlineKeyboardButton("🏁 Yakunlash va balansga o'tkazish", callback_data="tb_finish")])
 
     kb = InlineKeyboardMarkup(buttons)
 
@@ -204,7 +211,7 @@ def entry_test_bonus(update: Update, context: CallbackContext) -> int:
 _______________________
 📊 Savollar: {len(qids)} ta
 💎 Har to‘g‘ri javob: {s.per_correct_bonus}
-🎁 Hammasi to‘g‘ri bo‘lsa: {s.full_completion_bonus}
+🎁 Hammasi to‘g‘ri bo‘lsa: {s.full_completion_bonus}💎
 💰 Avto-cashout: har {s.auto_cashout_every_correct or 0} ta to‘g‘ri
 """
 

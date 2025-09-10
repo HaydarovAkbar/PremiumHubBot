@@ -165,7 +165,11 @@ def universal_callback_data(update: Update, context: CallbackContext):
             query.delete_message()
             context.bot.send_message(
                 chat_id=update.effective_user.id,
-                text="Promo kodni yuboring:",
+                text=(
+                    "Promo kodni yuboring:\n\n"
+                    "👉 <a href='https://t.me/Premiumhub_Promo/9'>Promo nima?</a>"
+                ),
+                parse_mode="HTML",disable_web_page_preview=True
             )
             return 12
 
@@ -777,7 +781,7 @@ def get_custom_promo(update: Update, context: CallbackContext):
             "Hmm ayyorlik qilmang) Siz allaqachon ushbu promo kodni ishlatgansiz😏",
             reply_markup=keyword.base()
         )
-        return state.CHECK_PROMO    `
+        return state.CHECK_PROMO
     if first_promo.count > 0:
         first_promo.count -= 1
         first_promo.save()
