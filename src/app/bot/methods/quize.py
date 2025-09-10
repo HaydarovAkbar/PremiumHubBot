@@ -49,6 +49,7 @@ savol matni 2
 a|b|c|d|e|f
 
 savol matni 3
+a|b|c|d|e|f
 
 <code>#Eslatma:</code>
 Har bir savol yangi qatorda bo'lishi kerak
@@ -168,56 +169,12 @@ def quiz_add_more(update: Update, context: CallbackContext) -> int:
         return state.QUIZ_QUESTION
     elif response in ['yo\'q', 'no', 'n']:
         update.message.reply_text("Quiz yaratish tugallandi. Rahmat!", reply_markup=keyword.admin_base())
-        return ConversationHandler.END
+        return state.ADMIN
     else:
         update.message.reply_text("Iltimos, faqat 'ha' yoki 'yo'q' deb javob bering.")
         return state.QUIZ_ADD_MORE
 
 
-# def delete_quiz(update: Update, context: CallbackContext) -> int:
-#     chat_id = update.effective_chat.id
-#     try:
-#         custom_user = CustomUser.objects.get(chat_id=chat_id, is_admin=True)
-#     except CustomUser.DoesNotExist:
-#         return ConversationHandler.END
-#
-#     quizzes = Quiz.objects.all()
-#     if not quizzes.exists():
-#         update.message.reply_text("Hozircha hech qanday quiz mavjud emas.", reply_markup=keyword.admin_base())
-#         return ConversationHandler.END
-#
-#     buttons = [[InlineKeyboardButton(q.title, callback_data=f"delete_{q.id}")] for q in quizzes]
-#     reply_markup = InlineKeyboardMarkup(buttons)
-#
-#     update.message.reply_text("Iltimos, o'chirmoqchi bo'lgan quizni tanlang:", reply_markup=reply_markup)
-#     return state.QUIZ_DELETE_SELECT
-#
-#
-# def quiz_delete_select(update: Update, context: CallbackContext) -> int:
-#     query = update.callback_query
-#     query.answer()
-#     data = query.data
-#     context.bot.send_message(
-#         chat_id=update.effective_chat.id,
-#         text=f"Quiz o'chirilmoqda, iltimos kuting... {data}"
-#     )
-#     if not data.startswith("delete_"):
-#         query.edit_message_text("Noto'g'ri tanlov. Iltimos, qayta urinib ko'ring.", reply_markup=keyword.admin_base())
-#         return ConversationHandler.END
-#
-#     quiz_id = int(data.split("_")[1])
-#     try:
-#         quiz = Quiz.objects.get(id=quiz_id)
-#         Question.objects.filter(quiz=quiz).delete()
-#         quiz.delete()
-#         query.edit_message_text(f"Quiz '{quiz.title}' muvaffaqiyatli o'chirildi.", reply_markup=keyword.admin_base())
-#     except Quiz.DoesNotExist:
-#         query.edit_message_text("Tanlangan quiz topilmadi. Iltimos, qayta urinib ko'ring.", reply_markup=keyword.admin_base())
-#
-#     return ConversationHandler.END
-
-
-# 1) Quizzarni tanlash
 def delete_quiz(update: Update, context: CallbackContext) -> int:
     chat_id = update.effective_chat.id
     try:
@@ -228,7 +185,7 @@ def delete_quiz(update: Update, context: CallbackContext) -> int:
     quizzes = Quiz.objects.order_by('-created_at')
     if not quizzes.exists():
         update.message.reply_text("Hozircha hech qanday quiz mavjud emas.", reply_markup=keyword.admin_base())
-        return ConversationHandler.END
+        return state.ADMIN
 
     # prefiks: quizsel:<id>
     buttons, row = [], []
@@ -255,14 +212,14 @@ def quiz_admin_panel(update: Update, context: CallbackContext) -> int:
     m = re.match(r"^(?:quizsel|quizpanel):(\d+)$", data)
     if not m:
         query.edit_message_text("Noto‘g‘ri tanlov.", reply_markup=keyword.admin_base())
-        return ConversationHandler.END
+        return state.ADMIN
 
     quiz_id = int(m.group(1))
     try:
         quiz = Quiz.objects.get(id=quiz_id)
     except Quiz.DoesNotExist:
         query.edit_message_text("Quiz topilmadi.", reply_markup=keyword.admin_base())
-        return ConversationHandler.END
+        return state.ADMIN
 
     qcount = quiz.questions.count()
     text = f"🧩 <b>{quiz.title}</b>\n\nSavollar soni: <b>{qcount}</b>"
@@ -344,10 +301,10 @@ def quiz_delete_run(update: Update, context: CallbackContext) -> int:
             cnt = quiz.questions.count()
             quiz.questions.all().delete()
             quiz.delete()
-        query.edit_message_text(f"✅ Quiz '{title}' va {cnt} ta savol o‘chirildi.", reply_markup=keyword.admin_base())
+        query.edit_message_text(f"✅ Quiz '{title}' va {cnt} ta savol o‘chirildi.")
     except Quiz.DoesNotExist:
         query.edit_message_text("Quiz topilmadi.", reply_markup=keyword.admin_base())
-    return ConversationHandler.END
+    return state.ADMIN
 
 # 5) Bitta savolni o‘chirish – tasdiqlash va bajarish
 def question_delete_confirm(update: Update, context: CallbackContext) -> int:
@@ -430,4 +387,4 @@ def universal_quiz_callback_data(update: Update, context: CallbackContext) -> in
             query.edit_message_reply_markup(reply_markup=None)
         except Exception:
             pass
-        return ConversationHandler.END
+        return state.ADMIN

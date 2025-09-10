@@ -96,37 +96,30 @@ def compute_bonus(correct: int, total: int, per_correct_bonus: Decimal, full_com
 
 # ======== YAKUNDA BARCHASINI DB'ga YOZISH ========
 
-@transaction.atomic
-def flush_results_to_db(user: CustomUser, correct: int, total: int, earned: Decimal) -> None:
-    """
-    Yakunda bitta transaksiyada:
-    - UserAnswer (aggregatlar)
-    - CustomUserAccount (current/total)
-    - TopUser (balance/earned)
-    """
-    # 1) UserAnswer
-    ua = _get_or_create_ua(user)
-    ua.correct_count += correct
-    ua.total_count += total
-    if total and correct == total:
-        ua.is_winner = True
-    ua.save(update_fields=["correct_count", "total_count", "is_winner", "updated_at"])
 
-    # 2) CustomUserAccount (Decimal)
+@transaction.atomic
+def flush_partial_to_db(user: CustomUser, delta_correct: int, delta_total: int, earned: Decimal) -> None:
+    """Sessiya tugamasdan turib, topilgan bonusning bir qismini balansga o'tkazish."""
+    # 1) UserAnswer aggregatga qo‘shamiz
+    ua, _ = UserAnswer.objects.select_for_update().get_or_create(user=user)
+    ua.correct_count += delta_correct
+    ua.total_count += delta_total
+    ua.save(update_fields=["correct_count","total_count","updated_at"])
+
+    # 2) Foydalanuvchi account
     acc, _ = CustomUserAccount.objects.select_for_update().get_or_create(chat_id=user.chat_id)
     acc.current_price += earned
     acc.total_price += earned
-    acc.save(update_fields=["current_price", "total_price"])
+    acc.save(update_fields=["current_price","total_price"])
 
-    # 3) TopUser (integer balans/earned bo‘lsa)
+    # 3) TopUser
     tu, _ = TopUser.objects.select_for_update().get_or_create(
         chat_id=user.chat_id,
         defaults={"fullname": f"{(user.first_name or '').strip()} {(user.last_name or '').strip()}".strip()}
     )
-    int_earned = int(earned)  # agar so‘m integer bo‘lsa
+    int_earned = int(earned)
     tu.balance += int_earned
     tu.total_earned += int_earned
-    # Eslatma: weekly/monthly reset uchun cron tavsiya etiladi; hozircha faqat yig‘amiz.
     tu.weekly_earned += int_earned
     tu.monthly_earned += int_earned
-    tu.save(update_fields=["balance", "total_earned", "weekly_earned", "monthly_earned", "updated_at"])
+    tu.save(update_fields=["balance","total_earned","weekly_earned","monthly_earned","updated_at"])

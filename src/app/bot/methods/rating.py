@@ -41,4 +41,5 @@ Haftalik va oylik konkurslarda qatnashing <b>Telegram Premium va Telegram starsâ
             caption=_msg,
             reply_markup=keyword.rating(),
         )
+        # update.message.reply_text(_msg, parse_mode=ParseMode.HTML, reply_markup=keyword.rating())
         return state.RATING

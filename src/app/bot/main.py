@@ -101,6 +101,7 @@ all_handler = ConversationHandler(
             CommandHandler('stories', get_all_stories),
             CallbackQueryHandler(on_answer, pattern=r"^tb:\d+:\d+$"),
             CallbackQueryHandler(on_finish_now, pattern=r"^tb_finish$"),
+            MessageHandler(Filters.regex('^(' + "Menyuga qaytish ⬅️" + ')$'), on_finish_now),
         ],
         state.CHECK_CHANNEL: [
             CommandHandler('start', start),
@@ -301,24 +302,24 @@ all_handler = ConversationHandler(
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][7] + ')$'), adminstrator),
             MessageHandler(Filters.regex('^(' + key_msg.base['uz'][8] + ')$'), entry_test_bonus),
         ],
-        state.CHECK_PROMO: [
-            CommandHandler('start', start),
-            CommandHandler('admin', admin_base),
-            CommandHandler('promo', info_promo),
-            CommandHandler('promocodes', get_all_promo_codes),
-            CommandHandler('stories', get_all_stories),
-
-            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][0] + ')$'), get_free_premium_and_stars),
-            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][1] + ')$'), get_premium_prices),
-            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][2] + ')$'), get_stars_prices),
-            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][3] + ')$'), get_rating_base),
-            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][4] + ')$'), get_bonus_base),
-            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][5] + ')$'), my_account),
-            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][6] + ')$'), manual),
-            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][7] + ')$'), adminstrator),
-            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][8] + ')$'), entry_test_bonus),
-            MessageHandler(Filters.all, get_custom_promo),
-        ],
+        # state.CHECK_PROMO: [
+        #     CommandHandler('start', start),
+        #     CommandHandler('admin', admin_base),
+        #     CommandHandler('promo', info_promo),
+        #     CommandHandler('promocodes', get_all_promo_codes),
+        #     CommandHandler('stories', get_all_stories),
+        #
+        #     MessageHandler(Filters.regex('^(' + key_msg.base['uz'][0] + ')$'), get_free_premium_and_stars),
+        #     MessageHandler(Filters.regex('^(' + key_msg.base['uz'][1] + ')$'), get_premium_prices),
+        #     MessageHandler(Filters.regex('^(' + key_msg.base['uz'][2] + ')$'), get_stars_prices),
+        #     MessageHandler(Filters.regex('^(' + key_msg.base['uz'][3] + ')$'), get_rating_base),
+        #     MessageHandler(Filters.regex('^(' + key_msg.base['uz'][4] + ')$'), get_bonus_base),
+        #     MessageHandler(Filters.regex('^(' + key_msg.base['uz'][5] + ')$'), my_account),
+        #     MessageHandler(Filters.regex('^(' + key_msg.base['uz'][6] + ')$'), manual),
+        #     MessageHandler(Filters.regex('^(' + key_msg.base['uz'][7] + ')$'), adminstrator),
+        #     MessageHandler(Filters.regex('^(' + key_msg.base['uz'][8] + ')$'), entry_test_bonus),
+        #     MessageHandler(Filters.all, get_custom_promo),
+        # ],
         state.GET_PROMO_CODE: [
             CommandHandler('start', start),
             CommandHandler('admin', admin_base),
@@ -373,8 +374,6 @@ all_handler = ConversationHandler(
 
             MessageHandler(Filters.regex('^(' + "➕ Test qo'shish" + ')$'), add_quiz),
             MessageHandler(Filters.regex('^(' + "➖ Test o'chirish" + ')$'), delete_quiz),
-            MessageHandler(Filters.regex('^(' + "📈 Test Reyting" + ')$'), add_promo_code),
-            MessageHandler(Filters.regex('^(' + "⚙️ Test Sozlamalar" + ')$'), check_custom_promo_code),
         ],
         state.CANCEL_UNBAN: [
             CommandHandler('start', start),
@@ -589,7 +588,26 @@ all_handler = ConversationHandler(
 
             MessageHandler(Filters.regex('^(' + "➖ Test o'chirish" + ')$'), delete_quiz),
             MessageHandler(Filters.regex('^(' + key_msg.back['uz'] + ')$'), admin_base),
-        ]
+        ],
+
+        12: [
+            CommandHandler('start', start),
+            CommandHandler('admin', admin_base),
+            CommandHandler('promo', info_promo),
+            CommandHandler('promocodes', get_all_promo_codes),
+            CommandHandler('stories', get_all_stories),
+
+            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][0] + ')$'), get_free_premium_and_stars),
+            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][1] + ')$'), get_premium_prices),
+            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][2] + ')$'), get_stars_prices),
+            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][3] + ')$'), get_rating_base),
+            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][4] + ')$'), get_bonus_base),
+            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][5] + ')$'), my_account),
+            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][6] + ')$'), manual),
+            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][7] + ')$'), adminstrator),
+            MessageHandler(Filters.regex('^(' + key_msg.base['uz'][8] + ')$'), entry_test_bonus),
+            MessageHandler(Filters.all, get_custom_promo),
+        ],
     },
     fallbacks=[CommandHandler('start', start),
                CommandHandler('admin', admin_base),
@@ -608,7 +626,7 @@ all_handler = ConversationHandler(
                MessageHandler(Filters.regex('^(' + key_msg.base['uz'][7] + ')$'), adminstrator),
                MessageHandler(Filters.regex('^(' + key_msg.base['uz'][8] + ')$'), entry_test_bonus),
                # MessageHandler(Filters.all, get_file_url),
-               MessageHandler(Filters.text, get_custom_promo),
+               # MessageHandler(Filters.text, get_custom_promo),
                ],
 )
 # new_member_handler = MessageHandler(Filters.status_update.new_chat_members, new_member_handler)

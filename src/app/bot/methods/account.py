@@ -1,10 +1,10 @@
 from datetime import datetime
-
+from django.db.models import F, FloatField, ExpressionWrapper, Q
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 from app.models import CustomUser, Channel, Prices, StarsPrices, RewardsChannelBoost, DailyBonus, StoryBonusPrice, \
     StoryBonusAccounts, Group, CustomUserAccount, InvitedUser, Settings, SpendPrice, SpendPriceField, PromoCodes, \
-    InterestingBonus, TopUser, InvitedBonusUser, InterestingBonusUser, CustomPromoCode, CustomUserPromoCode
+    InterestingBonus, TopUser, InvitedBonusUser, InterestingBonusUser, CustomPromoCode, CustomUserPromoCode, UserAnswer
 
 from ..keyboards.base import Keyboards
 from ..states import States
@@ -167,7 +167,7 @@ def universal_callback_data(update: Update, context: CallbackContext):
                 chat_id=update.effective_user.id,
                 text="Promo kodni yuboring:",
             )
-            return state.CHECK_PROMO
+            return 12
 
         elif query.data == 'get_promo_code':
             spend_field = SpendPriceField.objects.get(id=context.chat_data['promo_code'])
@@ -350,6 +350,62 @@ Ustiga bosib nusxalab olishingiz mumkin
                                      parse_mode="HTML",
                                      reply_markup=keyword.interesting_check_biobonus())
             return state.INTERESTING_BONUS_BIO
+
+        elif query.data == 'smart_rating':
+            query.answer(text="Hisoblanmoqda… 🔎")
+            days = 30  # so‘nggi 30 kun
+            min_total = 10  # kamida 10 ta savol ishlagan bo‘lsin
+
+            cutoff = timezone.now() - timedelta(days=days)
+
+            qs = UserAnswer.objects.filter(
+                total_count__gte=min_total,
+                last_answered_at__gte=cutoff,
+            ).annotate(
+                accuracy=ExpressionWrapper(
+                    F('correct_count') * 100.0 / F('total_count'),
+                    output_field=FloatField()
+                )
+            ).order_by('-accuracy', '-correct_count')[:10]
+
+            if not qs:
+                context.bot.send_message(
+                    chat_id=update.effective_user.id,
+                    text=f"🧠 Top aqillilar ro‘yxati hozircha bo‘sh.\n"
+                         f"(So‘nggi {days} kunda kamida {min_total} ta savol ishlaganlar ko‘rinadi.)"
+                )
+                return state.START
+
+            # Medallar
+            top_medals = {1: "🥇", 2: "🥈", 3: "🥉"}
+
+            lines = ["🧠 Top aqillilar(aniqlik bo‘yicha)\n\n"]
+            rank = 1
+            for ua in qs:
+                # ism-familiya
+                try:
+                    u = ua.user
+                    fullname = (u.first_name or "") + (" " + u.last_name if u.last_name else "")
+                    if not fullname.strip():
+                        fullname = u.username or str(u.chat_id)
+                except Exception:
+                    fullname = str(ua.user_id)
+
+                medal = top_medals.get(rank, f"{rank}.")
+                acc = round(ua.accuracy, 2)
+                lines.append(
+                    f"{medal} {fullname} — {acc}%  "
+                    f"(✅ {ua.correct_count} / {ua.total_count})"
+                )
+                rank += 1
+
+            context.bot.send_message(
+                chat_id=update.effective_user.id,
+                text="\n".join(lines),
+                # parse_mode="HTML",
+            )
+            return state.START
+
         elif query.data == 'top_rating':
             query.answer(text="Iltimos kuting... 🔄")
             _msg_ = "🏆TOP 20 ta foydalanuvchilar:\n\n"
@@ -679,7 +735,7 @@ Ustiga bosib nusxalab olishingiz mumkin
                 if spend_field.price >= account.current_price:
                     query.answer(
                         f"""
-                        Ush bu taklifdan foydalanish uchun sizga yana {spend_field.price - account.current_price} 💎 yetishmayapti!
+                        Ushbu taklifdan foydalanish uchun sizga yana {spend_field.price - account.current_price} 💎 yetishmayapti!
                         """, show_alert=True
                     )
                 else:

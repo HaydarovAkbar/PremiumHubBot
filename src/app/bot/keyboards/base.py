@@ -130,7 +130,8 @@ class Keyboards:
             [InlineKeyboardButton(
                 "🏆 Haftalik TOP Reyting",
                 callback_data='weekly_rating'
-            )]
+            )],
+            [InlineKeyboardButton("🧠 Top aqillilar", callback_data='smart_rating')],  # ⬅️ yangi
         ])
 
     @staticmethod
@@ -140,10 +141,10 @@ class Keyboards:
                 "⭐ Kanalga ovoz berib bonus olish",
                 callback_data='premium_bonus'
             )],
-            [InlineKeyboardButton(
-                "🫂 Guruhga odam qo'shish orqali pul ishlash",
-                callback_data='add_group_bonus'
-            )],
+            # [InlineKeyboardButton(
+            #     "🫂 Guruhga odam qo'shish orqali pul ishlash",
+            #     callback_data='add_group_bonus'
+            # )],
             [InlineKeyboardButton(
                 "🔗 Stories bonus",
                 callback_data='stories_bonus'
@@ -293,7 +294,6 @@ class Keyboards:
             ["📊 Umumiy Statistika", "🔓 Bandan olish"],
             ["📤 Promo kod kiritish", "💳 Promo kod tekshirish"],
             ["➕ Test qo'shish", "➖ Test o'chirish"],
-            ["📈 Test Reyting", "⚙️ Test Sozlamalar"],
         ], resize_keyboard=True)
 
     @staticmethod

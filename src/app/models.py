@@ -482,8 +482,13 @@ class GlobalTestSettings(models.Model):
     pass_threshold_correct = models.PositiveIntegerField(
         null=True, blank=True, help_text="O‘tish uchun zarur to‘g‘ri javoblar soni"
     )
-    shuffle_options = models.BooleanField(default=True)
-    allow_repeat_questions = models.BooleanField(default=False)
+    shuffle_options = models.BooleanField(default=True, verbose_name="Variantlarni aralashtirish")
+    allow_repeat_questions = models.BooleanField(default=False, verbose_name="Savollarni takrorlashga ruxsat berish")
+
+    auto_cashout_every_correct = models.PositiveIntegerField(
+        null=True, blank=True,
+        help_text="Nechta to‘g‘ri javobdan keyin avtomatik balansga o‘tkazilsin (masalan 10)."
+    )
 
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
