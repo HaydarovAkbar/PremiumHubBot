@@ -96,6 +96,12 @@ _________________
 
 
 def universal_callback_data(update: Update, context: CallbackContext):
+    query = update.callback_query
+    try:
+        query.answer()  # ✅ DARHOL
+    except Exception:
+        pass
+
     all_channel = Channel.objects.filter(is_active=True)
     left_channel = []
     for channel in all_channel:
@@ -124,7 +130,7 @@ def universal_callback_data(update: Update, context: CallbackContext):
 
 
         elif query.data == 'send_admin':
-            query.answer()
+            # query.answer()
             promo_code = context.chat_data['promo_code']
             promo_db = PromoCodes.objects.get(name=promo_code)
             spent_field = SpendPriceField.objects.get(name=promo_db.reward)
@@ -161,7 +167,7 @@ def universal_callback_data(update: Update, context: CallbackContext):
                                      reply_markup=keyword.base())
             return state.START
         elif query.data == 'add_custom_promo':
-            query.answer()
+            # query.answer()
             query.delete_message()
             context.bot.send_message(
                 chat_id=update.effective_user.id,
@@ -272,7 +278,7 @@ Admin sizga taklif doirasidagi xizmatni faollashtiradi.
             return state.START
 
         elif query.data == 'nik':
-            query.answer()
+            # query.answer()
             query.delete_message()
             interesting_bonus = InterestingBonus.objects.filter().last()
             _msg_ = f"""
@@ -340,7 +346,7 @@ Ustiga bosib nusxalab olishingiz mumkin
             # reply_markup=keyword.interesting_check_bonus())
             return state.INTERESTING_BONUS_NIK
         elif query.data == 'bio':
-            query.answer()
+            # query.answer()
             query.delete_message()
             interesting_bonus = InterestingBonus.objects.filter().last()
             _msg_ = f"""
