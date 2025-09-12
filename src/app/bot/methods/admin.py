@@ -430,6 +430,9 @@ def info_promo(update: Update, context: CallbackContext):
 🆔 PromoUSER_ID: <code>{promo_user.chat_id}</code>
 ☎️ PromoUSER_PHONE: +{promo_user.phone_number}
 """,
+                )
+                update.message.reply_html(
+                    "<b>Yuqoridagi promo kodni passive qilish uchun pastdagi tugmani bosing!</b>",
                     reply_markup=keyword.passive()
                 )
                 context.chat_data["promo_code"] = promo

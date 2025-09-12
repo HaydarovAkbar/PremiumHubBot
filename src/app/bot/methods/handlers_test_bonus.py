@@ -302,6 +302,7 @@ def _finish(update: Update, context: CallbackContext) -> int:
     correct = int(data.get("correct", 0))
     total = len(data.get("qids", []))
     per = data.get("per", Decimal("0.00"))
+
     full = data.get("full", Decimal("0.00"))
     start_balance = data.get("start_balance", Decimal("0.00"))
 
@@ -319,7 +320,7 @@ def _finish(update: Update, context: CallbackContext) -> int:
     if final_full_bonus:
         flush_partial_to_db(user, 0, 0, final_full_bonus)
         start_balance += final_full_bonus
-
+    earned_so_far = per * Decimal(correct)
     mot = motivational_text(correct, total)
 
     result_text = f"""
@@ -327,8 +328,8 @@ def _finish(update: Update, context: CallbackContext) -> int:
 _______________________
 📊 Umumiy savollar: {total}ta
 ✅ To‘g‘ri javoblar: {correct}
-💎 Yig‘ilgan bonus: +{leftover_earned}
-💳 Balansingiz: {start_balance}
+💎 Yig‘ilgan bonus: +{earned_so_far}
+💳 Balansingiz: {start_balance + earned_so_far}
 _______________________
 <code>{mot}</code>
 """

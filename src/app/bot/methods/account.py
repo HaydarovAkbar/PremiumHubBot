@@ -96,12 +96,6 @@ _________________
 
 
 def universal_callback_data(update: Update, context: CallbackContext):
-    query = update.callback_query
-    try:
-        query.answer()  # ✅ DARHOL
-    except Exception:
-        pass
-
     all_channel = Channel.objects.filter(is_active=True)
     left_channel = []
     for channel in all_channel:
@@ -122,6 +116,7 @@ def universal_callback_data(update: Update, context: CallbackContext):
         query = update.callback_query
         account, _ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id, )
         if query.data == 'back':
+            query.answer()
             query.delete_message()
             context.bot.send_message(chat_id=update.effective_user.id,
                                      text="Menyuga qaytdik!",
@@ -130,7 +125,7 @@ def universal_callback_data(update: Update, context: CallbackContext):
 
 
         elif query.data == 'send_admin':
-            # query.answer()
+            query.answer()
             promo_code = context.chat_data['promo_code']
             promo_db = PromoCodes.objects.get(name=promo_code)
             spent_field = SpendPriceField.objects.get(name=promo_db.reward)
@@ -167,7 +162,7 @@ def universal_callback_data(update: Update, context: CallbackContext):
                                      reply_markup=keyword.base())
             return state.START
         elif query.data == 'add_custom_promo':
-            # query.answer()
+            query.answer()
             query.delete_message()
             context.bot.send_message(
                 chat_id=update.effective_user.id,
@@ -180,6 +175,7 @@ def universal_callback_data(update: Update, context: CallbackContext):
             return 12
 
         elif query.data == 'get_promo_code':
+            query.answer()
             spend_field = SpendPriceField.objects.get(id=context.chat_data['promo_code'])
             user_account, __ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id)
             user_account.current_price -= spend_field.price
@@ -232,6 +228,7 @@ Admin sizga taklif doirasidagi xizmatni faollashtiradi.
             return state.SEND_PROMO_CODE
 
         elif query.data == 'spend':
+            query.answer()
             from django.utils.timezone import now
 
             account, _ = CustomUserAccount.objects.get_or_create(chat_id=update.effective_user.id)
@@ -278,7 +275,7 @@ Admin sizga taklif doirasidagi xizmatni faollashtiradi.
             return state.START
 
         elif query.data == 'nik':
-            # query.answer()
+            query.answer()
             query.delete_message()
             interesting_bonus = InterestingBonus.objects.filter().last()
             _msg_ = f"""

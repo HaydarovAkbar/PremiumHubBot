@@ -152,7 +152,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-HOST = 'https://b69d74112843.ngrok-free.app'
+HOST = 'https://5503606416e8.ngrok-free.app'
 USERNAME = 'HubPremiyumBot'
 ADMIN_USERNAME = 'premium_xizmatim'
 TOKEN = config('TOKEN')

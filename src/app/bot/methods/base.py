@@ -106,6 +106,9 @@ def start(update: Update, context: CallbackContext):
                                caption="Botni ishga tushirish uchun quyidagi kanallarga obuna bo’ling va “♻️ Tekshirish” tugmasini bosing",
                                reply_markup=keyword.channels(left_channel))
         return state.CHECK_CHANNEL
+    print(user)
+    print(user.__class__)
+    print(user.chat_id)
     if user.is_blocked:
         un_ban_button = InlineKeyboardMarkup(
             inline_keyboard=[
